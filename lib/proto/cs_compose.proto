@@ -1,0 +1,54 @@
+syntax = "proto3";
+package msg;
+
+import "comm_data.proto";
+
+// @desc 消耗组（一个消耗索引中可选择多个任意道具）
+message ConsumeGroup
+{
+    uint32 consume_id = 1;                      // 消耗索引ID
+    repeated ItemIdCount items = 2;             // 该消耗组中选择的道具列表
+}
+
+// @desc 客户端请求：查询玩家所有配方
+// @cmd CS_COMPOSE_GET_RECIPES
+message CS_Compose_Get_Recipes
+{
+}
+
+// @desc 服务器响应：返回玩家所有配方
+// @cmd SC_COMPOSE_GET_RECIPES
+message SC_Compose_Get_Recipes
+{
+    int32 result = 1;                           // 0=成功，其他值表示错误码
+    repeated uint32 recipe_ids = 2;             // 已解锁的配方ID列表
+}
+
+// @desc 客户端请求：执行合成
+// @cmd CS_COMPOSE_EXECUTE
+message CS_Compose_Execute
+{
+    uint32 recipe_id = 1;                       // 配方ID
+    repeated ConsumeGroup consume_groups = 2;   // 多个消耗组，每个消耗组使用消耗ID和配置进行匹配
+    uint32 compose_times = 3;                     // 合成次数
+}
+
+// @desc 服务器响应：返回合成结果
+// @cmd SC_COMPOSE_EXECUTE
+message SC_Compose_Execute
+{
+    int32 result = 1;                           // 0=成功，其他值表示错误码
+    repeated ConsumeGroup consume_groups = 2;    // 多个消耗组，每个消耗组使用消耗ID和配置进行匹配
+    repeated ItemIdCount produced_items = 3;    // 生成的道具
+    uint32 recipe_id = 4;                       // 执行的配方ID
+    uint32 compose_times = 5;                     // 合成次数
+}
+
+// @desc 服务器主动推送：配方解锁通知
+// @note 仅在 IsDefaultUnlock=false 的配方解锁时触发，默认解锁配方不会推送此通知
+// @cmd SC_COMPOSE_RECIPE_UNLOCK_NTF
+message SC_Compose_Recipe_Unlock_Ntf
+{
+    uint32 recipe_id = 1;                       // 新解锁的配方ID（不包含默认解锁配方）
+}
+

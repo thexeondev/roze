@@ -1,0 +1,64 @@
+syntax = "proto3";
+package msg;
+
+// desc 单条属性数据
+message PBAttribDataElem
+{
+    int32 attrib_type = 1;
+    int32 total_base = 2;       // 所有来源的基础加值累加（即白值）
+    int32 total_multi = 3;      // 所有来源的百分比累加（万分比）
+    int32 total_add = 4;        // 所有来源的额外加值累加
+}
+
+// @desc 单个角色的属性数据
+message PBCharacterAttribData
+{
+    uint64 inst_id = 1;
+    repeated PBAttribDataElem attrib_data = 2;
+}
+
+// @desc 请求属性数据
+// @cmd CS_OUTSIDE_ATTRIB_QUERY
+message CS_Outside_Attrib_Query
+{
+    repeated uint64 inst_id = 1;
+}
+
+// @desc 返回属性数据
+// @cmd SC_OUTSIDE_ATTRIB_QUERY
+message SC_Outside_Attrib_Query
+{
+    int32 result = 1;
+    repeated PBCharacterAttribData data = 2;
+}
+
+// @desc 返回属性数据
+// @cmd SC_OUTSIDE_ATTRIB_NTF
+message SC_Outside_Attrib_Ntf
+{
+    PBCharacterAttribData data = 1;
+}
+
+//--------------------通缉令仿生品属性-----------------------------------------------
+
+// @desc 请求属性数据
+// @cmd CS_WANTED_BIONICS_ATTRIB_QUERY
+message CS_Wanted_Bionics_Attrib_Query
+{
+    repeated uint64 inst_id = 1;
+}
+
+// @desc 返回属性数据
+// @cmd SC_WANTED_BIONICS_ATTRIB_QUERY
+message SC_Wanted_Bionics_Attrib_Query
+{
+    int32 result = 1;
+    repeated PBCharacterAttribData data = 2;
+}
+
+// @desc 返回属性数据
+// @cmd SC_WANTED_BIONICS_ATTRIB_NTF
+message SC_Wanted_Bionics_Attrib_Ntf
+{
+    PBCharacterAttribData data = 1;
+}

@@ -1,0 +1,49 @@
+syntax = "proto3";
+package msg;
+
+message PBBuffData
+{
+    uint32 id = 1;
+    int32 attach_time = 2;
+    int32 left_time = 3;
+    int32 left_battle = 4;
+}
+
+// @desc buff信息同步 请求
+// @cmd CS_BUFF_SYNC
+message CS_Buff_Sync
+{
+    int32 reserved = 1; // 无意义
+}
+
+// @desc buff信息同步 响应
+// @cmd SC_BUFF_SYNC
+message SC_Buff_Sync
+{
+    int32 result = 1;
+    repeated PBBuffData data = 2;
+}
+
+// @desc 添加buff通知
+// @cmd SC_BUFF_ADD
+message SC_Buff_Add
+{
+    int32 result = 1;
+    PBBuffData data = 2;
+}
+
+// @desc 移除buff通知
+// @cmd SC_BUFF_DEL
+message SC_Buff_Del
+{
+    int32 result = 1;
+    uint32 id = 2;
+}
+
+// @desc 更新buff通知
+// @cmd SC_BUFF_UPDATE
+message SC_Buff_Update
+{
+    int32 result = 1;
+    PBBuffData data = 2;
+}

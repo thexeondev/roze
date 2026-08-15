@@ -1,0 +1,1521 @@
+syntax = "proto3";
+
+package msg;
+option  go_package = "proto/GameMsg";
+
+enum EnmComm
+{
+    ENM_COMM_NONE = 0;
+}
+
+// 平台类型
+enum EnmPlatID
+{
+    ENM_PID_IOS     = 0; //  iOS
+    ENM_PID_ANDROID = 1; //  android
+    ENM_PID_PC      = 2; // PC
+}
+
+// 性别
+enum EnmGender
+{
+    ENM_GENDER_INVALID = 0; //  无效值
+    ENM_GENDER_MALE    = 1; //  男性
+    ENM_GENDER_FEMALE  = 2; //  女性
+    ENM_GENDER_MAX     = 3; //  最大性别
+}
+
+// 角色身份
+enum EnmRole
+{
+    ENM_ROLE_INVALID = 0; //  无效值
+    ENM_ROLE_MAIN    = 1; //  主角自己
+    ENM_ROLE_SECOND  = 2; //  另一个性别的主角(女主弟弟)
+}
+
+enum EnmSizeLimit
+{
+    option allow_alias          = true;
+    reserve                     = 0;
+    DENINE_WARNING              = 0;
+    MAX_TOKEN_LEN               = 1024; // token的最大长度
+    MAX_NAME_LEN                = 48;   // 角色名字的最大长度
+    MAX_ROLE_NUM_ONE_ACCOUNT    = 3;    // 最大角色个数
+    MAX_USERID_LEN              = 500;  // userid的最大长度
+    MAX_PASSWD_LEN              = 50;   // userid的最大长度
+    MAX_UDID_SIZE               = 100;   // udid的最大长度
+    MAX_ITEM_LEN                = 1000;  // 背包最大上限
+    MAX_ITEM_HOLE_GROUP_LEN     = 20;   // 背包共享组最大上限
+    MAX_CHARACTER_LEN           = 100;
+    MAX_SAVEPOINTS              = 300; // 最大存档点数量
+    MAX_EQUIP_POS               = 10;  // 装备槽
+    MAX_DYNAMIC_COLLECTION_LEN  = 1000;//动态采集物最大上限
+    MAX_STATIC_COLLECTION_LEN   = 2000;// 静态采集物最大上限
+    MAX_CORE_OBSERVE_COLLECTION_LEN = 500; // 核心观察收集品数量上限
+    MAX_URBAN_MEMORY_LEN = 10; // 城区记忆数量上限
+    MAX_URBAN_MEMORY_LEVEL_REWARDS_LEN = 30; // 单个城区记忆等级奖励数量上限
+    MAX_LIMIT_GROUP_LEN         = 50; // 限次组最大数量
+    MAX_BATTLE_PASS_LEN         = 10; // 战令最大数量
+    MAX_PATROL_MONSTER_LEN      = 300; // 巡逻怪最大数量
+    MAX_CHARACTER_TEAM_MEMBERS  = 4;  // 一个编队最多角色数
+    MAX_CHARACTER_TEAMS         = 15; // 最大编队数量
+    MAX_CHARACTER_NUMS          = 50; // 最大角色个数
+    MAX_TASKACTION_LEN          = 10;
+    MAX_PROCESSING_TASKS_LEN    = 1000;
+    MAX_COMPLETED_TASKS_LEN     = 4096;
+    MAX_TASK_ACCEPT_FINISHED_CONDS_LEN = 1024; // 待接取条件已完成集合上限
+    MAX_TASK_ACCEPT_UNLOCKED_TASKS_LEN = 300;  // 已解锁待接取任务集合上限
+    MAX_WHITE_ACCOUNT_OWNER_LEN = 30;
+    MAX_TEMP_GLOBAL_BUFF        = 10; // 最多临时局外buff种数（预留10种）
+    MAX_DUNGEONS_TYPE_INSTANCE_LEN = 20; // 副本类型实例数量
+    MAX_DUNGEONS_GROUP_LEN      = 200; // 副本组最大数量
+    MAX_ATTRIBUTE_COMPONENT_LEN = 10;
+    MAX_ATTRIBUTE_SYSTEM_LEN    = 10;
+    MAX_TEAM_NAME_LEN           = 43;   // 编队名字最大长度（14个汉字×3+1）
+    MAX_ATTRIBUTE_NUM           = 150;  // 局外属性列表
+    MAX_TRACKED_TARGETS_LEN     = 4;    // 追踪的 Target 最大数量
+    MAX_CHARGE_LEN              = 300;  //保存的最新充值记录条数
+    MAX_GOODS_ORDER_LEN         = 100;  //商品订单长度
+    MAX_ONLINE_BRIEF_ADDR_LEN   = 32;   // 源/目的地址最大长度
+    MAX_MSG_PKG_BODY_LEN        = 8096; // 协议正文最大长度（暂定为8K）
+    MAX_RETRY_PASS_REQ_LIST_LEN = 5;    // 待重新中转的协议的最大数量
+    MAX_CASES_LEN               = 50;   // 案件最大数量
+    MAX_CLUES_LEN               = 1000;  // 线索最大数量
+    MAX_EVIDENCES_LEN = 200; // 案件证据最大数量
+    MAX_CASE_PUBLISHED_STAGES_LEN = 50; // 案件已公布阶段最大数量
+    MAX_CASE_ENDING_STAGES_LEN = 50; // 案件已完成阶段最大数量
+    
+
+    MAX_GACHA_POOL_NUMS         = 20;   // 玩家身上的卡池信息数量
+    MAX_HOUSE_LEN               = 300;  // 拥有房子列表最大数量
+    MAX_HOUSE_MAIL_LEN          = 100;  // 房产邮件列表最大数量
+    MAX_HOUSE_GROUP_TARGET_NUM  = 5;   // 房产组目标最大数量
+    MAX_HOUSE_GROUP_NUM         = 50;   // 房产组最大数量
+    MAX_HOUSE_DISPATCH_CHAR_NUM = 5; // 房产派遣角色最大数量
+    MAX_HOUSE_SHOP_GOODS_NUM    = 100;  // 房产商店商品列表最大数量
+    MAX_HOUSE_FRAGMENT_NUM           = 200;  // 房产线索累积列表最大数量
+    MAX_HOUSE_TIMED_ITEM_PENDING_NUM    = 20;  // 房产 TimedItemOutput 待领取道具种类上限
+    MAX_HOUSE_GLOBAL_EFFECT_PER_CHAR    = 5;  // 单角色最多 TimedItemOutput effect 条数
+    MAX_INTEL_FAVORITE_NUM      = 50;   // 情报中心收藏玩法入口最大数量
+    MAX_BATTLE_MAP_LEN          = 300;  // 战斗副本最大数量
+    MAX_GEM_SLOTS               = 3;    // 每个角色的最大宝石数量
+    MAX_CHARGE_MONEY_LEN        = 32;   // 充值过的直充货币id数量上限
+    MAX_MONTH_CARD_NUM          = 4;    // 月卡数量最大值
+    MAX_MAIL_LEN                = 1000; // 邮件最大数量
+    MAX_MAIL_ATTACHMENTS_LEN    = 20;   // 邮件最大附件个数
+    MAX_MAIL_CONTENT_PARAMS_LEN = 20;   // 邮件最大内容参数个数
+    MAX_MAIL_TITLE_LEN = 201; // 邮件标题最大长度，50个中文字，按4个字节算，多留1个字节存
+    MAX_MAIl_FROM_LEN = 41; // 邮件发送者名字最大长度，10个中文字，按4个字节算，多留1个字节存
+    MAX_MAIL_CONTENT_LEN = 2001; // 邮件内容最大长度，500个中文字，，按4个字节算，多留1个字节存
+    MAX_SYS_MAIL_RECORD_LEN     = 2000; // 记录的收到过的系统邮件的最大数值
+    MAX_RCV_COND_MAIL_RECORD_LEN = 1000; // 记录的已收过的条件邮件的最大数值
+    MAX_MOTIVE_ELEM_NUM         = 3000; // 专武最大数量
+    MAX_CHECK_TEXT_LEN          = 200;  // 检查文本合规最大长度
+    MAX_HORDE_NUM               = 100;  // 尸潮副本最大数量
+    MAX_COMMON_ITEM_LEN         = 500;  // 新背包最大上限
+    MAX_UNLOCK_ITEM_LEN         = 2000; //解锁的道具ID最大上限
+    MAX_SILVER_CREATURE_LEN     = 50;   // 液银生物最大数量
+    MAX_GACHA_COLLECT_POOL_NUMS = 10;   //卡池类型数量
+    MAX_ITEM_CD_TYPE_LEN        = 20;   // 道具CD组类型数量
+    //通缉令相关
+    MAX_WANTED_TYPE_LEN         = 10; // 通缉令种类上限
+    MAX_WANTED_LEN              = 20; // 通缉令个数上限
+    MAX_WANTED_STEP_ATGS_LEN    = 5; // 通缉令步骤参数上限
+    MAX_WANTED_BLESS_LEN        = 50; // 通缉令祝福上限
+    MAX_WANTED_BIONICS_LEN      = 10; //通缉令仿生品数量上限（设计限制：手写代码 WantedCharacter/WantedBionics 按此值判定在场上限，不随意调）
+    MAX_WANTED_BOND_LEN         = 50; //通缉令羁绊数量上限
+    MAX_WANTED_RELICS_LEN       = 50; //通缉令遗物数量上限
+    MAX_WANTED_BATTLE_WIN_AWARD_LEN = 20; //通缉令每次战斗后要给的奖励ID数量上限
+    MAX_WANTED_CHOOSE_AWARD_INFOS_LEN = 40; //通缉令单次三选一信息 奖励数量上限
+    MAX_WANTED_CHOOSE_EVENT_LEN = 5; //通缉令选择事件数量上限
+    MAX_WANTED_CHOOSE_AWARD_COUNT = 20; //通缉令当前步骤最多的三选一次数
+    MAX_WANTED_QUEUE_AWARD_IDS_LEN = 20; //通缉令当前步骤顺序领取的奖励条目数量上限
+    MAX_WANTED_QUEUE_AWARD_MERGE_LEN = 30; //通缉令队列单条合并的 awardId 数量上限（须 == DIRECT_LEN）
+    MAX_WANTED_QUEUE_AWARD_DRAW_LEN = 60; //通缉令队列单条预抽取结果数量上限（须 >= MERGE_LEN × 单award最大抽数）
+    MAX_WANTED_QUEUE_AWARD_DIRECT_LEN = 30; //通缉令队列单条 Direct 类（Coin/HP）冻结快照数量上限（须 == MERGE_LEN）
+    MAX_WANTED_QUEUE_AWARD_DIRECT_INFO_LEN = 8; //通缉令队列单条 Direct 快照内 infos[] 长度上限
+    MAX_WANTED_EVENT_HISTORY_LEN = 50; //通缉令历史事件数量
+    MAX_WANTED_DIFFICULTY_LEN = 20; //通缉令难度上限
+    MAX_UNLOCK_TELEPORT_LEN    = 1000; // 传送点解锁最大数量
+    MAX_WANTED_ADVENTURE       = 30;// 通缉令奇遇最大数量
+    MAX_WANTED_NPC_MAX       = 50;// 通缉令NPC最大数量
+    MAX_WANTED_STAMINA       = 20;// 通缉令体力兑换最大数量
+    MAX_WANTED_SHOP          = 5;// 通缉令商店最大数量
+    MAX_WANTED_SHOP_GOODS    = 50;// 通缉令商店最大商品数量
+    MAX_WANTED_RECOVER       = 20;// 通缉令回血玩法最大数量
+    MAX_WANTED_REVIVE       = 20;// 通缉令复活玩法最大数量
+    MAX_WANTED_ENTRY_RED_DOT_NOTIFIED_LEN = 200; // 通缉令 entry 红点已通告 ID 上限（理论最大 = MAX_WANTED_TYPE_LEN × MAX_WANTED_DIFFICULTY_LEN）
+    MAX_WANTED_EFFECT_LEN   = 100;// 通缉令效果最大数量
+    MAX_WANTED_ATTR_LEN     = 20;// 通缉令属性最大数量（设计限制：WantedData 按此值打底槽位并按属性枚举下标访问，不随意调）
+    MAX_WANTED_UNLOCKED_BLESS_POOL_LEN = 1000; //祝福池已经解锁的祝福数量上限
+    MAX_WANTED_UNLOCKED_RELIC_POOL_LEN = 1000; //遗物池已经解锁的遗物数量上限
+    MAX_WANTED_UNLOCKED_BIONIC_POOL_LEN = 500; //仿生品池已经解锁的仿生品数量上限
+    MAX_WANTED_UNLOCKED_GEM_POOL_LEN = 300; //宝石池已经解锁的宝石数量上限
+    MAX_WANTED_GEM_LEN     = 300; //通缉令宝石仓库最大数量
+    MAX_WANTED_PENDING_PROMOTE_GEM_LEN = 50; //通缉令待进化或合成的宝石数量上限
+    MAX_WANTED_TALENT_NODE_LEN = 100;//通缉令天赋树节点最大数量
+    MAX_WANTED_TALENT_LEN = 20;//通缉令天赋树最大数量
+    MAX_WANTED_CREDIT_CLAIMED_LEN = 50; //通缉令周积分已领取奖励档位数量上限
+    // 每日活跃相关
+    MAX_DAILY_MISSION_REWARD_LEN = 10; // 每日活跃任务奖励数量上限
+    MAX_DAILY_MISSION_LIST_LEN   = 30; // 每日活跃任务目标数量上限
+    // 签到活动相关
+    MAX_SIGNIN_ACTIVITY_DAY_LEN         = 30;   // 签到活动的最大天数
+    MAX_ACTIVITY_TYPE_INST_LEN = 20; // 活动同时开放的数量
+    MAX_LIMITED_TOKEN_INFO_LEN = 50; // 活动限定代币信息最大数量
+    // 任务活动相关
+    MAX_TASK_ACTIVITY_TASK_LEN = 64; // 任务活动的最大任务数量（@len 引用于 db_activity_cstruct.task_activity_datas，扩容增大 DB 记录尺寸）
+
+    // 区域进度管理相关
+    MAX_SUB_REGION_SEQUENCE_LEN = 50; // 子区域序列个数
+    MAX_SUB_REGION_LEN = 10; // 单个区域内子区域个数
+    MAX_REGION_LEN = 10; // 区域数量
+    MAX_PROGRESS_VALUE_LEN = 5; // 进度值数量
+    MAX_SUB_REGION_UNLOCKED_WIND_ROAD_NUM = 100; // 一个subregion的风道最大数量
+    // 引导相关
+    MAX_GUIDE_LEN = 500; // 引导数量
+    MAX_MISC_PB_STR_LEN = 1000000; //misc pbstr 序列化长度最大
+    MAX_TMP_TEAM_LEN = 100; // 临时编队最大数量
+    MAX_ELEMENT_LEN = 8; // 最大元素数量
+    // 解锁系统相关
+    MAX_UNLOCK_EVENT_LEN = 1000; // 解锁事件最大数量
+    MAX_UNLOCK_CONDITION_LEN = 1000; // 解锁条件最大数量
+    MAX_UNLOCK_FEATURE_LEN = 100; // 解锁功能最大数量
+    MAX_FEATURE_EVENT_LEN = 3; // 单个功能的解锁事件最大数量
+    // 战斗相关
+    MAX_BATTLE_NUMS = 200; // 最大战斗数量
+    // 竞速相关
+    MAX_HORSE_TRACK_NUM = 100; // 最大赛道数量
+    MAX_TRACK_REWARD_LEN = 3; // 赛道奖励最大数量
+    // 系统设置相关
+    MAX_SETTING_VALUE_LEN = 32; // 系统设置值最大长度
+    MAX_SETTING_MODULE_NUM = 50; // 模块数量
+    MAX_SETTING_MODULE_ENTRY_NUM = 50; // 单个模块内设置项的数量
+    MAX_CUSTOM_SETTING_VALUE_LEN = 500; // 自定义设置值最大长度
+    MAX_CUSTOM_SETTING_NUM = 20; // 自定义设置最大数量
+    // 问卷相关
+    MAX_WJ_SURVEY_ID_LEN = 64; // 问卷ID最大长度（数字字符串）
+    MAX_WJ_COMPLETED_NUM = 15; // 玩家身上缓存的已完成问卷最大数量
+    // 配方相关
+    MAX_RECIPE_LEN = 256; // 最大配方数量
+    // 成就相关
+    MAX_ACHIEVEMENT_LEN = 1000; // 成就最大数量
+    MAX_ACHIEVEMENT_GROUP_LEN = 50; // 成就组最大数量
+    // 前期历程相关
+    MAX_NEWBIE_STAGES_LEN = 30; // 前期历程阶段最大数量
+    MAX_NEWBIE_LEN = 100; // 前期历程事件最大数量
+    // 进度事件相关
+    MAX_PROGRESS_LEN = 1000; // 进度最大数量，这个未来抽成一个公共共享内存
+    //装备相关
+    MAX_EQUIPMENT_LEN = 3000; // 最大装备数量
+    MAX_EQUIPMENT_SUB_ATTR_LEN = 4; // 最大装备副属性数量
+    // 红点相关
+    MAX_STATIC_RED_POINT_NUM = 1000; // 最大静态红点数量
+    MAX_DYNAMIC_RED_POINT_NUM = 100; // 最大动态红点数量
+    MAX_DYNAMIC_RED_POINT_BUSSINESS_ID_NUM = 100; // 最大动态红点业务ID数量
+    // 深渊
+    MAX_ABYSS_LEN = 10; // 最大深渊数量
+    MAX_ABYSS_LAYER_LEN = 32; // 单个深渊最大层数
+    MAX_ABYSS_ROOM_LEN = 3; // 单个深渊层最大房间数
+    MAX_ABYSS_LAYER_TASK_LEN = 3; // 单个深渊层最大任务数
+    // 好感度相关
+    MAX_AFFINITY_CHARCTER_NUM = 100; // 好感度角色最大数量
+    MAX_AFFINITY_EVENT_NUM = 30; // 好感度限制单日触发次数的事件的最大数量
+    MAX_AFFINITY_ASSISTANT_POS_NUM = 10; // 最大助手点位数量
+    MAX_AFFINITY_MEMOIR_PHOTO_NUM = 20; // 单角色已解锁回忆录照片最大数量
+    MAX_AFFINITY_DATE_TASK_NUM = 3; // 单角色已完成约会任务最大数量
+    MAX_AFFINITY_INTEL_NUM = 20; // 单角色已读情报最大数量
+    MAX_AFFINITY_VOICE_NUM = 100; // 单角色已读语音最大数量
+    MAX_AFFINITY_COUPLE_ACTION_NUM = 20; // 单角色已完成双人动作最大数量
+    // 新手引导
+    MAX_ROOKIE_GUIDE_LEN = 256; // 新手引导最大数量
+    // 返利组
+    MAX_REBATE_GROUP_LEN = 200; // 最大返利组数量
+    // 图鉴系统相关
+    MAX_COMPENDIUM_LEN = 500; // 最大图鉴条目数量
+    // MINI_FEATURE 相关
+    MAX_INTERACT_STATE_NUM = 100; // 机关互动状态最大数量
+    // 天赋相关
+    MAX_TALENT_NODE_NUM = 128; // 单个角色天赋节点最大数量
+    MAX_TALENT_ATTR_NODE_LEVEL = 1; // 天赋属性节点最大等级
+    // 命座相关
+    MAX_CONSTELLATION_POINT_NUM = 10; // 最大命座点数量
+    // Letter相关
+    MAX_LETTER_LEN = 200; // 最大Letter数量
+    MAX_LETTER_COMMIT_ITEM_LEN = 5; // 最大好感度信件提交道具记录
+    // 区域悬赏相关
+    MAX_HUNT_BOARD_COLUMN_LEN = 10; // 最大告示板栏位数量
+    MAX_HUNT_NODE_LEN = 128; // 区域悬赏最大节点数量（@len 引用于 db_hunt_cstruct.nodes，扩容增大 DB 记录尺寸）
+    MAX_HUNT_ENTRY_LEN = 300; // 侦探手册最大通缉令数量
+    MAX_HUNT_BOARD_LEN = 20; // 最大告示板数量
+    // 商店相关
+    MAX_SHOP_REFRESH_RECORD_LEN = 50; // 最大商店刷新记录数量
+    MAX_SHOP_SPEND_RECORD_LEN = 100;  // 最大商店消耗记录数量
+    // 咖啡制作相关
+    MAX_COFFEE_STAGE_NUM = 100; // 咖啡关卡最大数量
+    MAX_COFFEE_INGRE_NUM = 100; // 咖啡原料最大数量
+    MAX_COFFEE_ADD_INS_NUM = 100; // 咖啡配料最大数量
+    // Balatro 小丑牌相关
+    MAX_BALATRO_INVENTORY_LEN = 20; // 最大道具库存数
+    MAX_BALATRO_SHOP_ITEM_LEN = 8; // 最大商店商品数
+    MAX_BALATRO_SNAPSHOT_LEN = 10000; // 客户端快照最大长度
+    MAX_BALATRO_LEVEL_LEN = 20; // 最大难度等级数
+    MAX_BALATRO_JOKER_LEN = 128; // 最大小丑牌解锁数
+}
+
+enum EnmBalatroRunStatus
+{
+    BALATRO_RUN_STATUS_NONE         = 0; // 无对局
+    BALATRO_RUN_STATUS_PLAYING      = 1; // 进行中
+    BALATRO_RUN_STATUS_WIN          = 2; // 通关
+    BALATRO_RUN_STATUS_LOSE         = 3; // 失败
+    BALATRO_RUN_STATUS_HELL_GATEWAY = 4; // 普通段全清，等待玩家选择结算或进入噩梦
+}
+
+enum EnmBalatroBlindStatus
+{
+    BALATRO_BLIND_STATUS_READY    = 0; // 等待开始
+    BALATRO_BLIND_STATUS_PLAYING  = 1; // 进行中
+    BALATRO_BLIND_STATUS_SHOPPING = 2; // 商店阶段
+}
+
+enum EnmBalatroFailReason
+{
+    BALATRO_FAIL_REASON_NONE      = 0; // 未失败
+    BALATRO_FAIL_REASON_GIVE_UP   = 1; // 主动放弃
+    BALATRO_FAIL_REASON_LOW_SCORE = 2; // 未达积分
+}
+
+enum EPackType
+{
+    EPACKTYPE_MIN             = 0;
+    EPACKTYPE_MAIN            = 1; // 主背包
+    EPACKTYPE_EQUIP           = 2; // 装备背包
+    EPACKTYPE_TEMP_MAIN       = 3; // 临时背包
+    EPACKTYPE_SILVER_CREATURE = 4; // 液银生物背包
+    EPACKTYPE_GEM             = 5; // 宝石背包
+    EPACKTYPE_MAX             = 6; // MAX背包
+}
+
+enum ESource
+{
+    ESOURCE_MIN     = 0;
+    ESOURCE_NORMAL  = 1;
+    ESOURCE_PACKAGE = 2;
+}
+
+// @desc 账号登录结果
+// @TextCode
+enum EnmTextCode
+{
+    //通用成功返回
+    ENM_TEXT_OK                        = 0;
+
+    // [100~300] 框架层预留, 勿用
+    ENM_TEXT_CMD_FORBIDDEN_BY_SERVER      = 100;  // 该协议被服务器禁止使用
+    ENM_TEXT_CS_PB_VERDIFF = 101; // cspb版本不一致
+    ENM_TEXT_ACC_LOGIN_SERVER_NOT_OPEN_FAIL = 102; // 服务器在准备中，尚未开放
+    ENM_TEXT_ACC_LOGIN_NOT_IN_WHITE_LIST    = 103; // 不在白名单中
+    ENM_TEXT_ACC_LOGIN_ACCOUNT_BAN          = 104; // 账号被封禁
+    ENM_TEXT_ACC_LOGIN_VERSION_NOT_MATCH    = 105; // 版本不匹配
+    ENM_TEXT_ACC_LOGIN_IP_NOT_ALLOW         = 106; // IP不允许登录
+    ENM_TEXT_ACC_LOGIN_ACCOUNT_DATA_FAIL    = 107; // 账号数据错误
+    ENM_TEXT_ACC_LOGIN_ACCOUNT_ONLINE       = 108; // 账号已经在别处登录
+    ENM_TEXT_ACC_LOGIN_ACCOUNT_EMPTY        = 109; // 账号为空
+    ENM_TEXT_ACC_LOGIN_ACCOUNT_PASSWD_ERR   = 110; // 密码错误
+    ENM_TEXT_ACC_LOGIN_ACCOUNT_PASSWD_EMPTY = 111; // 密码为空
+    ENM_TEXT_CREATE_ROLE_RET_NAME_EXIST            = 112; // 角色名已存在
+    ENM_TEXT_CREATE_ROLE_RET_INIT_ROLE_DATA_FAIL   = 113; // 角色数据初始化失败
+    ENM_TEXT_NOT_ACC_LOGIN                         = 114; // 非账号登录状态
+    ENM_TEXT_CREATE_ROLE_RET_INSERT_ROLE_DATA_FAIL = 115; // 插入角色数据失败
+    ENM_TEXT_ACC_LOGIN_REPEAT     = 116; // 重复登录，重复发登录协议
+    ENM_TEXT_ACC_LOGIN_ELSEWHERE  = 117; // 账号别处登录
+    ENM_TEXT_ROLELOGIN_SCENE_FAIL = 118; // 登录过程scene 创建player异常
+    ENM_TEXT_ACC_LOGIN_BAD_CLIENT_VERSION = 119; //客户端版本号不对
+    ENM_TEXT_ACC_ELSEWHERE_IN_LOGINING = 120;  // 登陆时发现其他人已经在登陆此帐号过程中且还未结束
+    ENM_TEXT_DB_ADDR_NOT_FOUND = 121;  // DbSvr 地址分配失败
+    ENM_TEXT_RPC_GET_ROLE_ID_ERROR = 122;  // 获取账号数据失败
+    ENM_TEXT_GET_FREE_SHM_PLAYER_ERROR = 123;  // 分配玩家共享内存失败
+    ENM_TEXT_RPC_GET_ROLE_DATA_ERROR = 124;  // 获取角色数据失败
+    ENM_TEXT_RPC_LOGIN_SCENE_ERROR = 125;  // player 登录场景失败
+    ENM_TEXT_RPC_RECONNECT_SCENE_ERROR = 126;  // player 重新登录场景失败
+    ENM_TEXT_ALLOC_SCENE_ADDR_ERROR = 127;  // 分配 SceneSvr 地址失败
+    ENM_TEXT_USERID_EMPTY = 128;  // userId 为空，无法路由
+    ENM_TEXT_ACC_LOGIN_NOT_QUEUE = 129; // 登录未经过排队
+    ENM_TEXT_ADD_PLAYER_TO_MGR_FAIL = 130;  // 添加 player 到管理器失败
+    ENM_TEXT_PLAYER_INIT_MODULES_FAIL = 131;  // player 初始化 modules 失败
+    ENM_TEXT_PLAYER_INIT_FROM_DB_FAIL = 132;  // player 从 db 数据初始化失败
+    ENM_TEXT_CACHE_ADDR_NOT_FOUND = 133;  // CacheSvr 地址分配失败
+    ENM_TEXT_RPC_CHECK_LOGIN_ERROR = 134; // 登录黑白名单 RPC 失败（超时/通信/返回异常）
+    ENM_TEXT_DB_INVALID_SERVER_VERSION = 135; // db服务器版本号太低
+    ENM_TEXT_DB_LOW_VERSION_ONLINE = 136; // 低version服务器在线
+    ENM_TEXT_LOGINSVR_RECOVERING = 137; // LoginSvr 路由恢复中，请稍后重试
+    ENM_TEXT_AUTH_ADDR_NOT_FOUND = 138; // 分配 AuthSvr 地址失败
+    ENM_TEXT_RPC_ACC_AUTH_ERROR = 139;  // 帐号认证失败
+    ENM_TEXT_LOGIN_ADDR_NOT_FOUND = 140; // 分配 LoginSvr 地址失败
+
+
+    ENM_TEXT_FAIL      = 201; //  失败
+    ENM_TEXT_MONGO      = 202; //  mongo连不上
+    ENM_TEXT_MONGO_EXEC_FAIL      = 203; //  mongo操作失败
+    ENM_TEXT_MONGO_PARSE_FAIL      = 204; //  mongo解析失败
+    ENM_TEXT_NO_PLAYER_DATA      = 205; // 没有角色数据 //需要scene创建
+    ENM_TEXT_DATA_NOT_LOAD      = 206; // 数据还没加载
+    ENM_TEXT_PARAM_NOT_VALID      = 207; // 参数错误
+    ENM_TEXT_NOT_IN_WHITE_LIST      = 208; // 不在白名单中
+    ENM_TEXT_IN_BLACK_LIST      = 209; // 在黑名单中
+    ENM_TEXT_DEVICE_LOCK      = 210; // 设备锁
+    
+    //业务
+    ENM_TEXT_TABLE_NOT_FOUND               = 1015;
+    ENM_TEXT_PLAYER_CACACHE_ITEM_NOT_FOUND = 1016;
+    ENM_TEXT_PLAYER_NULL                   = 1017;
+    ENM_TEXT_EQUIP_NOT_THISTYPE   = 1029;
+    ENM_TEXT_ITEM_TYPE_MISMATCH   = 1031;
+    ENM_TEXT_STAMINA_NOT_ENOUGH   = 1032; // 体力不足（消耗量>当前量）
+    ENM_TEXT_STAMINA_RECOVER_MAX  = 1033; // 体力已上限（9999，不能再加了）
+    ENM_TEXT_ILLEGAL_ROLE_NAME    = 1035; // 非法角色名
+    ENM_TEXT_WORD_CHECK_FAILED = 1042; // 您所输入的信息包含敏感词
+
+    // 道具系统错误码
+    ENM_TEXT_ITEM_LIMITTYPE_MAX   = 1018;
+    ENM_TEXT_ITEM_HOLD_MAX        = 1019; //道具达到最大数量
+    ENM_TEXT_ITEM_NOT_ENOUGH      = 1020; //道具不足
+    ENM_TEXT_ITEM_NO_USEHANDLER   = 1021; //道具没有使用效果
+    ENM_TEXT_PACKAGE_FULL         = 1022;
+    ENM_TEXT_PACKAGE_ILEGAL_SUB   = 1023;
+    ENM_TEXT_PACKAGE_ILEGAL_PARAM = 1024;
+    ENM_TEXT_PACKAGE_SUB_FAIL     = 1025;
+    ENM_TEXT_PACKAGE_NIL          = 1026;
+    ENM_TEXT_PACKAGE_ITEM_NIL     = 1027;
+    ENM_TEXT_PACKAGE_OP_FREEQUENT = 1028;
+    ENM_TEXT_ITEM_USE_TOO_MUCH    = 1040; //使用道具太多了
+    ENM_TEXT_ITEM_USE_ZERO        = 1041; //使用道具数量为0
+    ENM_TEXT_ITEM_CD              = 1060;//道具CD中
+    ENM_TEXT_ITEM_ADD_FAIL_TO_MAIL = 1070;//道具添加失败 进邮件
+    ENM_TEXT_ITEM_CFG_NOT_EXIST        = 1071; //道具配置不存在
+
+    ENM_TEXT_GENDER_PARAM_WRONG         = 1043; // 性别参数错误
+    ENM_TEXT_ROLE_NAME_SETTED           = 1044; // 角色名已设置
+    ENM_TEXT_ROLE_NAME_TOO_LONG         = 1045; // 角色名太长
+    ENM_TEXT_CHECK_TEXT_ILLEGAL         = 1046; // 文本不合规
+    ENM_TEXT_CHECK_EVENT_TYPE_NOT_EXIST = 1047; // 事件类型不存在
+    ENM_TEXT_ROLE_NAME_SAME             = 1048; // 两个角色名相同
+    ENM_TEXT_GENDER_SETTED              = 1049; // 性别已设置
+
+    ENM_TEXT_WRONG_PARAM                  = 1051;
+    ENM_TEXT_REDIS_OP_FAIL                = 1055;
+
+    // 采集物错误码
+    ENM_TEXT_COLLECTION_NO_DATA     = 1050; // 采集物数据不存在
+    ENM_TEXT_COLLECTION_ALREADY_OP  = 1052; // 采集物已经操作过了
+    ENM_TEXT_COLLECTION_COND_UNMEET = 1053; // 条件不满足
+    ENM_TEXT_COLLECTION_OP_ILEGAL   = 1054; // 非法操作
+    // ENM_TEXT_COLLECTION_NOT_UNLOCKED      = 1057; // 采集物未解锁
+    ENM_TEXT_COLLECTION_REQ_TOO_FREQUENT = 1058; // 请求采集物列表过于频繁
+    ENM_TEXT_COUNT_GROUP_LIMIT = 1059; // 限次组数量达到上限
+
+    // 1100~1199 角色相关错误码
+    ENM_TEXT_CHARACTER_EXP_FULL                          = 1100; // 经验已满
+    ENM_TEXT_CHARACTER_STAR_FULL                         = 1101; // 星级已满
+    ENM_TEXT_CHARACTER_NOT_EXIST                         = 1102; // 角色不存在
+    ENM_TEXT_CHARACTER_CANNOT_GROW                       = 1103; // 角色不可养成（如试用角色）
+    ENM_TEXT_CHARACTER_INVALID_TEAMID                    = 1104; // 非法编队ID
+    ENM_TEXT_CHARACTER_INVALID_TEAM_MEMBER_INDEX         = 1105; // 非法角色下标
+    ENM_TEXT_CHARACTER_TEAM_MEMBER_NO_SWITCH             = 1106; // 前台角色未切换（本来就是她）
+    ENM_TEXT_CHARACTER_TEAM_NO_SWITCH                    = 1107; // 队伍未切换
+    ENM_TEXT_CHARACTER_TEAM_CANNOT_SWITCH_NOW            = 1108; // 当前状态不可替换队伍
+    ENM_TEXT_CHARACTER_MEMBER_CANNOT_SWITCH_NOW          = 1109; // 当前状态不可切换角色
+    ENM_TEXT_CHARACTER_TEAM_CANNOT_MODIFY_NOW            = 1110; // 当前状态不可修改编队
+    ENM_TEXT_CHARACTER_NO_MEMBER_IN_TARGET_TEAM          = 1111; // 要切换的队伍里没有角色
+    ENM_TEXT_CHARACTER_CANNOT_CLEAR_MEMBERS_IN_MAIN_TEAM = 1112; // 使用中队伍不能清空全部角色
+    ENM_TEXT_CHARACTER_NOBODY_SIT_AT_INDEX               = 1113; // 编队的该位置没有角色
+    ENM_TEXT_CHARACTER_TEAM_NAME_TOO_LONG                = 1114; // 编队名字太长
+    ENM_TEXT_TEAM_EXP_FULL                               = 1115; // 冒险等级最大经验已满
+    ENM_TEXT_CHARACTER_LEVEL_LIMIT                       = 1116; // 角色等级不足
+    ENM_TEXT_CHARACTER_ALREADY_EXIST                     = 1117; // 角色已存在
+    ENM_TEXT_CHARACTER_TEAM_MEMBER_DUPLICATE             = 1118; // 编队角色有重复
+    ENM_TEXT_CHARACTER_TEAM_GEM_NOT_OWNED                = 1119; // 编队装配未拥有的宝石
+    ENM_TEXT_CHARACTER_TEAM_GEM_DUPLICATE                = 1120; // 编队装配重复的宝石
+    ENM_TEXT_CHARACTER_TEAM_GEM_COST_NOT_ENOUGH          = 1121; // 编队装配宝石cost不足
+    ENM_TEXT_CHARACTER_TEAM_GEM_NOT_EXIST                = 1122; // 宝石不存在
+    ENM_TEXT_CHARACTER_TEAM_GEM_ELEMENT_LIMIT            = 1123; // 宝石元素限制
+    ENM_TEXT_CHARACTER_TEAM_GEM_SIZE_NOT_MATCH           = 1124; // 角色和宝石数据数量不匹配
+    ENM_TEXT_CHARACTER_TEAM_GEM_STATE_INVALID            = 1125; // 宝石状态不合法
+    ENM_TEXT_CHARACTER_IS_ALIVE                          = 1126; // 角色存活中
+    ENM_TEXT_CHARACTER_TEAM_MEMBER_ALL_DEAD              = 1127; // 编队没有存活角色
+    ENM_TEXT_CHARACTER_IS_DEAD                           = 1128; // 角色已死亡
+
+    // 1200~1299 任务系统错误码
+    ENM_TEXT_STEP_ID_INVALID       = 1200; // step id非法
+    ENM_TEXT_TASK_ID_INVALID       = 1201; // task id非法
+    ENM_TEXT_ACTION_NOT_PROCESSING = 1202; // action不在进行中
+    ENM_TEXT_ACTION_ID_NOT_FOUND   = 1203; // action id 不存在
+    ENM_TEXT_TASK_IS_FINISHED      = 1204; // 任务已经完成了
+    ENM_TEXT_TASK_IS_PROCESSING    = 1205; // 任务进行中
+    ENM_TEXT_TASK_ID_NOT_FOUND     = 1206; // task id 不存在
+    ENM_TEXT_TASK_NO_STEP          = 1207; // task没有设置step
+    ENM_TEXT_STEP_ID_NOT_FOUND     = 1208; // step id 不存在
+    ENM_TEXT_TASK_NOT_PROCESSING   = 1209; // task 没有进行中
+    ENM_TEXT_TASK_STEP_FAILED      = 1210; // step失败
+    ENM_TEXT_TASK_STEP_PROCESSING  = 1211; // step仍然进行中
+    ENM_TEXT_TASK_NOT_ACTIVATED    = 1212; // 任务未激活
+    ENM_TEXT_TASK_ALREADY_ACTIVATED = 1213; // 任务已激活
+    ENM_TEXT_TASK_CANNOT_ACTIVATE  = 1214; // 任务不可激活（非默认不激活的任务）
+    ENM_TEXT_TASK_CANNOT_RESET     = 1215; // 任务不可重置
+    ENM_TEXT_TASK_ACCEPT_FAILED                       = 1216; // 客户端主动接取失败
+    ENM_TEXT_TASK_ACCEPT_COND_NOT_FOUND               = 1217; // 接取条件ID不存在
+    ENM_TEXT_TASK_ACCEPT_COND_NOT_CLIENT_TYPE         = 1218; // 接取条件类型不允许由客户端上报
+    ENM_TEXT_TASK_ACCEPT_COND_NOT_IN_UNLOCKED_TASK    = 1219; // 接取条件不属于任何已解锁任务
+    ENM_TEXT_TASK_ACCEPT_COND_ALL_TASKS_ACCEPTED      = 1220; // 接取条件关联的任务均已接取
+    ENM_TEXT_TASK_REQ_REPEATED_SIZE_OVER_LIMIT        = 1221; // 客户端请求 repeated 字段超过长度上限
+    ENM_TEXT_TASK_ROLLBACK_NOOP                       = 1222; // 自回滚无进度无 timer，跳过全部回滚副作用
+
+    // 1300~1400 通用错误码
+    ENM_TEXT_ARRAY_PUSH_FAIL = 1300; //在数组内添加元素失败(通常是因为到达数组最大值)
+    ENM_TEXT_POINT_NULL      = 1301; //某对象指针为空
+    ENM_MGR_NOT_FOUND        = 1302; //各种系统的mgr未找到
+    ENM_TEXT_INVALID_ARGS    = 1303; //参数错误
+    ENM_TEXT_BAD_ALLOC       = 1304; //内存分配失败
+
+    // 1500~1599 玩家进出地图错误码
+    ENM_TEXT_MAP_INST_NOT_FOUND   = 1500; //地图实例未找到
+    ENM_TEXT_MAP_CONF_NOT_FOUND   = 1501; //地图配置未找到
+    ENM_TEXT_MAP_CONDITION        = 1502; //地图进入条件不足
+    ENM_TEXT_MAP_PLAYER_COUNT_MAX = 1503; //地图人数达到上限
+    ENM_TEXT_MAP_LINE_NOT_FOUND   = 1504; //地图分线未找到
+    ENM_TEXT_SAVEPOINT_NOT_UNLOCKED = 1505; //存档点未解锁
+
+    // 1600~1650 副本相关
+    ENM_TEXT_DUNGEONS_COUNT_MAX     = 1600; //副本完成次数达到上限
+    ENM_TEXT_WORLD_LEVEL_NOT_ENOUGH = 1601; //世界等级不足
+    ENM_TEXT_DUNGEONS_FAIL          = 1602; //挑战失败
+    ENM_TEXT_DUNGEONS_TYPE_WRONG    = 1603; //副本类型错误
+    ENM_TEXT_DUNGEONS_IN            = 1604; //当前正在副本中
+    ENM_TEXT_DUNGEONS_NOT_IN        = 1605; //当前不在副本中
+    ENM_TEXT_DUNGEONS_GROUP_INVALID = 1606; // 副本组非法
+    ENM_TEXT_DUNGEONS_GROUP_CANNOT_UNLOCK = 1607; // 副本组不可解锁
+    ENM_TEXT_DUNGEONS_GROUP_ALREADY_UNLOCK = 1608; // 副本组早已解锁
+    ENM_TEXT_DUNGEONS_REWARD_PENDING_FULL  = 1609; // 待领取奖励已满，请先领取
+    ENM_TEXT_DUNGEONS_GROUP_REWARD_PENDING = 1610; // 同组副本有待领取奖励，请先领取
+
+    // 1700~1799 技能相关
+    ENM_TEXT_SKILL_NOT_EXIST            = 1700; // 技能不存在
+    ENM_TEXT_SKILL_LEVEL_LIMIT          = 1701; // 技能等级已达上限
+    ENM_TEXT_SKILL_NOT_BELONG_CHARACTER = 1702; // 角色没有该技能
+    ENM_TEXT_TALENT_FULL                = 1703; // 天赋已满
+    ENM_TEXT_TALENT_NODE_INVALID        = 1704; // 天赋树节点不存在
+    ENM_TEXT_TALENT_CONTENT_INVALID     = 1705; // 天赋不存在
+    ENM_TEXT_TALENT_DUPLICATED          = 1706; // 天赋重复
+    ENM_TEXT_TALENT_PARENT_LOCKED       = 1707; // 天赋父级未全部解锁
+    ENM_TEXT_TALENT_ALREADY_UNLOCKED    = 1708; // 天赋已经解锁
+    ENM_TEXT_CHARACTER_NO_SKILLS        = 1709; // 角色没有技能列表
+    ENM_TEXT_TALENT_MAX_LEVEL           = 1710; // 天赋已达最大等级
+    ENM_TEXT_TALENT_BREAK_LEVEL_LIMIT   = 1711; // 角色突破等级不足
+    // 1800~1899 sdk相关
+    ENM_TEXT_SDK_SIGN_WRONG         = 1800; // sdk签名错误
+    ENM_TEXT_SDK_GOODS_TIME_INVALID = 1801; // 商品不在有效期
+    ENM_TEXT_SDK_GOODS_NOT_FOUND    = 1802; // 商品不存在
+    ENM_TEXT_SDK_GOODS_PRICE_WRONG  = 1803; // 商品价格错误
+    ENM_TEXT_SDK_PARAMS_WRONG       = 1804; // sdk参数解析错误
+    ENM_TEXT_SDK_LOGIN_TOKEN_WRONG  = 1805; // sdk登录token错误
+
+    // 1900~1999 BUFF相关
+    ENM_TEXT_BUFF_FULL       = 1900; // buff已满
+    ENM_TEXT_BUFF_NOT_EXIST  = 1901; // buff不存在
+    ENM_TEXT_BUFF_INVALID    = 1902; // buff找不到配置
+    ENM_TEXT_BUFF_DUPLICATED = 1903; // buff重复
+    ENM_TEXT_BUFF_EXPIRED    = 1904; // buff已过期
+
+    // 2000~2099 液银生物相关
+    ENM_TEXT_SILVER_CREATURE_NOT_FOUND                  = 2001; // 液银生物不存在
+    ENM_TEXT_SILVER_CREATURE_ADD_FAIL                   = 2002; // 液银生物添加失败
+    ENM_TEXT_SILVER_CREATURE_NO_CAN_CLAIM_REWARD        = 2003; // 没有可领取奖励
+
+    // 2100~2199 商店相关
+    ENM_TEXT_MONEY_INVALID_TYPE        = 2100; // 货币类型错误
+    ENM_TEXT_MONEY_INVALID_NUM         = 2101; // 货币数量错误
+    ENM_TEXT_MONEY_NOT_ENOUGH          = 2102; // 货币不足
+    ENM_TEXT_SHOP_NOT_EXSIT            = 2110; // 商店不存在
+    ENM_TEXT_SHOP_INVALID_TYPE         = 2111; // 商店类型错误
+    ENM_TEXT_SHOP_GOODS_NOT_EXSIT      = 2112; // 商品不存在
+    ENM_TEXT_SHOP_GOODS_NOT_ENOUGH     = 2113; // 商品存量不足
+    ENM_TEXT_SHOP_GOODS_PAY_TYPE_ERROR = 2114; // 付款类型错误
+    ENM_TEXT_SHOP_INVALID_BOUGHT_NUM   = 2115; // 购买数量记录错误
+    ENM_TEXT_SHOP_GOODS_LIST_CD_ERROR  = 2116; // 商品列表请求频率错误
+    ENM_TEXT_SHOP_GOODS_NOT_STARTED    = 2117; // 商品未开始销售
+    ENM_TEXT_SHOP_GOODS_ALREADY_ENDED  = 2118; // 商品已结束销售
+    ENM_TEXT_SHOP_GOODS_PRECOND_NOT_MET = 2119; // 商品前置条件未满足
+
+    // 2200~2299 成就相关
+    ENM_TEXT_ACHIEVEMENT_NOT_FOUND        = 2200; // 成就不存在
+    ENM_TEXT_ACHIEVEMENT_NOT_FINISHED     = 2201; // 成就未完成
+    ENM_TEXT_ACHIEVEMENT_ALREADY_REWARD   = 2202; // 成就已领取奖励
+    ENM_TEXT_ACHIEVEMENT_REWARD_NOT_FOUND = 2203; // 成就奖励不存在
+    ENM_TEXT_ACHIEVEMENT_CAN_NOT_JUDGE    = 2204; // 客户端不能决定成就进度
+    ENM_TEXT_ACHIEVEMENT_ALREADY_FINISHED = 2205; // 成就已经完成
+    ENM_TEXT_NOT_UNLOCK                   = 2206; // 未解锁
+    ENM_TEXT_ACHIEVEMENT_MAX_COUNT        = 2207; // 成就数量已达上限
+    ENM_TEXT_ACHIEVEMENT_INVALID_EVENT    = 2208; // 事件无效
+
+    // 2300~2399 房地产相关
+    ENM_TEXT_HOUSE_NOT_UNLOCK          = 2300; // 房子未解锁
+    ENM_TEXT_HOUSE_ALREADY_OWN         = 2301; // 房子已拥有
+    ENM_TEXT_HOUSE_NOT_EXIST           = 2302; // 房子不存在
+    ENM_TEXT_HOUSE_NOT_ENOUGH_CURRENCY = 2303; // 房子购买货币不足
+    ENM_TEXT_HOUSE_NO_INCOME             = 2304; // 房子产出为空, 无法领取产出
+    ENM_TEXT_CENTRAL_HOUSE_NOT_OPEN = 2305; // 核心房子未开业
+    ENM_TEXT_HOUSE_ALREADY_OPEN = 2306; // 房子已开业
+    ENM_TEXT_HOUSE_NOT_BUY = 2307; // 房子未购买
+    ENM_TEXT_HOUSE_SURROUND_CANNOT_UPGRADE = 2308; // 周边房子不能升级
+    ENM_TEXT_HOUSE_NOT_OPEN = 2309; // 房子未开业
+    ENM_TEXT_HOUSE_ALREADY_UNLOCKED = 2310; // 房子已解锁
+    ENM_TEXT_HOUSE_CANNOT_UNLOCK_BY_RANGE = 2311; // 房子不能通过范围解锁
+    ENM_TEXT_HOUSE_CANNOT_UNLOCK_RANGE_OUT = 2312; // 房子不在解锁范围
+    ENM_TEXT_HOUSE_ATTR_NOT_ENOUGH = 2313; // 房子属性不足
+    ENM_TEXT_CHARACTER_ALREADY_DISPATCHED = 2314; // 角色已派遣到其他房子
+    ENM_TEXT_CHARACTER_IDENTITY_INVALID = 2315; // 角色身份不符合派遣要求
+    ENM_TEXT_CHARACTER_ELEMENT_INVALID = 2316; // 角色元素不符合派遣要求
+    ENM_TEXT_HOUSE_NO_DISPATCH_CHAR = 2317; // 房子没有派遣角色
+    ENM_TEXT_HOUSE_DISPATCH_BUILDING_LIMIT = 2318; // 房子派遣建筑数量超过上限
+    ENM_TEXT_HOUSE_LEVEL_MAX = 2319; // 房子等级已达上限
+    ENM_TEXT_HOUSE_INVALID_CHARUID = 2320; // 角色不存在
+    ENM_TEXT_HOUSE_TARGET_GROUP_NOT_FINISHED = 2321; // 房子目标组未完成
+    ENM_TEXT_HOUSE_TARGET_GROUP_ALREADY_CLAIMED = 2322; // 房子目标组已领取奖励
+    ENM_TEXT_HOUSE_INCOME_CD = 2323; // 房子收入领取cd
+    ENM_TEXT_HOUSE_SHOP_CURRENCY_NOT_ENOUGH = 2324; // 房子商店货币不足
+    ENM_TEXT_HOUSE_SHOP_GOODS_NOT_EXIST = 2325; // 房子商店商品不存在
+    ENM_TEXT_HOUSE_SHOP_GOODS_BUY_CNT_NOT_ENOUGH = 2326; // 房子商店商品购买次数不足
+    ENM_TEXT_HOUSE_CANT_DISPATCH = 2327; // 周边房子不能派遣角色
+    ENM_TEXT_HOUSE_DISPATCH_CHAR_CANT_CLAIM = 2328; // 房子派遣角色不能领取奖励
+    ENM_TEXT_HOUSE_BATCH_DISPATCH_EMPTY = 2329; // 批量派遣列表为空
+    ENM_TEXT_HOUSE_SHOP_GOODS_ALREADY_BOUGHT = 2330; // 房子商店商品已购买
+    ENM_TEXT_HOUSE_SYS_LEVEL_NOT_ENOUGH = 2331; // 房产系统等级不足，无法升级到目标等级
+    ENM_TEXT_HOUSE_FRAGMENT_LIST_FULL = 2332; // 房产线索累积列表已满，无法新增
+
+    // 2400~2499 抽卡相关
+    ENM_TEXT_NULL_POOL_DATA    = 2400; // 卡池不存在，或者卡池过期
+    ENM_TEXT_GACHA_COST_ERR    = 2401; // 抽卡消耗数量不足
+    ENM_TEXT_GACHA_REWARDS_GET = 2402; // 该卡池该奖励已领取
+    ENM_TEXT_GACHA_TIME_ERR    = 2403; // 卡池时间错误
+    ENM_TEXT_GACHA_DAILY_LIMIT = 2404; // 卡池今日抽卡次数已达上限
+    ENM_TEXT_GACHA_DROP_ERR    = 2405; // 卡池掉落失败
+    ENM_TEXT_GACHA_REBATE_ERR  = 2406; // 卡池返利条件不足
+
+    // 2500~2599 月卡相关
+    ENM_TEXT_MONTH_CARD_ID_INVALID  = 2500; // 月卡id错误
+    ENM_TEXT_MONTH_CARD_DAY_UPLIMIT = 2501; // 月卡天数上限
+
+    // 2600~2699 专武相关
+    ENM_TEXT_MOTIVE_ALEARY_EQUIPED       = 2600; // 专武已装备
+    ENM_TEXT_MOTIVE_UID_INVALID          = 2601; // 专武uid错误
+    ENM_TEXT_MOTIVE_LEVEL_ALEARY_REACHED = 2602; // 专武等级已经为目标等级
+    ENM_TEXT_MOTIVE_LEVEL_REACHED_MAX    = 2603; // 专武等级已经达到最大等级
+    ENM_TEXT_MOTIVE_REFINE_MAX           = 2604; // 专武升阶等级已经达到最大
+    ENM_TEXT_MOTIVE_EQUIPED              = 2605; // 专武已装备
+    ENM_TEXT_MOTIVE_REPEAT               = 2606; // 专武uid重复
+    ENM_TEXT_MOTIVE_LOCKED               = 2607; // 专武未解锁
+    ENM_TEXT_MOTIVE_DECOMPOSE_SSR        = 2608; // 专武SSR禁止分解
+    ENM_TEXT_MOTIVE_DECOMPOSE_DEVELOPED  = 2609; // 养成过的专武禁止分解
+
+    ENM_TEXT_MOTIVE_LEVELUP_USE_SELF     = 2620; // 专武升级不能使用自己
+    ENM_TEXT_MOTIVE_LEVELUP_ITEM_INVALID = 2621; // 专武升级材料无效
+    ENM_TEXT_MOTIVE_CONF_INVALID         = 2622; // 专武升级配置无效
+    ENM_TEXT_MOTIVE_NEED_BREAK           = 2623; // 专武升级需要先突破
+    ENM_TEXT_MOTIVE_LEVELUP_CANNOT       = 2624; // 专武不能升级
+    ENM_TEXT_MOTIVE_LEVELUP_MONEY_NOT_ENOUGH = 2625; // 专武升级货币不足
+    ENM_TEXT_MOTIVE_LEVELUP_COST_ITEM_FAILED = 2626; // 专武升级扣除道具失败
+    ENM_TEXT_MOTIVE_LEVELUP_COST_MONEY_FAILED = 2627; // 专武升级扣除货币失败
+    ENM_TEXT_MOTIVE_LEVELUP_COST_MOTIVE_FAILED = 2628; // 专武升级扣除专武失败
+    
+    ENM_TEXT_MOTIVE_BREAK_REACHED_MAX    = 2640; // 专武突破已经达到最大等级
+    ENM_TEXT_MOTIVE_NEED_LEVEL_UP        = 2641; // 专武突破需要先升级
+    ENM_TEXT_MOTIVE_BREAK_NEED_WORLD_LEVEL = 2642; // 专武突破世界等级不足
+    ENM_TEXT_MOTIVE_BREAK_MONEY_NOT_ENOUGH = 2643; // 专武突破货币不足
+    ENM_TEXT_MOTIVE_BREAK_ITEM_NOT_ENOUGH  = 2644; // 专武突破材料不足
+    ENM_TEXT_MOTIVE_BREAK_COST_ITEM_FAILED = 2645; // 专武突破扣除道具失败
+    ENM_TEXT_MOTIVE_BREAK_COST_MONEY_FAILED = 2646; // 专武突破扣除货币失败
+
+    // 2700~2799 直充相关
+    ENM_TEXT_CHARGE_GOODS_LIST_CD_ERROR = 2700; // 直充商品列表请求频率错误
+    ENM_TEXT_CHARGE_GOODS_ORDER_CD_ERROR = 2701; // 直充商品购买请求频率错误
+    ENM_TEXT_GIFT_GOODS_NOT_EXSIT = 2702; // 礼包商品不存在
+    ENM_TEXT_GIFT_GOODS_NOT_ENOUGH = 2703; // 礼包商品存量不足
+
+    // 2800~2899 通缉令相关
+    ENM_TEXT_WANTED_IS_IN_WANTED   = 2800;//当前正处于一场通缉令当中
+    ENM_TEXT_WANTED_NOT_IN_WANTED   = 2801;//当前不在通缉令当中
+    ENM_TEXT_WANTED_MAX_STEP    = 2802;//已经是最大步骤
+    ENM_TEXT_WANTED_EXCHANGE_WRONG_STATUS    = 2803;//步骤状态不允许体力兑换
+    ENM_TEXT_WANTED_EXCHANGE_REPEATED    = 2804;//该步骤体力奖励已经兑换
+    ENM_TEXT_WANTED_STEP_WRONG_AWARD    = 2805;//当前步骤中没有该奖励
+    ENM_TEXT_WANTED_BIONICS_REPLACE_ID_NOT_EXIST = 2806;//不存在
+
+    ENM_TEXT_WANTED_ADVENTURE_ALREADY_EXISTS = 2807;//奇遇已存在
+    ENM_TEXT_WANTED_ADVENTURE_NOT_EXISTS = 2808;//奇遇不存在
+    ENM_TEXT_WANTED_ADVENTURE_CONTENT_INVALID = 2809;//奇遇内容无效
+    ENM_TEXT_WANTED_ADVENTURE_OPTION_INVALID = 2810;//奇遇选项无效
+    ENM_TEXT_WANTED_ADVENTURE_NOT_COMPLETE = 2819;//奇遇未完成
+
+    ENM_TEXT_WANTED_STAMINA_ALREADY_EXISTS = 2811;//体力兑换已存在
+    ENM_TEXT_WANTED_STAMINA_NOT_EXISTS = 2812;//体力兑换不存在
+
+    ENM_TEXT_WANTED_SHOP_ALREADY_EXISTS = 2813;//商店已存在
+    ENM_TEXT_WANTED_SHOP_NOT_EXISTS = 2814;//商店不存在
+    ENM_TEXT_WANTED_SHOP_GOODS_COUNT_NOT_ENOUGH = 2815;//商店商品数量不足
+    ENM_TEXT_WANTED_SHOP_GOODS_NOT_EXISTS = 2816;//商店商品不存在
+    ENM_TEXT_WANTED_SHOP_MONEY_NOT_ENOUGH = 2817;//商店货币不足
+    ENM_TEXT_WANTED_BLESS_REPEATED = 2830;//祝福重复
+    ENM_TEXT_WANTED_RELIC_REPEATED = 2831;//遗物重复
+    ENM_TEXT_WANTED_RELIC_NOT_EXISTS = 2832;//遗物不存在
+
+    ENM_TEXT_WANTED_RECOVER_ALREADY_EXISTS = 2833;//恢复玩法已存在
+    ENM_TEXT_WANTED_RECOVER_NOT_EXISTS = 2834;//恢复玩法不存在
+    ENM_TEXT_WANTED_RECOVER_FINISHED = 2835;//恢复玩法已完成
+
+    ENM_TEXT_WANTED_REVIVE_ALREADY_EXISTS = 2836;//复活玩法已存在
+    ENM_TEXT_WANTED_REVIVE_NOT_EXISTS = 2837;//复活玩法不存在
+    ENM_TEXT_WANTED_REVIVE_FINISHED = 2838;//复活玩法已完成
+    ENM_TEXT_WANTED_REVIVE_ALL_FAILED = 2839;//复活全部失败(货币不足或者角色没死)
+
+    ENM_TEXT_WANTED_EFFECT_ALREADY_EXISTS = 2850;//效果已存在
+    ENM_TEXT_WANTED_EFFECT_NOT_EXISTS = 2851;//效果不存在
+
+    ENM_TEXT_WANTED_GEM_NOT_EXIST = 2860;//宝石不存在
+    ENM_TEXT_WANTED_GEM_CONF_INVALID = 2861;//宝石配置无效
+    ENM_TEXT_WANTED_GEM_EVOLVE_INVALID = 2862;//宝石进阶条件不满足
+    ENM_TEXT_WANTED_GEM_CANNOT_EVOLVE = 2863;//宝石不能进阶
+    ENM_TEXT_WANTED_GEM_CANNOT_MERGE = 2864;//宝石不能合成
+    ENM_TEXT_WANTED_GEM_MERGE_INVALID = 2865;//宝石合成条件不满足
+
+    ENM_TEXT_WANTED_NPC_NOT_EXIST = 2870;//肉鸽NPC不存在
+    ENM_TEXT_WANTED_NPC_NOT_UNLOCK = 2871;//肉鸽NPC未解锁
+    ENM_TEXT_WANTED_STEP_NOT_FINISH = 2872;//当前步骤未完成
+    ENM_TEXT_WANTED_NPC_NOT_INTERACT = 2873;//NPC不能交互
+
+    ENM_TEXT_WANTED_AWARD_NOT_FOUND = 2880;//三选一奖励未找到
+    ENM_TEXT_WANTED_AWARD_REFRESH_FAILED = 2881;//三选一奖励刷新失败
+    ENM_TEXT_WANTED_COIN_NOT_ENOUGH = 2882;//通缉令代币不足
+    ENM_TEXT_WANTED_CREDIT_CLAIMED_FULL = 2883;//周积分奖励领取列表已满
+
+    // 2900~2999 战斗相关
+    ENM_TEXT_BATTLE_ALEARDY_EXIST       = 2900; // 已经在战斗状态中
+    ENM_TEXT_BATTLE_TYPE_INVALID        = 2901; // 战斗类型无效
+    ENM_TEXT_BATTLE_ID_INVALID          = 2902; // 战斗id无效
+    ENM_TEXT_BATTLE_STATE_NOT_MATCH     = 2903; // 战斗状态不匹配
+    ENM_TEXT_BATTLE_STATE_FORBID        = 2904; // 战斗状态禁止该功能
+    ENM_TEXT_BATTLE_PASS_TIME_TOO_SHORT = 2905; // 战斗时间过短
+
+    // 3000~3099 传送点相关
+    ENM_TEXT_TELEPORT_ALREADY_UNLOCK            = 3000; // 传送点已经解锁
+    ENM_TEXT_TELEPORT_NOT_EXIST                 = 3001; // 传送点不存在
+    ENM_TEXT_TELEPORT_MAPID_INVALID             = 3002; // 解锁传送点mapid不合法
+    ENM_TEXT_TELEPORT_POS_RANGE_INVALID         = 3003; // 玩家不在传送点坐标范围内
+    ENM_TEXT_TELEPORT_UNLOCK_FAILED             = 3004; // 解锁失败,解锁传送点已经到数组上限
+    ENM_TEXT_TELEPORT_NOT_UNLOCKED              = 3005; // 传送点未解锁
+
+    // 3100~3199 每日活跃相关
+    ENM_TEXT_DAILY_MISSION_ID_INVALID           = 3100; // 每日活跃任务目标不存在
+    ENM_TEXT_DAILY_MISSION_ID_NOT_FINISH      = 3101; // 每日活跃任务目标未完成
+    ENM_TEXT_DAILY_MISSION_ID_HAS_CLAIMED     = 3102; // 每日活跃任务目标已领取活跃点
+    ENM_TEXT_DAILY_MISSION_REWARD_ID_INVALID    = 3103; // 每日活跃任务奖励id错误
+    ENM_TEXT_DAILY_MISSION_REWARD_NOT_FOUND     = 3104; // 每日活跃任务奖励未找到
+
+    //3200~3299 签到活动相关
+    ENM_TEXT_NOT_SIGNIN_ACTIVITY                    = 3200; // 不是签到活动
+    ENM_TEXT_SIGNIN_ACTIVITY_NOT_OPENTIME           = 3201; // 不在活动开放时间
+    ENM_TEXT_SIGNIN_ACTIVITY_NOT_UNLOCKED           = 3202; // 活动未解锁
+    ENM_TEXT_SIGNIN_ACTIVITY_CANNOT_CLAIM_REWARD    = 3203; // 不能领取奖励
+    ENM_TEXT_SIGNIN_ACTIVITY_REWARD_INVALID         = 3204; // 奖励无效
+    ENM_TEXT_SIGNIN_ACTIVITY_ID_INVALID             = 3205; // 活动ID无效
+
+    /************** 新定义的活动类型 *************/
+
+    // 3300~3399 区域进度相关
+    ENM_TEXT_SUB_REGION_NO_AVAILABLE_REWARDS = 3300; // 没有可领取的奖励
+
+    // 3400~3499 教程相关
+    ENM_TEXT_GUIDE_ID_NOT_UNLOCKED             = 3400; // 教程id未解锁
+    
+    // 3500~3599 角色升级/突破
+    ENM_TEXT_CHARACTER_LEVEL_UP_ITEMS_EMPTY             = 3500; // 升级经验道具为空
+    ENM_TEXT_CHARACTER_LEVEL_UP_CONF_INVALID            = 3501; // 找不到配置信息
+    ENM_TEXT_CHARACTER_LEVEL_UP_MAX_LIMIT               = 3502; // 角色等级已达上限
+    ENM_TEXT_CHARACTER_LEVEL_UP_NEED_BREAK              = 3503; // 角色需要突破才能继续升级
+    ENM_TEXT_CHARACTER_LEVEL_UP_ITEM_INVALID            = 3504; // 升级经验道具不合法
+    ENM_TEXT_CHARACTER_LEVEL_UP_FAILED                  = 3505; // 角色升级失败
+    ENM_TEXT_CHARACTER_LEVEL_UP_COST_ITEM_FAILED        = 3506; // 扣除升级经验道具失败
+    ENM_TEXT_CHARACTER_LEVEL_UP_COST_MONEY_FAILED       = 3507; // 扣除货币失败
+
+    ENM_TEXT_CHARACTER_LEVEL_BREAK_CONF_INVALID           = 3550; // 找不到突破配置信息
+    ENM_TEXT_CHARACTER_LEVEL_BREAK_NEED_LEVEL_UP          = 3551; // 角色等级不足
+    ENM_TEXT_CHARACTER_LEVEL_BREAK_LEVEL_MAX_LIMIT        = 3552; // 角色已达等级上限
+    ENM_TEXT_CHARACTER_LEVEL_BREAK_NEED_WORLD_LEVEL       = 3553; // 角色世界等级不足
+    ENM_TEXT_CHARACTER_LEVEL_BREAK_MONEY_NOT_ENOUGH       = 3554; // 角色突破所需货币不足
+    ENM_TEXT_CHARACTER_LEVEL_BREAK_COST_ITEM_FAILED       = 3555; // 扣除突破道具失败 
+    ENM_TEXT_CHARACTER_LEVEL_BREAK_COST_MONEY_FAILED      = 3556; // 扣除突破货币失败
+
+    // 3600~3699 战令相关
+    ENM_TEXT_BATTLE_PASS_NOT_EXIST                        = 3600; //战令不存在
+    ENM_TEXT_BATTLE_PASS_LEVEL_AWARD                      = 3601; //战令等级奖励已领取
+
+    // 3700~3799 赛马相关
+    ENM_TEXT_HORSE_TRACK_NOT_UNLOCKED = 3700; // 赛道未解锁
+    ENM_TEXT_HORSE_TRACK_NOT_JOINED = 3701; // 赛道未加入
+    ENM_TEXT_HORSE_RACING_FAILED = 3702; // 竞速失败
+    ENM_TEXT_HORSE_TRACK_NOT_FOUND = 3703; // 赛道不存在
+    ENM_TEXT_HORSE_TRACK_NOT_NORMAL = 3704; // 赛道不是普通赛道
+    ENM_TEXT_HORSE_REPLAY_NO_PENDING = 3705; // 无可领取的重复奖励
+
+    // 3800~3899 活动中心
+    ENM_TEXT_ACTIVITY_ID_INVALID = 3800;                // 活动id无效
+    ENM_TEXT_ACTIVITY_NOT_OPEN_TIME = 3801;             // 活动未在开放时间
+    ENM_TEXT_ACTIVITY_SHOW_LEVEL_NOT_REACHED = 3802;    // 玩家未达到活动显示等级
+    ENM_TEXT_ACTIVITY_NOT_UNLOCKABLE = 3803;            // 活动不能解锁
+    ENM_TEXT_ACTIVITY_CLOSED_BY_GM = 3804;              // GM已经关闭活动
+    ENM_TEXT_ACTIVITY_NOT_VISIBALE = 3805;              // 活动不可见
+    ENM_TEXT_ACTIVITY_CONFIG_NOT_FOUND = 3806;          // 未找到活动配置
+
+    // 3900~3999邮件相关
+    ENM_TEXT_MAIL_ATTACHMENT_ALREADY_RECV = 3900;  // 附件已经领取过了
+    
+    // 4000~4099 物品合成相关
+    ENM_TEXT_COMPOSE_RECIPE_NOT_FOUND                     = 4000; // 配方不存在
+    ENM_TEXT_COMPOSE_RECIPE_NOT_UNLOCKED                  = 4001; // 配方未解锁
+    ENM_TEXT_COMPOSE_COST_NOT_FOUND                       = 4002; // 消耗组配置不存在
+    ENM_TEXT_COMPOSE_COST_MISMATCH                        = 4003; // 消耗组配置不匹配
+    ENM_TEXT_COMPOSE_INVALID_ITEM                         = 4004; // 无效的材料道具
+    ENM_TEXT_COMPOSE_ITEM_NOT_ENOUGH                      = 4005; // 材料道具不足
+    ENM_TEXT_COMPOSE_MONEY_NOT_ENOUGH                     = 4006; // 货币不足
+    ENM_TEXT_COMPOSE_ITEM_COUNT_MISMATCH                  = 4007; // 材料道具数量不匹配
+    ENM_TEXT_COMPOSE_ITEM_ID_INVALID                      = 4008; // 材料道具ID无效
+    ENM_TEXT_COMPOSE_LIMIT_GROUP_NOT_ENOUGH               = 4009; // 合成限次组不足
+    
+    // 4100~4200 核心收集品错误码
+    ENM_TEXT_URBAN_MEMORY_INVALID_PARAM = 4100;        // 参数非法
+    ENM_TEXT_URBAN_MEMORY_CONFIG_NOT_FOUND = 4101;      // 配置不存在
+    ENM_TEXT_URBAN_MEMORY_ALREADY_OBSERVED = 4102;      // 已经观察过
+    ENM_TEXT_URBAN_MEMORY_CONDITION_NOT_MET = 4103;     // 条件不满足
+    ENM_TEXT_URBAN_MEMORY_ITEM_NOT_ENOUGH = 4104;       // 物品不足
+    ENM_TEXT_URBAN_MEMORY_INVALID_REGION = 4105;        // 非法的区域ID
+    ENM_TEXT_URBAN_MEMORY_INVALID_LEVEL = 4106;         // 非法的等级
+    ENM_TEXT_URBAN_MEMORY_REWARD_ALREADY_CLAIMED = 4107;// 奖励已领取
+    ENM_TEXT_URBAN_MEMORY_LEVEL_NOT_REACHED = 4108;     // 等级未达到
+    ENM_TEXT_URBAN_MEMORY_BOOK_NOT_FOUND = 4109;        // 书籍不存在
+    ENM_TEXT_URBAN_MEMORY_NOT_BOOK_ITEM = 4110;         // 不是书籍类型物品
+    ENM_TEXT_URBAN_MEMORY_SUBMIT_ITEM_INVALID = 4111;   // 提交物品非法
+    ENM_TEXT_URBAN_MEMORY_OBSERVE_STATE_INVALID = 4112; // 观察状态非法
+    ENM_TEXT_URBAN_MEMORY_NO_REWARD_TO_CLAIM = 4113;    // 没有可领取的奖励
+    ENM_TEXT_URBAN_MEMORY_BAG_FULL = 4114;              // 背包空间不足
+
+    // 4200~4270 新手历程相关
+    ENM_TEXT_NEWBIE_REWARD_ALREADY_CLAIMED   = 4200; // 新手奖励已领取
+    ENM_TEXT_NEWBIE_STAGE_NOT_COMPLETED      = 4201; // 新手阶段未全部完成
+    ENM_TEXT_NEWBIE_STAGE_NOT_UNLOCKED       = 4202; // 新手阶段未解锁
+    ENM_TEXT_NEWBIE_UNLOCK_CONDITION_NOT_MET = 4203; // 新手解锁条件未满足
+    ENM_TEXT_NEWBIE_NOT_FINISHED             = 4204; // 新手历程未完成
+    ENM_TEXT_NEWBIE_EVENT_REWARD_ALREADY_CLAIMED = 4205; // 新手事件奖励已领取
+
+    // 4270~4299 进度事件系统
+    ENM_TEXT_PROGRESS_EVENT_ID_INVALID           = 4270; // 进度事件ID无效
+    ENM_TEXT_PROGRESS_EVENT_NOT_CLIENT_JUDGE    = 4271; // 进度事件不能由客户端判断
+    // 4300~4399 装备相关
+    ENM_TEXT_EQUIP_NOT_EXIST               = 4300; // 装备不存在
+    ENM_TEXT_EQUIP_ALREADY_EQUIPED         = 4301; // 装备已装备
+    ENM_TEXT_EQUIP_NOT_EQUIPED             = 4302; // 装备未装备
+    ENM_TEXT_EQUIP_MAX_COUNT                = 4303; // 装备空间不足
+    ENM_TEXT_EQUIP_NOT_BELONG_TO_CHARACTER = 4304; // 装备不属于该角色
+    ENM_TEXT_EQUIP_LOCK_STATUS_WRONG     = 4305; // 装备锁定状态错误
+    ENM_TEXT_EQUIP_ONLY_MAIN_EQUIP_CAN_REFINE = 4306; // 只有核心装备可以精炼
+    ENM_TEXT_EQUIP_REFINE_CANNOT_COST_SELF = 4307; // 精炼时不允许使用自身
+    ENM_TEXT_EQUIP_REFINE_COST_ONLY_SAME_EQUIP = 4308; // 精炼时只能使用同名装备
+    ENM_TEXT_EQUIP_REFINE_COST_EQUIP_IS_WEARING = 4309; // 精炼时被消耗的装备是被穿戴状态
+    ENM_TEXT_EQUIP_REFINE_COST_EQUIP_IS_LOCK = 4310; // 精炼时被消耗的装备是被锁定状态
+    ENM_TEXT_EQUIP_REFINE_ITEM_COUNT_EXCEED = 4311; // 精炼时使用的道具数量超过配置上限
+    ENM_TEXT_EQUIP_REFINE_ITEM_NOT_ENOUGH = 4312; // 精炼时使用的道具不足
+    ENM_TEXT_EQUIP_REFINE_NUM_EXCEED_REST_COUNT = 4313; // 精炼次数超过剩余次数
+    ENM_TEXT_EQUIP_REFINE_MONEY_NOT_ENOUGH = 4314; // 精炼时货币不足
+    ENM_TEXT_EQUIP_ENCHANT_INVALID_CHARACTER = 4315; // 定向附魔的角色无效
+    ENM_TEXT_EQUIP_ENCHANT_ITEM_NOT_ENOUGH = 4316; // 附魔时使用的道具不足
+    ENM_TEXT_EQUIP_DIRECTIONAL_ENCHANT_ITEM_NOT_ENOUGH = 4317; // 定向附魔时使用的道具不足
+    ENM_TEXT_EQUIP_ENCHANT_MONEY_NOT_ENOUGH = 4318; // 附魔时货币不足
+    ENM_TEXT_EQUIP_LEVEL_NOT_ENOUGH = 4319; // 角色等级不足，无法穿戴该装备
+
+    // 4400~4499 深渊相关
+    ENM_TEXT_ABYSS_NOT_EXIST          = 4400; // 深渊不存在
+    ENM_TEXT_ABYSS_LAYER_NOT_UNLOCKED = 4401; // 深渊层数未解锁
+    ENM_TEXT_ABYSS_LAYER_NOT_EXIST    = 4402; // 深渊层数不存在
+    ENM_TEXT_ABYSS_NOT_UNLOCKED       = 4403; // 深渊未解锁
+    ENM_TEXT_ABYSS_ROOM_NOT_EXIST     = 4404; // 深渊房间不存在
+    ENM_TEXT_ABYSS_ROOM_NOT_UNLOCKED  = 4405; // 深渊房间未解锁
+    ENM_TEXT_ABYSS_STAR_AWARD_ALL     = 4406; // 深渊星级奖励已全部领取
+    ENM_TEXT_ABYSS_MAX_COUNT         = 4407; // 深渊数量已达上限
+    ENM_TEXT_ABYSS_NOT_START       = 4408; // 当前没有进行中的深渊
+    ENM_TEXT_ABYSS_LAYER_NOT_FINISH = 4409; //当前层并没有通关(还有房间没完成)
+
+    // 4500~4599 分解系统相关
+    ENM_TEXT_DECOMPOSE_COUNT_EXCEED = 4500; // 分解数量超过上限
+
+    // 4600~4699 好感度相关
+    ENM_TEXT_AFFINITY_INVALID_CHARUID = 4600; // 无效的char uid
+    ENM_TEXT_AFFINITY_INVALID_ASSISTANT_POS = 4601; // 无效的助手位置
+    ENM_TEXT_AFFINITY_NOT_ENOUGH_GIFT_CNT = 4602; // 礼物次数不足
+    ENM_TEXT_AFFINITY_NOT_ENOUGH_TOTAL_GIFT_CNT = 4603; // 总礼物次数不足
+    ENM_TEXT_AFFINITY_ALREADY_CLAIMED = 4604; // 奖励已领取
+    ENM_TEXT_AFFINITY_LEAD_CHARUID = 4605; // 无效的char uid 这是男女主角
+    ENM_TEXT_AFFINITY_STAGE_MAX_LEVEL = 4606; // 好感度阶段已达上限
+
+    // 4700~4799 杂项小功能集合相关
+    ENM_TEXT_MINI_EXCHANGE_NOT_VALID = 4700; //道具兑换没有该配方
+    ENM_TEXT_MINI_INTERACT_STATE_INSERT_FAILED = 4701; // 交互状态插入失败
+    ENM_TEXT_MINI_INTERACT_STATE_UPDATE_FAILED = 4702; // 交互状态更新失败
+    ENM_TEXT_MINI_INTERACT_STATE_NOT_FOUND = 4703; // 交互状态未找到
+    ENM_TEXT_MINI_STAMINA_EXCHANGE_NOT_VALID = 4704; // 钻石体力兑换：配置不存在
+    ENM_TEXT_MINI_STAMINA_EXCHANGE_COST_NOT_FOUND = 4705; // 钻石体力兑换：找不到当前次数对应的消耗档位
+    ENM_TEXT_MINI_STAMINA_EXCHANGE_NOT_SUPPORTED = 4706; // 钻石体力兑换：尚未支持的体力类型
+
+    // 4800~4899 Condition条件相关
+    ENM_TEXT_CONDITION_CHECK_FAILED = 4800; // 条件配置检查失败
+    ENM_TEXT_CONDITION_KEY_EXISTS = 4801; // 条件key已存在
+    ENM_TEXT_CONDITION_CANNOT_FOUND_DUNGEONS = 4802; // 没有找到对应的副本
+
+    // 4900~4999 Function功能相关
+    ENM_TEXT_FUNCTION_CHECK_FAILED = 4900; // 功能配置检查失败
+    ENM_TEXT_FUNCTION_KEY_EXISTS = 4901; // 功能key已存在
+    ENM_TEXT_FUNCTION_CANNOT_FOUND_DUNGEONS = 4902; // 没有找到对应的副本
+
+    // 5000~5099 奖励相关
+    ENM_TEXT_REWARD_GET_METHOD_NOT_EXISTS = 5001; // 指定领取方式的奖励不存在
+    ENM_TEXT_REWARD_EXISTS = 5002; // 奖励已存在
+    ENM_TEXT_REWARD_GET_METHOD_INVALID = 5003; // 奖励的领取方式非法
+    ENM_TEXT_REWARD_BUSINESS_TYPE_INVALID = 5004; // 奖励的业务类型非法
+    ENM_TEXT_REWARD_NOT_EXISTS = 5005; // 奖励不存在
+
+    // 5100~5199 肉鸽天赋树相关
+    ENM_TEXT_WANTED_TALENT_NOT_UNLOCK = 5100; //天赋树未解锁
+    ENM_TEXT_WANTED_TALENT_NODE_NOT_UNLOCK = 5101; //天赋树节点未解锁
+    ENM_TEXT_WANTED_TALENT_POINT_NOT_ENOUGH = 5102; //天赋点不足
+    ENM_TEXT_WANTED_TALENT_NODE_UNLOCK = 5103; //天赋树节点已解锁
+    ENM_TEXT_WANTED_TALENT_EXIST = 5104; //天赋树已经存在
+    
+    // 5200~5299 案件相关
+    ENM_TEXT_CASE_NOT_EXIST = 5200; // 案件不存在
+    ENM_TEXT_CASE_CONF_NOT_FOUND = 5201; // 案件配置不存在
+    ENM_TEXT_CASE_NOT_DEDUCTION = 5202; // 案件不是推理案件
+    ENM_TEXT_CASE_STAGE_NOT_FOUND = 5203; // 案件阶段不存在
+    ENM_TEXT_CASE_STAGE_CONF_INVALID = 5204; // 案件阶段配置错误
+    ENM_TEXT_CASE_STAGE_CONF_NOT_FOUND = 5205; // 案件阶段配置不存在
+    ENM_TEXT_CASE_CANNOT_PUBLISH = 5206; // 案件不能公布
+    ENM_TEXT_CASE_CANNOT_BACK = 5207; // 案件不能回溯
+    ENM_TEXT_CASE_ALREADY_PUBLISHED = 5208; // 案件已公布
+    ENM_TEXT_CASE_CLUE_NOT_EXIST = 5209; // 线索不存在
+    ENM_TEXT_CASE_CLUE_ALREADY_PUT = 5210; // 线索已放置
+    ENM_TEXT_CASE_EVIDENCE_NOT_EXIST = 5211; // 证物不存在
+    ENM_TEXT_CASE_EVIDENCE_ALREADY_DECRYPTED = 5212; // 证物已经解密过
+    ENM_TEXT_CASE_NOT_FINISHED = 5213; // 案件未完成
+    ENM_TEXT_CASE_NO_REWARD = 5214; // 案件无奖励配置
+    ENM_TEXT_CASE_REWARD_ALREADY_CLAIMED = 5215; // 案件奖励已领取
+    ENM_TEXT_CASE_CLUE_NODE_CONFLICT = 5216; // 线索节点冲突
+
+    // 5300~5399 命座
+    ENM_TEXT_CONSTELLATION_POINT_ALREADY_ACTIVE = 5300; // 命座已激活
+    ENM_TEXT_CONSTELLATION_PRE_POINT_NOT_ACTIVE = 5301; // 前置命座未激活
+
+    // 5400~5499 信鸽
+    ENM_TEXT_LETTER_NOT_EXIST = 5400; // 信件不存在
+    ENM_TEXT_LETTER_NOT_RECV = 5401; // 信件未收到
+    ENM_TEXT_LETTER_ALREADY_RECV = 5402; // 信件已经收到
+    ENM_TEXT_LETTER_ALREADY_READ = 5403; // 信件已经阅读
+    ENM_TEXT_LETTER_ALREADY_REPLIED = 5404; // 信件已经回复
+    ENM_TEXT_LETTER_ALREADY_REWARD = 5405; // 信件奖励已经领取
+    ENM_TEXT_LETTER_NOT_ALLOW_ITEM = 5406; // 信件不允许提交物品
+    ENM_TEXT_LETTER_COMMIT_ITEM_NOT_ENOUGH = 5407; // 信件提交物品不足
+    ENM_TEXT_LETTER_SEND_FAILED = 5408; // 信件发送失败
+    ENM_TEXT_LETTER_IN_DELAY = 5409; // 信件处于发送延迟中(不可见)
+    ENM_TEXT_LETTER_OPTION_NOT_EXIST = 5410; // 信件选项不存在
+    ENM_TEXT_LETTER_OPTION_TYPE_INVALID = 5411; // 信件选项类型非法
+    ENM_TEXT_LETTER_COMMIT_ITEM_CNT_OVER = 5412; // 信件提交物品数量超过上限
+    ENM_TEXT_LETTER_COMMIT_ITEM_EMPTY = 5413; // 信件提交物品数量为空
+    ENM_TEXT_LETTER_COMMIT_ITEM_NOT_GIFT = 5414; // 信件提交物品非礼物
+    ENM_TEXT_LETTER_NOT_REPLIED = 5415; // 信件未回复
+    ENM_TEXT_LETTER_NOT_EXIST_REWARD = 5416; // 信件未配置奖励
+    
+    // 5500~5599 通缉令
+    ENM_TEXT_HUNT_BOARD_NOT_FOUND = 5500; // 告示板不存在
+    ENM_TEXT_HUNT_BOARD_CONF_NOT_FOUND = 5501; //告示板配置不存在
+    ENM_TEXT_HUNT_BOARD_COLUMN_NOT_FOUND = 5502; // 栏位不存在
+    ENM_TEXT_HUNT_BOARD_COLUMN_CONF_NOT_FOUND = 5503; // 栏位配置不存在
+    ENM_TEXT_HUNT_BOARD_COLUMN_STATUS_INVALID = 5504; // 栏位状态不对
+    ENM_TEXT_HUNT_BOARD_SPEED_UP_COUNT_INVALID = 5505; // 加速次数非法
+    ENM_TEXT_HUNT_ENTRY_NOT_FOUND = 5506;   // 通缉令没发现
+    ENM_TEXT_HUNT_ENTRY_STATUS_INVALID = 5507; // 通缉令状态不太
+    ENM_TEXT_HUNT_NODE_STATUS_INVALID = 5508; // 通缉令Node不对
+    ENM_TEXT_HUNT_STAGE_NOT_FOUND = 5509; // 通缉令阶段不存在
+    ENM_TEXT_HUNT_STAGE_PROGRESS_NOT_ENOUGH = 5510; // 通缉令阶段进度不足
+    ENM_TEXT_HUNT_STAGE_ALREADY_UNLOCKED = 5511; // 通缉令阶段已解锁
+    ENM_TEXT_HUNT_ALREADY_COMPLETED = 5512; // 通缉令已完成
+    ENM_TEXT_HUNT_CONFIG_NOT_FOUND = 5513; // 通缉令配置不存在
+    ENM_TEXT_HUNT_NODE_NOT_FOUND = 5514; // 通缉令节点不存在
+
+    // 5600~5699 解锁系统相关
+    ENM_TEXT_UNLOCK_FEATURE_NOT_UNLOCKED = 5600; // 解锁功能未解锁
+    ENM_TEXT_UNLOCK_FEATURE_ALREADY_READ = 5601; // 解锁功能已读
+    ENM_TEXT_UNLOCK_FEATURE_DATA_NOT_FOUND = 5602; // 解锁功能数据不存在
+
+    // 5700~5719 任务活动相关
+    ENM_TEXT_TASK_ACTIVITY_TASK_ID_INVALID        = 5700; // 任务活动任务ID无效
+    ENM_TEXT_TASK_ACTIVITY_TASK_NOT_FINISHED      = 5701; // 任务活动任务未完成
+    ENM_TEXT_TASK_ACTIVITY_REWARD_ALREADY_CLAIMED = 5702; // 任务活动奖励已领取
+    ENM_TEXT_TASK_ACTIVITY_NO_CLAIMABLE_TASK      = 5703; // 任务活动没有可领取的任务
+
+    // Balatro 小丑牌 [5800, 5900)
+    ENM_TEXT_BALATRO_RUN_ALREADY_ACTIVE       = 5800; // 已有进行中的对局
+    ENM_TEXT_BALATRO_RUN_NOT_ACTIVE           = 5801; // 无进行中的对局
+    ENM_TEXT_BALATRO_RUN_NOT_OVER             = 5802; // 对局未结束
+    ENM_TEXT_BALATRO_WRONG_BLIND_STATUS       = 5803; // 盲注状态不正确
+    ENM_TEXT_BALATRO_INVALID_LEVEL            = 5804; // 关卡配置不存在
+    ENM_TEXT_BALATRO_NOT_ENOUGH_GOLD          = 5805; // 金币不足
+    ENM_TEXT_BALATRO_ITEM_ALREADY_SOLD        = 5806; // 商品已售出
+    ENM_TEXT_BALATRO_INVALID_ITEM_INDEX       = 5807; // 商品索引越界
+    ENM_TEXT_BALATRO_ITEM_NOT_FOUND           = 5808; // 道具不存在或不足
+    ENM_TEXT_BALATRO_INVENTORY_FULL           = 5809; // 道具槽位已满
+    ENM_TEXT_BALATRO_PREV_LEVEL_NOT_PASSED    = 5810; // 前置关卡未通关
+    ENM_TEXT_BALATRO_INTEL_LEVEL_NOT_ENOUGH   = 5811; // 情报中心等级不足
+    ENM_TEXT_BALATRO_REPEATED_CLAIM_EXCEED    = 5812; // 复刷奖励领取数量超过配置上限
+    ENM_TEXT_BALATRO_WRONG_RUN_STATUS         = 5813; // 对局状态不匹配（如非 HELL_GATEWAY 时调用 HellContinue）
+
+    // [5900, 6000) 情报中心
+    ENM_TEXT_INTEL_RISK_NOT_ENOUGH               = 5900; // 风险值不足
+    ENM_TEXT_INTEL_RISK_EXCEED_LIMIT             = 5901; // 风险值超过储存上限
+    ENM_TEXT_INTEL_FAVORITE_FULL                 = 5902; // 收藏列表已满
+    ENM_TEXT_INTEL_LEVEL_MAX                     = 5903; // 情报等级已满级
+    ENM_TEXT_INTEL_UPGRADE_CONDITION_NOT_MET     = 5904; // 升级条件不足
+    ENM_TEXT_INTEL_COLLECT_CD                    = 5905; // 情报收益领取冷却中
+
+    // [6000, 6100) 咖啡店
+    ENM_TEXT_COFFEE_STAGE_NOT_CLEARED            = 6000; // 咖啡关卡未通关
+    ENM_TEXT_COFFEE_REPLAY_NO_PENDING            = 6001; // 咖啡无可领取的重复奖励
+
+    // [6100, 6200) 战斗校验（battle_verify）：CS_Battle_Log_Report 上报回包错误码，逐类区分便于联调排查
+    ENM_TEXT_BATTLE_VERIFY_NOT_RUNNING            = 6100; // 未处于战斗校验会话中（未入战 / 已结束）
+    ENM_TEXT_BATTLE_VERIFY_BATTLE_UID_MISMATCH    = 6101; // 上报 battle_uid 与当前会话不一致
+    ENM_TEXT_BATTLE_VERIFY_SEGMENT_ID_INVALID     = 6102; // 段号非法（segment_id=0）
+    ENM_TEXT_BATTLE_VERIFY_SEGMENT_OUT_OF_ORDER   = 6103; // 段号超前乱序（跳段，会产生缺口）
+    ENM_TEXT_BATTLE_VERIFY_FRAME_RANGE_INVALID    = 6104; // 帧范围非法（start_frame > end_frame）
+    ENM_TEXT_BATTLE_VERIFY_EVENT_TYPE_INVALID     = 6105; // 段内含未知事件类型
+    ENM_TEXT_BATTLE_VERIFY_EVENTS_OVERSIZE        = 6106; // events 条数超 max_events（拒整段）
+    ENM_TEXT_BATTLE_VERIFY_DB_WRITE_FAILED        = 6107; // 落库失败（Send2DbSvr 返回非 0）；服务端未推进游标，客户端应重发同段（唯一需重发的码）
+    ENM_TEXT_BATTLE_VERIFY_SEGMENT_DUPLICATE      = 6108; // 段号重复（segment_id < 期望，已收过，不重复落库；约定客户端不因错误码重发）
+    ENM_TEXT_BATTLE_VERIFY_EVENT_PAYLOAD_OVERSIZE = 6109; // 单事件变长负载超上限（character_attrib_deltas 组/条、attack_hit targets、add_affix atoms）
+    ENM_TEXT_BATTLE_VERIFY_STATE_ACTOR_OVERSIZE   = 6110; // state 角色/怪物数超上限（characters / monsters）
+    ENM_TEXT_BATTLE_VERIFY_STATE_ATTRIB_OVERSIZE  = 6111; // state 单角色/单怪属性条数超上限（attrib_data）
+    ENM_TEXT_BATTLE_VERIFY_REPORT_DISABLED        = 6112; // 战斗校验上报总开关已关闭；整条上报管线短路，客户端应停止上报（约定不因此码重发）
+}
+
+// @desc 道具ShowType, 不太理解道具类型为啥还要分客户端、服务端，先配置需要的，后面按需补充
+// @TextCode
+// 1	货币类
+// 2	消耗品
+// 3	礼包
+// 4	养成道具
+// 5	素材
+// 6	角色卡
+// 7	专武
+// 8	BUFF
+// 9	食物
+// 10	宝箱
+// 11	命座
+// 12	液银仿生品
+// 13	宝石
+// 14	任务道具
+// 15	经验
+// 16	贵重物页签下的消耗品
+// 17	体力道具，有特殊界面
+// 18	风道，特殊LD需求
+// 19	收藏品
+// 20	装备
+// 21	收集品
+// 22	书籍类收集品
+// 23	礼物
+// 24	合成配方
+enum EnmItemShowType
+{
+    ENM_ITEM_SHOW_TYPE_NONE = 0; // 无特殊展示
+    ENM_ITEM_SHOW_TYPE_GIFT = 23;
+}
+
+
+// @desc 道具变化来源
+// @TextCode
+// 其实现在算作了FlowReason
+enum EnmItemReason
+{
+    ENM_ITEM_CHANGE_MIN                       = 0;
+    ENM_ITEM_CHANGE_SHOP                      = 1;  // 商店
+    ENM_ITEM_CHANGE_GM                        = 2;  // GM
+    ENM_ITEM_CHANGE_USE                       = 3;  // 使用道具
+    ENM_ITEM_CHANGE_CHARACTER_LEVEL_UP        = 4;  // 角色升级
+    ENM_ITEM_CHANGE_INIT                      = 5;  // 角色初始化
+    ENM_ITEM_CHANGE_NORMAL                    = 6;  // !!! 系统通用 !!!
+    ENM_ITEM_CHANGE_BATTLE_END                = 7;  // 战斗结算
+    ENM_ITEM_CHANGE_NEW_CHARACTER_INIT_WEAPON = 8;  // 新角色自带液银生物
+    ENM_ITEM_CHANGE_TASK                      = 9;  // 任务奖励
+    ENM_ITEM_CHANGE_TASK_ACTION_ADD           = 10; // 任务action下发
+    ENM_ITEM_CHANGE_TASK_ACTION_COST          = 11; // 任务action扣除
+    ENM_ITEM_CHANGE_COLLECT                   = 12; // 采集物
+    ENM_ITEM_CHANGE_DUNGEONS_END              = 13; // 复刷副本
+    ENM_ITEM_CHANGE_TALENT                    = 14; // 天赋解锁
+    ENM_ITEM_CHANGE_SILVER_CREATURE_COMBINE   = 15; // 液银生物合成
+    ENM_ITEM_CHANGE_ACHIEVEMENT               = 16; // 领取成就奖励
+    ENM_ITEM_CHANGE_HOUSE_INDUSTRY_DROP       = 17; // 房子产业掉落
+    ENM_ITEM_CHANGE_GACHA_REWARD              = 18; // 抽卡奖励
+    ENM_ITEM_CHANGE_MOTIVE_LEVEL_UP           = 19; // 专武升级
+    ENM_ITEM_CHANGE_MOTIVE_REFINE_UP          = 20; // 专武升阶
+    ENM_ITEM_CHANGE_DECOMPOSE_MOTIVES         = 21; // 分解专武
+    ENM_ITEM_CHANGE_MOTIVE_LOCK_OR_UNLOCK     = 22; // 专武上锁/解锁
+    ENM_ITEM_CHANGE_MAIL                      = 23; // 邮件领取
+    ENM_ITEM_CHANGE_CHARACTER_CONVERT         = 24; // 角色转化
+    ENM_ITEM_CHANGE_MONTHCARD_DELIVER         = 25; //月卡
+    ENM_ITEM_CHANGE_MONTHCARD_CHARGE          = 26; //充值购买
+    ENM_ITEM_CHANGE_SHOP_BUY                  = 27; //商店购买
+    ENM_ITEM_CHANGE_GIFT_DELIVER              = 28; //礼包领取
+    ENM_ITEM_CHANGE_WANTED_EXCHANGE           = 29; //通缉令体力兑换
+    ENM_ITEM_CHANGE_WANTED_OVER               = 30; //通缉令结算
+    ENM_ITEM_CHANGE_DAILY_MISSION_REWARD      = 31; // 每日活跃奖励
+    ENM_ITEM_CHANGE_SIGNIN_ACTIVITY           = 32; //签到活动
+    ENM_ITEM_CHANGE_REGION_PROGRESS           = 33; //区域进度
+    ENM_ITEM_CHANGE_GUIDE                     = 34; // 教程奖励
+    ENM_ITEM_CHANGE_NEW_CHARACTER             = 35; //新角色
+    ENM_ITEM_CHANGE_CHARACTER_LEVELUP_RECYCLE = 36; //升级多出经验回收
+    ENM_ITEM_CHANGE_CHARACTER_BREAK           = 37; //角色突破
+    ENM_ITEM_CHANGE_MOTIVE_BREAK              = 38; // 专武突破
+    ENM_ITEM_CHANGE_MOTIVE_LEVEL_UP_RECYCLE   = 39; // 专武升级溢出经验回收
+    ENM_ITEM_CHANGE_BATTLE_PASS_LEVEL_AWARD   = 40; //战令等级奖励
+    ENM_ITEM_CHANGE_HOUSE_UPGRADE                              = 41;  // 房子升级
+    ENM_ITEM_CHANGE_HOUSE_BUY                                  = 42;  // 房子购买
+    ENM_ITEM_CHANGE_HOUSE_INCOME                               = 43;  // 房子收入
+    ENM_ITEM_CHANGE_GACHA_REVERT_FOR_ADDITEM_FAIL              = 44; // 抽卡失败恢复道具
+    ENM_ITEM_CHANGE_GACHA_REVERT_FOR_AWARDS_EMPTY              = 45; // 抽卡失败恢复货币
+    ENM_ITEM_CHANGE_GACHA_COST                                 = 46; // 抽卡消耗
+    ENM_ITEM_CHANGE_ITEM_USE_EFFECT                            = 47; // 道具使用效果
+    ENM_ITEM_CHANGE_DUNGEONS_FINISH_COST                       = 48; // 副本扣体力
+    ENM_ITEM_CHANGE_WANTED_SHOP_BUY                            = 49; // 通缉令商店购买
+    ENM_ITEM_CHANGE_WANTED_REVIVE                              = 50; // 通缉令复活
+    ENM_ITEM_CHANGE_DAILY_MISSION_FINISH_CLAIM                 = 51; // 每日活跃任务完成领取
+    ENM_ITEM_CHANGE_WANTED_ADVENTURE                           = 52; // 通缉令奇遇
+    ENM_ITEM_CHANGE_WANTED_STEP_START                                = 53; // 通缉令步骤开始
+    ENM_ITEM_CHANGE_WANTED_DISCART                             = 54; // 通缉令资源丢弃
+    ENM_ITEM_CHANGE_TIMER_RECOVER_STAMINA                      = 55; // 时间恢复体力
+    ENM_ITEM_CHANGE_HORSE_RACING                               = 56; // 赛马玩法，赛道奖励
+    ENM_ITEM_CHANGE_COMPOSE                                    = 57; // 配方合成
+    ENM_ITEM_CHANGE_EQUIP_WISH                                  = 58; // 装备许愿
+    ENM_ITEM_CHANGE_EQUIP_LEVEL_UP                              = 59;//装备升级
+    ENM_ITEM_CHANGE_EQUIP_FILL_ATTR                             = 60;//装备补缀
+    ENM_ITEM_CHANGE_ABYSS_STAR_REWARD                           = 61;//深渊星级奖励
+    ENM_ITEM_CHANGE_DECOMPOSE_ITEMS                            = 62; // 道具分解
+    ENM_ITEM_CHANGE_DECOMPOSE_EQUIPS                           = 63; // 装备分解
+    ENM_ITEM_CHANGE_AFFINITY_GIFT                               = 64; // 好感度送礼
+    ENM_ITEM_CHANGE_AFFINITY_LEVEL_REWARD                       = 65; // 好感度奖励
+    ENM_ITEM_CHANGE_EQUIP_DECOMPOSE                             = 66; // 装备分解
+    ENM_ITEM_CHANGE_URBAN_MEMORY_OBSERVE_REWARD                      = 67; // 核心收集品观察奖励
+    ENM_ITEM_CHANGE_URBAN_MEMORY_LEVEL_UP_REWARD                     = 68; // 核心收集品等级提升奖励
+    ENM_ITEM_CHANGE_REBATE                                          = 69;//返水
+    ENM_ITEM_CHANGE_MINI_EXCHANGE                                   = 70;//小功能--道具兑换
+    ENM_ITEM_CHANGE_HOUSE_TARGET_GROUP_REWARD                         = 71;    // 房地产目标组完成奖励
+    ENM_ITEM_CHANGE_HOUSE_DISPATCH_REWARD                           = 72;    // 房地产派遣完成奖励
+    ENM_ITEM_CHANGE_HOUSE_DISPATCH_REWARD_BY_EFFECT = 73;           // 房地产派遣完成奖励，由角色技能额外奖励
+    ENM_ITEM_CHANGE_LIMIT_TOKEN                                 = 74;    // 限时代币获取或消耗
+    ENM_ITEM_CHANGE_SILVER_CREATURE_INSTITUTE_LEVEL_REWARD          = 75; // 液银生物等级奖励
+    ENM_ITEM_CHANGE_ACTIVE_CONSTELLATION_POINT                  = 76; // 激活命座点
+    ENM_ITEM_CHANGE_HOUSE_SHOP_REFRESH = 77; // 房产商店刷新
+    ENM_ITEM_CHANGE_HOUSE_SHOP_BUY_GOODS = 78; // 房产商店购买商品
+    ENM_ITEM_CHANGE_WANTED_GEM_EVOLVE                            = 79; // 通缉令宝石进化
+    ENM_ITEM_CHANGE_WANTED_GEM_MERGE                             = 80; // 通缉令宝石合成
+    ENM_ITEM_CHANGE_WANTED_TALENT_TREE                           = 81; // 通缉令开始 天赋树提供的加成
+    ENM_ITEM_CHANGE_LETTER_REWARD                                   = 82; // 信件奖励
+    ENM_ITEM_CHANGE_LETTER_OPTION_ITEM                              = 83; // 信件选项提交道具
+    ENM_ITEM_CHANGE_LETTER_OPTION_AFFINITY_ITEM                     = 84; // 信件选项提交好感度道具
+    ENM_ITEM_CHANGE_WANTED_ADD_BLESS                              = 85; // 通缉令添加祝福的时候
+    ENM_ITEM_CHANGE_WANTED_BOND_CHANGE                              = 86; // 通缉令羁绊等级变化的时候
+    ENM_ITEM_CHANGE_HUNT_COMPLETE                                = 87; // 区域悬赏通缉令完成奖励
+    ENM_ITEM_CHANGE_HUNT_SPEED_UP                                = 88; // 区域悬赏加速消耗
+    ENM_ITEM_CHANGE_EQUIP_REFINE                                    = 89; // 装备精炼
+    ENM_ITEM_CHANGE_EQUIP_ENCHANT                                   = 90; // 装备附魔
+    ENM_ITEM_CHANGE_WANTED_STEP_FINISH                                = 91; // 通缉令步骤完成
+    ENM_ITEM_CHANGE_WANTED_BATTLE_WIN                                = 92; // 通缉令战斗完成
+    ENM_ITEM_CHANGE_TASK_ACTIVITY                                    = 93; // 任务活动奖励
+    ENM_ITEM_CHANGE_CASE_REWARD                                      = 94; // 案件奖励
+    ENM_ITEM_CHANGE_WANTED_CREDIT_CLAIM                              = 95; // 通缉令周积分里程碑奖励领取
+    ENM_ITEM_CHANGE_WANTED_ZOMBIE_AWARD                              = 96; // 通缉令尸潮击杀奖励
+    ENM_ITEM_CHANGE_COFFEE_STAGE_REWARD                              = 97; // 咖啡关卡星级奖励
+    ENM_ITEM_CHANGE_COFFEE_REPLAY_REWARD                             = 98; // 咖啡重复奖励
+    ENM_ITEM_CHANGE_COFFEE_RISK_COST                                 = 99; // 咖啡重复奖励风险值消耗
+    ENM_ITEM_CHANGE_WANTED_AWARD_REFRESH                             = 100; // 通缉令三选一奖励刷新
+    ENM_ITEM_CHANGE_BALATRO                                          = 101; // 小丑牌玩法奖励
+    ENM_ITEM_CHANGE_AFFINITY_DATE_TASK_REWARD                        = 102; // 好感度约会任务奖励
+    ENM_ITEM_CHANGE_MINI_STAMINA_EXCHANGE                            = 103; // 小功能--钻石体力兑换
+    ENM_ITEM_CHANGE_POI_TASK                                         = 104; // POI任务
+    ENM_ITEM_CHANGE_HOUSE_TIMED_OUTPUT_COST                          = 105; // 房产 TimedItemOutput 周期扣款
+    ENM_ITEM_CHANGE_HOUSE_TIMED_OUTPUT_CLAIM                         = 106; // 房产 TimedItemOutput 领取奖励
+    ENM_ITEM_CHANGE_TIMER_RECOVER_RISK_VALUE                         = 107; // 时间恢复风险值
+    ENM_ITEM_CHANGE_BALATRO_RISK_COST                                = 108; // 小丑牌复刷奖励风险值消耗
+    ENM_ITEM_CHANGE_COLLECT_STAMINA                                  = 109; // 体力采集物
+    ENM_ITEM_CHANGE_HORSE_RACING_REPLAY_REWARD                       = 110; // 赛马重复领取奖励
+    ENM_ITEM_CHANGE_HORSE_RISK_COST                                  = 111; // 赛马重复领取风险值消耗
+    ENM_ITEM_CHANGE_NEWBIE_STAGE_REWARD                              = 112; // 前期历程阶段奖励
+    ENM_ITEM_CHANGE_NEWBIE_EVENT_REWARD                              = 113; // 前期历程事件奖励
+}
+
+// @desc 地图类型
+enum EnmMapType
+{                               //预留类型扩展
+    ENM_MAP_WORLD          = 0; //大世界地图
+    ENM_MAP_WORLD_BATTLE   = 1; //大世界副本
+    ENM_MAP_PARALLEL_WORLD = 2; //平行世界副本
+}
+
+// @desc 玩家在地图中出生位置类型
+enum EnmBornPosType
+{
+    ENM_BORN_SAVE_POINT  = 0; //使用保存点
+    ENM_BORN_POSITION    = 1; //使用坐标
+    ENM_BORN_DEFAULT_POS = 2; //使用地图默认出生点
+    ENM_BORN_TELEPORT    = 3; //使用传送点
+}
+
+// @desc 周期类型
+enum EnmPeriodType
+{
+    ENM_PERIOD_NONE    = 0; // 无
+    ENM_PERIOD_DAILY   = 1; // 天
+    ENM_PERIOD_WEEKLY  = 2; // 周
+    ENM_PERIOD_MONTHLY = 3; // 月
+    ENM_PERIOD_FOREVER = 4; // 永久
+}
+
+// @desc 任务action更新类型
+enum EnmTaskActionUpdateType
+{
+    ETASK_ACTION_UPDATE_TYPE_NORMAL  = 0; //正常任务进度更新
+    ETASK_ACTION_UPDATE_TYPE_NEW     = 1; //新任务接取
+    ETASK_ACTION_UPDATE_TYPE_FINISH  = 2; //任务完成
+    ETASK_ACTION_UPDATE_TYPE_FAIL    = 3; //任务step失败回退
+    ETASK_ACTION_UPDATE_TYPE_RECONNECT   = 4; //弱网重连
+    ETASK_ACTION_UPDATE_TYPE_REMOVED = 5; //任务被移除（真·失败）
+    ETASK_ACTION_UPDATE_TYPE_ACTIVATE = 6; //任务激活
+    ETASK_ACTION_UPDATE_TYPE_RESET    = 7; //任务重置
+}
+
+// @desc 待接取任务数据变更推送的类型
+enum ETaskAcceptInfoNtfType
+{
+    ETaskAcceptInfoNtfType_Null          = 0;
+    ETaskAcceptInfoNtfType_Unlock        = 1; // task 刚被解锁，task_accept_infos 给出该 task 的初始 TaskAcceptInfo
+    ETaskAcceptInfoNtfType_CondUpdate    = 2; // 已解锁 task 的 finished_cond_id 集合发生变化
+    ETaskAcceptInfoNtfType_Remove        = 3; // task 在配表中失效，客户端从列表摘除
+    ETaskAcceptInfoNtfType_AcceptSuccess = 4; // task 已成功接取，客户端从列表摘除
+}
+
+enum EMailType
+{
+    ENM_MAIL_TYPE_INVALID  = 0;
+    ENM_MAIL_TYPE_SYS      = 1; // 系统邮件
+    ENM_MAIL_TYPE_TEMPLATE = 2; // 模板邮件
+}
+
+enum FenceEventType
+{
+    ENM_FENCE_EVENT_INVALID = 0;
+    ENM_FENCE_EVENT_NAME    = 1;
+    ENM_FENCE_EVENT_CMT     = 2;
+    ENM_FENCE_EVENT_ART     = 3;
+    ENM_FENCE_EVENT_CHAT    = 4;
+    ENM_FENCE_EVENT_MAX     = 5;
+}
+
+enum EBattleType
+{
+    ENM_BATTLE_TYPE_INVALID  = 0;
+    ENM_BATTLE_TYPE_EXPOSE   = 1; // 揭发战
+    ENM_BATTLE_TYPE_PATROL   = 2; // 巡逻战
+    ENM_BATTLE_TYPE_WORLD_BOSS = 3; //世界boss
+    ENM_BATTLE_TYPE_BOSS = 4; // 灰姑娘
+    ENM_BATTLE_TYPE_REPEAT_DUNGEON = 5; // 复刷副本
+    ENM_BATTLE_TYPE_WEEK_DUNGEON = 6; // 周副本
+    ENM_BATTLE_TYPE_WANTED = 7; // 通缉令
+    ENM_BATTLE_TYPE_HORDE = 8; // 尸潮
+    ENM_BATTLE_TYPE_WORLD_DUNGEON = 9; // 大世界副本
+    ENM_BATTLE_TYPE_ABYSS = 10; // 深渊
+    ENM_BATTLE_TYPE_MAX      = 11;
+}
+
+enum EBattleResultType
+{
+    ENM_BATTLE_RESULT_TYPE_INVALID  = 0;
+    ENM_BATTLE_RESULT_TYPE_SUCCESS   = 1; // 成功
+    ENM_BATTLE_RESULT_TYPE_DEAD_FAIL   = 2; // 全死失败
+    ENM_BATTLE_RESULT_TYPE_TIMEOUT_FAIL = 3; // 超时失败
+    ENM_BATTLE_RESULT_TYPE_FORCE_FAIL = 4; // 强制失败
+    ENM_BATTLE_RESULT_TYPE_RECHALLENGE = 5; // 重新挑战
+}
+
+// @desc 关卡结束结果（深渊房间 / 副本结束埋点共用，区分入战前/入战后玩家主动放弃与重新挑战）
+enum EnmStageEndResult
+{
+    ENM_STAGE_END_RESULT_INVALID          = 0;
+    ENM_STAGE_END_RESULT_SUCCESS          = 1; // 成功
+    ENM_STAGE_END_RESULT_DEAD_FAIL        = 2; // 全死失败
+    ENM_STAGE_END_RESULT_TIMEOUT_FAIL     = 3; // 超时失败
+    ENM_STAGE_END_RESULT_FORCE_FAIL_PRE   = 4; // 强制失败（入战前玩家主动放弃）
+    ENM_STAGE_END_RESULT_FORCE_FAIL_POST  = 5; // 强制失败（入战后玩家主动放弃）
+    ENM_STAGE_END_RESULT_RECHALLENGE_PRE  = 6; // 重新挑战（入战前 esc 选重新挑战）
+    ENM_STAGE_END_RESULT_RECHALLENGE_POST = 7; // 重新挑战（入战后 esc 选重新挑战）
+}
+// @desc 步骤状态枚举
+enum EnmWantedStepStatus
+{
+    ENM_WSS_START = 0; //已开始
+    ENM_WSS_FINISHED = 1;//步骤已完成
+}
+
+// @desc 肉鸽宝石埋点操作类型（schema_wanted.proto :: WantedGemEquip.operation_type）
+enum EnmWantedGemOperationType
+{
+    ENM_WANTED_GEM_OP_INVALID = 0;
+    ENM_WANTED_GEM_OP_REMOVE = 1; // 卸下
+    ENM_WANTED_GEM_OP_REPLACE = 2; // 替换（含装新颗 / 自动装配 / 手动整组替换 / 角色继承）
+}
+
+// @desc 肉鸽宝石埋点装备方式（schema_wanted.proto :: WantedGemEquip.equiptype），由埋点函数从 DBOneWanted.gem_auto_equip_off 派生
+enum EnmWantedGemEquipType
+{
+    ENM_WANTED_GEM_EQUIP_INVALID = 0;
+    ENM_WANTED_GEM_EQUIP_AUTO = 1; // 自动（gem_auto_equip_off=false）
+    ENM_WANTED_GEM_EQUIP_MANUAL = 2; // 手动（gem_auto_equip_off=true）
+}
+
+// @desc 进度值
+enum EnmProgressValue
+{
+    ENM_PROGRESS_VALUE_0 = 0; // 0%
+    ENM_PROGRESS_VALUE_25 = 25; // 25%
+    ENM_PROGRESS_VALUE_50 = 50; // 50%
+    ENM_PROGRESS_VALUE_75 = 75; // 75%
+    ENM_PROGRESS_VALUE_100 = 100; // 100%
+}
+
+// @desc 房子状态
+enum EnmHouseState
+{
+    ENM_HOUSE_STATE_INVALID = 0; // 未解锁
+    ENM_HOUSE_STATE_UNLOCKED = 1; // 已发现 相当于已解锁
+    ENM_HOUSE_STATE_PURCHASED = 2; // 已购买
+    ENM_HOUSE_STATE_OPEN = 3; // 已营业
+}
+
+// @desc guide状态
+enum EnmGuideState
+{
+    ENM_GUIDE_STATE_INVALID = 0; // 未开始
+    ENM_GUIDE_STATE_READED = 1; // 引导已读
+}
+
+// @desc 临时编队类型
+enum EnmTmpTeamType
+{
+    ENM_TMP_TEAM_TYPE_NONE = 0; // 无效
+    ENM_TMP_TEAM_TYPE_TASK = 1; // 任务编队
+    ENM_TMP_TEAM_TYPE_DUNGEON = 2; // 副本编队
+    ENM_TMP_TEAM_TYPE_WANTED = 3; // 通缉令编队
+    ENM_TMP_TEAM_TYPE_MIND_PALACE = 4; // 思维空间编队
+    ENM_TMP_TEAM_TYPE_ABYSS = 5; // 深渊编队
+    ENM_TMP_TEAM_TYPE_WORLD = 6; // 大世界区域临时编队
+    ENM_TMP_TEAM_TYPE_MAP = 7; // 平行世界临时编队
+    ENM_TMP_TEAM_TYPE_DUNGEON_CONFIG = 8; // 副本配置编队（临时角色）
+    ENM_TMP_TEAM_TYPE_MAX = 9; // 最大值
+}
+
+// @desc 奖励显示类型
+enum EnmAwardShowType
+{
+    ENM_AST_NONE = 0; // 无效
+    ENM_AST_LEFT_DOWN = 1; // 左下角小弹窗
+    ENM_AST_MIDDLE = 2; // 界面中间弹窗
+    ENM_AST_SCREEN = 3; // 全屏
+}
+
+// @desc 赛道状态
+enum EnmTrackState
+{
+    ENM_TRACK_STATE_INVALID = 0; // 无效
+    ENM_TRACK_STATE_LOCKED = 1; // 已锁定
+    ENM_TRACK_STATE_UNLOCKED = 2; // 已解锁
+}
+
+// @desc 赛道奖励类型（按名次）
+enum EnmTrackRewardType
+{
+    ENM_TRACK_REWARD_TYPE_INVALID = 0;  // 无效
+    ENM_TRACK_REWARD_TYPE_1ST = 1;      // 第1名奖励
+    ENM_TRACK_REWARD_TYPE_2ND = 2;      // 第2名奖励
+    ENM_TRACK_REWARD_TYPE_3RD = 3;      // 第3名奖励
+}
+
+// @desc 活动状态
+enum EnmActivityState
+{
+    ENM_ACTIVITY_STATE_NONE = 0;
+    ENM_ACTIVITY_STATE_LOCKED = 1;     // 未解锁
+    ENM_ACTIVITY_STATE_UNLOCKABLE = 2; // 可解锁
+    ENM_ACTIVITY_STATE_RUNNING = 3;    // 进行中（已解锁）
+    ENM_ACTIVITY_STATE_COMPLETED = 4;  // 已完成（活动进度或奖励已完成）
+    ENM_ACTIVITY_STATE_ENDED = 5;      // 已结束
+}
+
+// @desc 图鉴解锁状态
+enum EnmCompendiumUnlockState
+{
+    ENM_CUS_LOCKED = 0; // 未解锁
+    ENM_CUS_COLLECTING = 1; // 收集中
+    ENM_CUS_UNLOCKED = 2; // 已解锁
+}
+
+// @desc 观察收集品状态
+enum EnmObserveCollectibleState
+{
+    ENM_OCS_NOT_OBSERVED = 0; // 未观察
+    ENM_OCS_MARKED = 1; // 留标观察
+    ENM_OCS_FULLY_OBSERVED = 2; // 彻底观察
+}
+
+
+// @desc 收集品升级原因
+enum EnmLevelUpReason
+{
+    ENM_LUR_UNKNOWN = 0; // 未知原因
+    ENM_LUR_REASON_OBSERVE = 1; // 观察收集品
+    ENM_LUR_REASON_SUBMIT = 2; // 提交收集品
+}
+
+// @desc 红点变化通知类型
+enum EnmRedPointChangeNotifyType
+{
+    ENM_RP_CNT_NONE = 0; // 无效
+    ENM_RP_CNT_ADD = 1; // 增加红点
+    ENM_RP_CNT_REMOVE = 2; // 移除红点
+}
+
+// @desc 好感度
+enum EnmAffinityUpdateType
+{
+    ENM_AFFINITY_UPDATE_TYPE_NULL = 0; // 无
+    ENM_AFFINITY_UPDATE_TYPE_CHARACTER = 1; // 单个角色
+    ENM_AFFINITY_UPDATE_TYPE_TEAM = 2; // 编队
+    ENM_AFFINITY_UPDATE_TYPE_GIFT = 3; // 送礼 客户端用
+    ENM_AFFINITY_UPDATE_TYPE_ASSISTANT = 4; // 助手npc 客户端用
+}
+
+// @desc 策划眼中的分类方式(无法理解并且阻止策划)
+enum EnmDungeonsSystemType
+{
+    EST_INVALID = 0;   // 无
+    EST_DUNGEONS = 1;   // 副本系统
+    EST_ABYSS = 2; // 深渊系统
+}
+
+// @desc 案件回溯类型
+enum EnmCaseBackType
+{
+    ENM_CASE_BACK_TYPE_NONE = 0; // 无效
+    ENM_CASE_BACK_TYPE_ROLLBACK = 1; // 回滚
+    ENM_CASE_BACK_TYPE_TRACEBACK = 2; // 回溯
+}
+
+// @desc letter状态
+enum EnmLetterState
+{
+    ENM_LETTER_STATE_NONE = 0; // 无
+    ENM_LETTER_STATE_UNREAD = 1; // 未读
+    ENM_LETTER_STATE_READ = 2; // 已读
+    ENM_LETTER_STATE_REPLIED = 3; // 已回复
+}
+
+// 告示板栏位状态
+enum EnmHuntBoardColumnStatus
+{
+    ENM_HUNT_BOARD_COLUMN_INVALID       = 0;
+    ENM_HUNT_BOARD_COLUMN_AVAILABLE     = 1;    // 有通缉令可接取
+    ENM_HUNT_BOARD_COLUMN_WAIT_REFRESH  = 2;    // 接取后开始刷新
+    ENM_HUNT_BOARD_COLUMN_EMPTY         = 3;    // 无通缉令可刷出（全部完成）
+}
+
+// 玩家持有通缉令状态
+enum EnmHuntStatus
+{
+    ENM_HUNT_STATUS_INVALID     = 0;
+    ENM_HUNT_STATUS_ACCEPTED    = 1;    // 已接取（正在进行）
+    ENM_HUNT_STATUS_PENDING     = 2;    // 待接取（录入手册/放弃后进入）
+    ENM_HUNT_STATUS_COMPLETED   = 3;    // 已完成
+}
+
+// 玩家接取通缉令类型
+enum EnmHuntAcceptType
+{
+    ENM_HUNT_ACCEPT_TYPE_INVALID   = 0;
+    ENM_HUNT_ACCEPT_TYPE_BOARD = 1;      // 告示板
+    ENM_HUNT_ACCEPT_TYPE_DIALOG = 2;      // 对话
+    ENM_HUNT_ACCEPT_TYPE_ITEMUSE = 3;      // 使用道具
+    ENM_HUNT_ACCEPT_TYPE_SYSTEM = 4;      // 系统发放
+}
+
+// 调查节点状态
+enum EnmHuntNodeStatus
+{
+    ENM_HUNT_NODE_STATUS_INVALID     = 0;
+    ENM_HUNT_NODE_STATUS_ACTIVE      = 1;    // 激活未完成
+    ENM_HUNT_NODE_STATUS_COMPLETED   = 2;    // 激活已完成
+    ENM_HUNT_NODE_STATUS_ABANDONED   = 3;    // 弃置
+}
+
+// 通缉令数据变更操作类型
+enum EnmHuntUpdateType
+{
+    ENM_HUNT_UPDATE_TYPE_INVALID    = 0;
+    ENM_HUNT_UPDATE_TYPE_ADD        = 1;    // 新增
+    ENM_HUNT_UPDATE_TYPE_DELETE     = 2;    // 删除
+    ENM_HUNT_UPDATE_TYPE_UPDATE     = 3;    // 更新
+}
+
+// @desc 进度业务类型
+enum EnmProgressBussinessType
+{
+    ENM_PROGRESS_BUSSINESS_TYPE_NONE = 0;          // 无业务
+    ENM_PROGRESS_BUSSINESS_TYPE_NEWBIE = 1;        // 前期历程
+    ENM_PROGRESS_BUSSINESS_TYPE_NEWBIE_STAGE = 2;   // 前期历程阶段
+    ENM_PROGRESS_BUSSINESS_TYPE_ACHIEVEMENT = 3;   // 成就系统
+    ENM_PROGRESS_BUSSINESS_TYPE_DAILY_MISSION = 4;  // 每日任务
+    ENM_PROGRESS_BUSSINESS_TYPE_UNLOCK_CONDITION = 5; // 解锁系统-解锁条件
+    ENM_PROGRESS_BUSSINESS_TYPE_UNLOCK_FEATURE = 6; // 解锁系统-功能解锁
+    ENM_PROGRESS_BUSSINESS_TYPE_MAIL = 7; // 邮件系统
+    ENM_PROGRESS_BUSSINESS_TYPE_TASK_ACTIVITY = 8; // 任务活动
+    ENM_PROGRESS_BUSSINESS_TYPE_COFFEE = 9;        // 咖啡制作-关卡解锁
+    ENM_PROGRESS_BUSSINESS_TYPE_COFFEE_INGRE = 10;  // 咖啡制作-原料解锁
+    ENM_PROGRESS_BUSSINESS_TYPE_COFFEE_ADD_INS = 11; // 咖啡制作-配料解锁
+    ENM_PROGRESS_BUSSINESS_TYPE_MAX = 12;          // 业务类型最大值
+}
+
+// @desc 临时角色来源类型
+enum EnmTmpCharacterSource
+{
+    ENM_TMP_CHARA_SOURCE_GM       = 0; // GM添加
+    ENM_TMP_CHARA_SOURCE_TMP_TEAM = 1; // 临时编队
+    ENM_TMP_CHARA_SOURCE_TRIAL    = 2; // 角色试用
+}
+
+// @desc 深渊结算原因
+enum EnmAbyssFinishReason
+{
+    ENM_ABYSS_FINISH_REASON_NORMAL  = 0; // 正常结束（is_win 任意；is_win=false 表示死亡或超时）
+    ENM_ABYSS_FINISH_REASON_GIVE_UP = 1; // 玩家主动放弃（is_win 必为 false）
+    ENM_ABYSS_FINISH_REASON_REPLAY  = 2; // 重新挑战（is_win 必为 false）
+}

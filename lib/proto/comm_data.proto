@@ -1,0 +1,315 @@
+syntax = "proto3";
+
+package msg;
+option  go_package = "proto/GameMsg";
+import "comm_macro.proto";
+
+// @desc 鉴权数据
+message AccessAuth // @gencstruct
+{
+    bytes token       = 1; // @len{ msg::MAX_TOKEN_LEN } access token
+    uint32 expire_time = 2; // 超时时间
+}
+
+enum PlayerAttrType
+{
+    ENM_PLAYER_ATTR_INVALID          = 0;
+    ENM_PLAYER_ATTR_COIN             = 1; // 金币数
+    ENM_PLAYER_ATTR_SATIETY          = 2; // 饱食度值
+    ENM_PLAYER_ATTR_STAMINA_CUR      = 3; // 当前体力值
+    ENM_PLAYER_ATTR_STAMINA_FULLTIME = 4; // 体力自然回复满时间
+}
+
+// @desc 绑定在玩家身上的游戏数据
+message PlayerAttr
+{
+    int32 attr_type = 1; // use PlayerAttrType
+    oneof value
+    {
+        int32  value_int32  = 2;
+        uint32 value_uint32 = 3;
+        int64  value_int64  = 4;
+        uint64 value_uint64 = 5;
+        bytes value_bytes = 6;
+    }
+}
+
+// @desc 玩家货币数据
+message PlayerMoney
+{
+    int32 type   = 1;
+    int64 amount = 2;
+}
+
+// @desc 角色基本信息
+message RoleBaseInfo
+{
+    uint64                    role_id              = 1;  // 角色id
+    bytes                    role_name            = 2;  // 角色名字 @len{ msg::MAX_NAME_LEN }
+    int32                     role_level           = 3;  // 角色等级
+    EnmGender                 gender               = 4;  // 性别
+    repeated PlayerAttr       player_attr          = 5;  // 基本属性
+    bool                    role_name_inited = 6;
+    PlayerLevelData           level_Data           = 10; //等级数据
+    repeated PlayerMoney      money                = 11; //货币数据
+    bytes                     second_role_name = 12; // 另一个主角的名字
+}
+
+// @desc 玩家地图信息
+message RoleMapInfo
+{
+    uint32 current_gametime = 1;  // 游戏内时间（分钟）
+    uint32 current_weather = 2;  // 当前天气
+}
+
+message CmdMotiveData
+{
+    uint64 motive_uniq_id = 1; // 唯一ID
+    uint64 claim_time = 2;     // 获取时间戳（毫秒级）
+    uint32 level = 3;          // 等级
+    uint32 refine = 4;         // 等阶（原神-精炼/崩铁-叠影）
+    uint32 lock_state = 5;     // 锁定状态（0：未锁定；1：已锁定）
+    uint32 exp = 6;            // 经验值进度条
+    uint32 break_level = 7;    // 专武突破等阶
+}
+
+// @desc 道具信息(还是希望不同系统数据能分开是最好的，如果将来有机会 尽量还是争取下)
+message CmdItem {
+    uint32 item_id = 1;     // 道具id 
+    uint32 item_num = 2;    // 数量
+    bool is_new = 3;//是不是新解锁的道具
+    uint64 bind_id = 4;     // 绑定id(前端需要用这个好处理 后端不需要 但要赋上值 普通的是itemid 其他的是特殊物品的uid)
+    oneof item_uniq_data {
+        CmdMotiveData motive_data = 5;
+    }
+}
+
+// @desc 角色的数据
+message RoleInfo
+{
+    RoleBaseInfo base_info   = 1; // 角色基本信息
+    RoleMapInfo  map_info    = 2; // 角色地图信息
+    GlobalConf   global_conf = 3; // 全局服务器配置
+}
+
+// @desc 道具id-数量组合
+message ItemIdCount // @gencstruct
+{
+    uint32 item_id = 1; // 道具id
+    uint32 count   = 2; // 数量
+}
+
+// @desc 三维坐标/向量
+message Vector3Int // @gencstruct
+{
+    int32 x = 1;
+    int32 y = 2;
+    int32 z = 3;
+}
+
+// @desc 朝向
+message Rotator // @gencstruct
+{
+    int32 yaw   = 1;
+    int32 pitch = 2;
+    int32 roll  = 3;
+}
+
+message ElementParam // @gencstruct
+{
+    int32 element_type = 1; // use designer_config::ElementType
+    int32 value = 2;
+}
+
+// @desc 元素数据参数表
+message ElementParamMap // @gencstruct
+{
+    repeated ElementParam elem_param = 1; // @len{ msg::MAX_ELEMENT_LEN }
+}
+
+message TaskIdType
+{
+    uint32 task_id      = 1;
+    uint32 task_type    = 2;
+}
+
+message TaskAction
+{
+    uint64 action_id = 1;
+    uint32 progress  = 2; // 进度（需要统计数值进度的。非数值的这里恒为0，表示未完成）
+    uint32 max_progress  = 3; // 最大进度（需要统计数值进度的。非数值型填充1）
+}
+
+message TaskStep
+{
+    uint64              step_id = 1;
+    repeated TaskAction actions = 2; // 全部action及完成情况
+}
+
+message TaskData
+{
+    uint32   task_id      = 1;
+    uint32   task_type    = 2;
+    TaskStep current_step = 3; // 当前进行的step
+    bool     is_activated = 4; // 是否激活
+}
+
+message PlayerTaskData
+{
+    repeated TaskData processing_tasks = 2; // 进行中的任务
+    repeated TaskData finished_tasks   = 3; // 已完成的任务（ID）
+}
+
+//@desc 待接取的任务信息(已经解锁的可接取的任务)
+message TaskAcceptInfo
+{
+    uint32   task_id      = 1;
+    uint32   task_type    = 2;
+    repeated uint32 finished_cond_ids = 3; // 已经完成的接取条件ID列表（客户端显示需要）
+}
+
+// @desc 玩家等级数据
+message PlayerLevelData // @gencstruct
+{
+    uint32 world_level_max = 1; //最大世界等级
+    uint32 world_level_cur = 2; //当前世界等级
+    uint32 team_level      = 3; //冒险等级
+    uint32 team_exp        = 4; //冒险等级经验
+}
+
+// @desc 全局服务器配置（下发1次），ID对应S_ServerGlobal表的ID
+message GlobalConf
+{
+    // int32 default_character = 1;
+    int32 satiety_limit            = 2; // 饱食度上限
+    int32 stamina_regen_max        = 3; // 体力自然恢复上限
+    int32 max_stamina              = 4; // 体力总上限
+    int32 stamina_regen_interval   = 5; // 1点体力的恢复间隔
+    int32 max_silver_creature_cost = 6; // 液银生物最大cost
+    int32 max_silver_creature_num  = 7; // 液银生物最大数量
+    int32 unlock_collection_range = 8; // 战斗解锁采集物范围半径
+    bytes launch_date = 9; // 游戏上线时间
+    int32 launch_date_type = 10; // 游戏上线时间类型，0为当地时间，1为UTC+8时间
+    int32 max_bag_cell  = 11;//背包最大格子数
+    int32 reward_expire_interval = 12; // 奖励过期时间间隔
+}
+
+message MailTemplateContentParam {
+    bytes param = 1;
+}
+
+message MailContent {
+    bytes language = 1;
+    bytes title = 2;
+    bytes from = 3;
+    bytes content = 4;
+}
+
+message MailData {
+    uint32 mail_id = 1;
+    bool important = 4;  // 是否为重要邮件
+    repeated ItemIdCount items = 6;  // 附件
+    bool open = 7;  // 是否已读
+    uint32 time = 8;
+    uint32 template_id = 9;  // TemplateMail表 id
+    repeated MailTemplateContentParam template_content_params = 10;  // 模板邮件内容参数个数
+    bool has_rcv_attach = 11;  // 是否已经领过附件
+    uint32 type = 12;  // EMailType
+    uint32 expire_time = 13;
+    repeated MailContent contents = 14;
+}
+
+
+// @desc GM邮件内容
+message GmMailContent {
+    uint32 contentId = 1;    // 邮件内容ID
+    string languageType = 2; // 语言类型
+    string title = 3;        // 邮件标题
+    string content = 4;      // 邮件内容
+    string sender = 5;       // 邮件发送者
+}
+
+// @desc GM邮件附件
+message GmMailAttachment {
+    uint32 attachmentId = 1; // 附件ID
+    string propId = 2;       // 道具ID
+    string propType = 3;     // 道具类型
+    string propName = 4;     // 道具名称
+    uint32 propCount = 5;    // 道具数量
+    string propIconUrl = 6;  // 道具图标
+    uint32 mailId = 7;       // 邮件ID
+    string createUser = 8;   // 创建者
+    uint64 createTime = 9;   // 创建时间
+}
+
+// @desc GM邮件数据
+message GmMailData {
+    uint32 mailId = 1;                            // GM邮件ID
+    string project = 2;                           // 项目名称
+    uint32 mailStatus = 3;                        // 邮件状态
+    uint32 mailTimerType = 4;                     // 邮件时间类型 1: 即时邮件，2: 定时邮件
+    uint64 pushTime = 5;                          // 邮件发送时间（毫秒）
+    uint64 updateTime = 6;                        // 邮件更新时间（毫秒）
+    uint64 validateDay = 7;                       // 邮件有效截止时间（毫秒）
+    repeated GmMailContent contentList = 8;       // 邮件内容列表
+    repeated GmMailAttachment attachmentList = 9; // 邮件附件列表
+    uint64 windowPhase = 10;                      // 邮件窗口期时间（毫秒）
+    uint64 createTime = 11;                       // 邮件创建时间（毫秒）
+    uint32 isDeleteCollect = 12;                  // 是否为重要邮件，0: 不重要，1: 重要
+}
+
+// @desc 游戏公告数据
+message NoticeData {
+    uint32 notice_id = 1;         // 公告ID
+    uint32 notice_type = 2;       // 公告类型
+    bytes short_title = 3;       // 公告短标题
+    bytes long_title = 4;        // 公告长标题
+    bytes content = 5;           // 公告内容
+    uint64 push_time = 6;         // 公告推送时间（毫秒）
+    uint64 create_time = 7;       // 公告创建时间（毫秒）
+    uint64 end_time = 8;          // 公告过期时间（毫秒）
+    uint32 login_force_popup = 9; // 登陆强弹设置
+}
+
+// @desc GM公告内容
+message GmNoticeContent {
+    uint32 noticeContentId = 1; // 公告内容ID
+    uint32 noticeId = 2;        // 公告ID
+    string languageType = 3;    // 语言类型
+    string shortTitle = 4;      // 公告标题（短标题）
+    string longTitle = 5;       // 公告标题（长标题）
+    string noticeContent = 6;   // 公告内容
+    string createUser = 7;      // 创建者
+    uint64 createTime = 8;      // 创建时间
+}
+
+// @desc GM公告数据
+message GmNoticeData {
+    uint32 noticeId = 1;                      // GM公告ID
+    string project = 2;                       // 项目名称
+    uint32 noticeType = 3;                    // 公告类型
+    uint32 noticeStatus = 4;                  // 公告状态
+    uint32 noticeTimerType = 5;               // 公告时间类型
+    string noticeDesc = 6;                    // 公告描述
+    uint64 updateTime = 7;                    // 公告更新时间（毫秒）
+    repeated GmNoticeContent contentList = 8; // 公告内容列表
+    uint32 isDelete = 9;                      // 是否删除（0: 未删除，1: 已删除）
+    uint64 pushTime = 10;                     // 公告推送时间（毫秒）
+    uint64 createTime = 11;                   // 公告创建时间（毫秒）
+    uint64 endTime = 12;                      // 公告过期时间（毫秒）
+    uint32 loginForcePopup = 13;              // 登陆强弹设置
+}
+// 单条 TimedItemOutput effect 状态
+message IntelTimedOutputEffectInfo
+{
+    uint32 effect_id = 1;          // HouseGlobalEffect.id
+    int64  last_reward_time = 2;   // 上次成功产出时间戳（派遣时初始化为当时时间戳）
+}
+
+// 单个派遣角色的 TimedItemOutput 状态
+message IntelTimedOutputCharInfo
+{
+    uint64 char_uid = 1;                              // 角色 UID
+    uint32 house_id = 2;                              // 所在情报建筑 ID
+    repeated IntelTimedOutputEffectInfo effect_list = 3; // 该角色所有 TimedItemOutput effect
+}

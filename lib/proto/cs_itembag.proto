@@ -1,0 +1,109 @@
+syntax = "proto3";
+package msg;
+
+import "comm_data.proto";
+import "comm_macro.proto";
+
+// @desc 物品CD组
+message CmdItemCD
+{
+    uint32 type = 1;     // CD组类型
+    uint32 cd_time = 2;    // CD转好的时间戳
+}
+
+// @desc 请求新背包列表(还是希望将来能够分开 比如专武去拉专武的 而不是来背包拉道具)
+// @cmd CS_ITEM_BAG_GET_LIST
+message CS_Item_Bag_Get_List
+{
+}
+
+// @desc 返回新背包列表
+// @cmd SC_ITEM_BAG_GET_LIST
+message SC_Item_Bag_Get_List
+{
+    repeated CmdItem items = 1;
+    int32 result = 2;
+    repeated CmdItemCD item_cds = 3; // CD列表
+}
+
+// @desc 物品变化推送(前端希望同步的是最终数量 而非增量)
+// @cmd SC_ITEM_BAG_CHANGE_NTF
+message SC_Item_Bag_Change_Ntf
+{
+    EnmItemReason reason = 1;   // 来源
+    repeated CmdItem items = 2; // 最新数量
+}
+
+// @desc 使用道具
+// @cmd CS_ITEM_USE_COUNT
+message CS_Item_Use_Count
+{
+    uint32 item_id = 1;     // 道具id
+    uint32 item_num = 2;    // 数量
+    repeated uint64 params = 3;//有些道具使用需要额外参数
+};
+
+// @desc 使用道具
+// @cmd SC_ITEM_USE_COUNT
+message SC_Item_Use_Count
+{
+    int32 result = 1;
+    uint32 item_id = 2;  // 道具id
+    uint32 success = 3;  // 成功数量
+    uint32 total = 4;    // 尝试使用数量
+};
+
+// @desc 贵重物品
+message PreciousAward
+{
+    uint32 item_id = 1;
+    bool is_new = 2;    // “新”标签
+    repeated ItemIdCount repeat_convert = 3;    // 重复转换道具表
+    repeated ItemIdCount extra_items = 4;    // 额外物品表
+}
+
+// @desc 贵重物品展示推送
+// @cmd SC_PRECIOUS_AWARD_SHOW_NTF
+message SC_Precious_Award_Show_Ntf
+{
+    EnmItemReason source = 1;
+    repeated PreciousAward items = 2; // 贵重物品列表
+}
+
+// @desc 物品CD变化推送
+// @cmd SC_ITEM_CD_NTF
+message SC_Item_CD_Ntf
+{
+    CmdItemCD cd = 1; // cd变化
+}
+
+// @desc 检测添加道具 失败通知
+// @cmd SC_ITEM_ADD_ERROR_NTF
+message SC_Item_Add_Error_Ntf
+{
+    uint32 item_id = 1;
+    int32 result = 2;//失败原因
+}
+
+// @desc 一条奖励展示信息
+message ShowAwardInfo
+{
+    uint32 item_id = 1;
+    uint32 item_count = 2;
+    bool is_new = 3;    // “新”标签
+}
+
+// @desc 一轮奖励展示快照
+message AwardShowRoundInfo
+{
+    repeated ShowAwardInfo items = 1; // 本轮展示道具列表
+}
+
+// @desc 奖励获得显示通知
+// @cmd SC_AWARD_SHOW_NTF
+message SC_Award_Show_Ntf
+{
+    repeated ShowAwardInfo items = 1; //
+    EnmAwardShowType type = 2;
+    EnmItemReason source = 3;
+}

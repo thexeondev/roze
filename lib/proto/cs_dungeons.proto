@@ -1,0 +1,261 @@
+syntax = "proto3";
+package msg;
+
+import "comm_data.proto";
+import "comm_macro.proto";
+
+
+//所有副本玩法协议都在这里 一般分为2种 跨地图副本和大世界副本
+//*******************************************************所有副本数据*******************************************************
+// @desc 类型实例完成次数数据
+message CSDungeonsTypeInstanceData
+{
+    uint32 type_instance = 1; // 副本类型实例
+    uint32 count_day     = 2; // 当日完成次数
+    uint32 count_week    = 3; // 当周完成次数
+}
+
+// @desc 副本通用数据
+message CSDungeonsCommonData
+{
+    repeated CSDungeonsTypeInstanceData type_instance_data = 1; //副本类型实例完成数据(用于周刷新日刷新)
+    repeated CSOneDungeonsFinishData dungeons_list = 2;  //副本完成次数数据
+}
+
+// @desc 单个尸潮副本数据
+message CSOneHordeData
+{
+    uint32 id          = 1; // 副本id TODO: 待客户端对齐后改为uint64，避免超过42亿后ID截断
+    uint32 kill_count  = 2; // 击杀数量
+    uint32 star_award  = 3; // 领取到的星级奖励
+}
+
+// @desc 尸潮数据
+message CSHordeData
+{
+    repeated CSOneHordeData horde_list = 1; //尸潮副本数据列表
+}
+
+// @desc 单个副本完成次数数据
+message CSOneDungeonsFinishData
+{
+    uint64 id = 1;//副本id
+    uint32 count = 2;//完成次数
+}
+
+// @desc 副本完成次数数据
+message CSDungeonsFinishData
+{
+    repeated CSOneDungeonsFinishData dungeons_list = 1; 
+}
+
+// @desc 单个待领取奖励的副本信息
+message CSOneDungeonsWaitReward
+{
+    uint64 dungeons_id = 1; // 副本id
+    uint64 expire_ts = 2; // 过期时间戳
+}
+
+// @desc 待领取奖励的副本信息
+message CSDungeonsWaitReward
+{
+    repeated CSOneDungeonsWaitReward list = 1;
+}
+
+// @desc 副本组状态
+enum EnmDungeonsGroupState
+{
+    EDGS_DEFAULT = 0;   // 默认状态，未激活
+    EDGS_ACTIVATE = 1;   // 激活状态，未解锁
+    EDGS_UNLOCK = 2; // 解锁状态，可战斗
+}
+
+// @desc 单个副本组状态
+message OneDungeonsGroupState
+{
+    uint32 dungeons_group_id = 1; // 副本组id
+    int32 state = 2; // 状态，EnmDungeonsGroupState
+}
+
+// @desc 副本组状态
+message DungeonsGroupState
+{
+    repeated OneDungeonsGroupState list = 1;
+}
+
+// @desc  副本全部数据
+message CSDungeonsData
+{
+    CSDungeonsCommonData common_data = 1; //副本通用数据
+    CSHordeData horde_data = 2; //尸潮数据
+    CSDungeonsWaitReward wait_reward_data = 3; // 待领取奖励的副本
+    DungeonsGroupState group_state_data = 4; // 副本组状态
+}
+//***************************************************通用协议**************************************************//
+
+// @desc 客户端请求完整副本数据
+// @cmd CS_DUNGEONS_FULL_DATA
+message CS_Dungeons_Full_Data
+{
+}
+
+// @desc 服务器返回完整副本数据
+// @cmd SC_DUNGEONS_FULL_DATA
+message SC_Dungeons_Full_Data
+{
+    int32 result = 1;
+    CSDungeonsData data = 2;
+}
+
+// @desc 客户端请求进入副本
+// @cmd CS_DUNGEONS_ENTER
+message CS_Dungeons_Enter
+{
+    uint64 dungeons_id = 1;    // 副本id
+}
+
+// @desc 服务器返回进入副本
+// @cmd SC_DUNGEONS_ENTER
+message SC_Dungeons_Enter
+{
+    int32 result = 1;
+    uint64 dungeons_id = 2;    // 副本id
+}
+
+// @desc 客户端完成副本
+// @cmd CS_DUNGEONS_FINISH
+message CS_Dungeons_Finish
+{
+    uint64 dungeons_id = 1;    // 副本id
+    bool victory = 2; // 胜利
+    bool leave = 3;// 主动离开
+    HordeFinishDataReq horde_data = 4; // 尸潮数据
+    bool replay = 5; // 玩家选择重新挑战；仅用于埋点标记结束原因，重新挑战流程仍由后续 CS_Dungeons_Enter 触发
+}
+
+// @desc 服务器返回完成副本
+// @cmd SC_DUNGEONS_FINISH
+message SC_Dungeons_Finish
+{
+    int32 result = 1;
+    repeated CmdItem reward_list = 2; //显示获得物品
+    HordeFinishDataRes horde_data = 3; // 尸潮结算额外数据
+    uint32 team_lv_before = 4; //奖励前队伍等级
+    uint32 team_lv_after = 5; //奖励后队伍等级
+}
+
+// @desc 客户端请求重新挑战副本（原地重开，不切场景，客户端据此不播跳图loading）
+//       重新挑战流程：先发 CS_Dungeons_Finish{replay=true} 结算上一局，再发本协议开新一局
+// @cmd CS_DUNGEONS_REPLAY
+message CS_Dungeons_Replay
+{
+    uint64 dungeons_id = 1;    // 副本id
+}
+
+// @desc 服务器返回重新挑战副本
+// @cmd SC_DUNGEONS_REPLAY
+message SC_Dungeons_Replay
+{
+    int32 result = 1;
+    uint64 dungeons_id = 2;    // 副本id
+}
+
+// @desc 客户端确认进入副本
+// @cmd CS_DUNGEONS_ENTER_ALREADY
+message CS_Dungeons_Enter_Already
+{
+
+}
+
+// @desc 当前深渊进度
+message AbyssCurrentData
+{
+    uint32 abyss_id = 1; // 当前挑战的深渊ID
+    uint32 layer = 2; // 当前层数index
+    uint32 room = 3; // 当前房间index 从1开始
+    repeated int64 finish_time = 4;   // 前几个房间完成时间(ms)
+}
+
+// @desc 返回确认进入副本
+// @cmd SC_DUNGEONS_ENTER_ALREADY
+message SC_Dungeons_Enter_Already
+{
+    int32 result = 1;
+    EnmDungeonsSystemType cur_system = 2;
+    DungeonsCurrentData dungeons_info = 3;
+    AbyssCurrentData abyss_info = 4;
+}
+
+// @desc 服务器通知副本数据变化
+// @cmd SC_DUNGEONS_DATA_NTF
+message SC_Dungeons_Data_Ntf
+{
+    repeated CSDungeonsTypeInstanceData info = 1;//类型实例完成次数数据
+    repeated CSOneDungeonsFinishData finish_count = 2;//副本完成次数
+}
+
+//***************************************************复刷副本**************************************************//
+// @desc 当前复刷副本进度
+message DungeonsCurrentData
+{
+    uint32 dungeons_id = 1; // 副本id TODO: 待客户端对齐后改为uint64，避免超过42亿后ID截断
+    uint32 battle_id   = 2; // 已完成的战斗id
+}
+// @desc 客户端通知副本类型数据变化
+// @cmd CS_DUNGEONS_CURRENT_DATA
+message CS_Dungeons_Current_Data
+{
+    DungeonsCurrentData info = 1;//目前应该只有进度
+}
+
+// @desc 服务器通知当前副本数据变化
+// @cmd SC_DUNGEONS_CURRENT_DATA
+message SC_Dungeons_Current_Data
+{
+    int32 result = 1;
+    DungeonsCurrentData info = 2;//更改的内容
+}
+//***************************************************尸潮**************************************************//
+// @desc 尸潮结算上报数据 目前好像只需要击杀数量
+message HordeFinishDataReq
+{
+    uint32 kill_count = 1;    // 击杀数量
+}
+
+// @desc 尸潮结算通知数据 目前好像只需要击杀数量
+message HordeFinishDataRes
+{
+    uint32 kill_count = 1;    // 击杀数量
+}
+
+// @desc 服务器通知副本数据变化
+// @cmd SC_HORDE_DATA_NTF
+message SC_Horde_Data_Ntf
+{
+    uint32 id          = 1; // 副本id TODO: 待客户端对齐后改为uint64，避免超过42亿后ID截断
+    uint32 kill_count  = 2; // 击杀数量
+    uint32 star_award  = 3; // 领取到的星级奖励
+}
+
+//***************************************************副本组**************************************************
+// @desc 副本组激活同步
+// @cmd SC_DUNGEONS_GROUP_ACTIVATE_NTF
+message SC_Dungeons_Group_Activate_Ntf
+{
+    uint32 dungeons_group_id = 1; // 副本组id
+}
+
+// @desc 副本组解锁请求
+// @cmd CS_DUNGEONS_GROUP_UNLOCK_REQ
+message CS_Dungeons_Group_Unlock_Req
+{
+    uint32 dungeons_group_id = 1; // 副本组id
+}
+
+// @desc 副本组解锁回复
+// @cmd SC_DUNGEONS_GROUP_UNLOCK_RSP
+message SC_Dungeons_Group_Unlock_Rsp
+{
+    int32 result = 1;
+    uint32 dungeons_group_id = 2; // 副本组id
+}

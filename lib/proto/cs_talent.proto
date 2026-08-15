@@ -1,0 +1,57 @@
+syntax = "proto3";
+package msg;
+
+// @desc 角色天赋节点信息
+message TalentNodeInfo
+{
+    uint32 node_id = 1;
+    uint32 level = 2;
+    uint32 extra_level = 3;
+}
+
+// @desc 角色天赋树信息
+message TalentInfo
+{
+    uint64 inst_id = 1;                 // 角色实例ID
+    repeated TalentNodeInfo nodes = 2;  // 角色天赋节点信息（节点总等级为0可选择不同步）
+}
+
+// @desc 天赋树查询
+// @cmd CS_TALENT_QUERY
+message CS_Talent_Query
+{
+    int32 reserved = 1;
+}
+
+// @desc 天赋树查询响应
+// @cmd SC_TALENT_QUERY
+message SC_Talent_Query
+{
+    int32 result = 1;
+    repeated TalentInfo infos = 2;
+}
+
+// @desc 天赋节点升级请求
+// @cmd CS_TALENT_LEVEL_UP
+message CS_Talent_Level_Up
+{
+    uint64 inst_id = 1;     // 角色实例ID
+    uint32 node_id = 2;     // 天赋结点ID
+}
+
+// @desc 天赋节点升级响应
+// @cmd SC_TALENT_LEVEL_UP
+message SC_Talent_Level_Up
+{
+    int32 result = 1;
+    uint64 inst_id = 2;             // 角色实例ID
+    TalentNodeInfo node_info = 3;   // 天赋结点ID
+}
+
+// @desc 天赋节点等级变化通知
+// @cmd  SC_TALENT_LEVEL_CHANGED_NTF
+message SC_Talent_Level_Changed_Ntf
+{
+    uint64 inst_id = 1;             // 角色实例ID
+    TalentNodeInfo node_info = 2;   // 天赋结点ID
+}

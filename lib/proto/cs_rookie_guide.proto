@@ -1,0 +1,70 @@
+syntax = "proto3";
+package msg;
+
+// @desc 新手引导信息
+message Rookie_Guide_Info
+{
+    uint32 guide_id        = 1;  // 引导ID
+    uint32 step_id         = 2;  // 当前关键步骤ID
+    bool is_step_start     = 3;  // 当前关键步骤是否开始
+    bool is_guide_complete = 4;  // 是否已完成该引导
+}
+
+// @desc 新手引导步骤开始请求
+// @cmd  CS_ROOKIE_GUIDE_STEP_START_REQ
+message CS_Rookie_Guide_Step_Start_Req
+{
+    uint32 guide_id = 1; // 引导ID
+    uint32 step_id  = 2; // 步骤ID
+}
+
+// @desc 新手引导步骤开始响应
+// @cmd  SC_ROOKIE_GUIDE_STEP_START_RES
+message SC_Rookie_Guide_Step_Start_Res
+{
+    int32 result = 1; // 结果码
+    Rookie_Guide_Info guide_info = 2; // 对应的新手引导信息
+}
+
+// @desc 新手引导步骤完成请求
+// @cmd  CS_ROOKIE_GUIDE_STEP_COMPLETE_REQ
+message CS_Rookie_Guide_Step_Complete_Req
+{
+    uint32 guide_id = 1; // 引导ID
+    uint32 step_id = 2;  // 步骤ID
+}
+
+// @desc 新手引导步骤完成响应
+// @cmd  SC_ROOKIE_GUIDE_STEP_COMPLETE_RES
+message SC_Rookie_Guide_Step_Complete_Res
+{
+    int32 result = 1; // 结果码
+    Rookie_Guide_Info guide_info = 2; // 对应的新手引导信息
+}
+
+// @desc 新手引导信息请求
+// @cmd  CS_ROOKIE_GUIDE_INFOS_REQ
+message CS_Rookie_Guide_Infos_Req
+{
+}
+
+// @desc 新手引导信息响应
+// @cmd  SC_ROOKIE_GUIDE_INFOS_RES
+message SC_Rookie_Guide_Infos_Res
+{
+    int32 result = 1; // 结果码
+    repeated Rookie_Guide_Info guide_infos = 2; // 新手引导信息列表
+}
+
+// @desc 新手引导信息变化
+// @cmd  SC_ROOKIE_GUIDE_INFO_CHANGE_NTF
+message SC_Rookie_Guide_Info_Change_Ntf
+{
+    Rookie_Guide_Info guide_info = 1; // 变化的新手引导信息
+}
+
+// @desc 清空新手引导数据通知
+// @cmd  SC_ROOKIE_GUIDE_INFOS_CLEAR_NTF
+message SC_Rookie_Guide_Infos_Clear_Ntf
+{
+}

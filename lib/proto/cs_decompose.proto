@@ -1,0 +1,34 @@
+syntax = "proto3";
+package msg;
+
+import "comm_data.proto";
+
+// @desc 专武-分解请求
+// @cmd  CS_DECOMPOSE_MOTIVE
+message CS_Decompose_Motive
+{
+    repeated uint64 motive_uniq_ids = 1; // 专武唯一ID列表
+}
+
+// @desc 专武-分解响应
+// @cmd  SC_DECOMPOSE_MOTIVE
+message SC_Decompose_Motive
+{
+    int32 result = 1; // 结果
+    repeated ItemIdCount reward_items = 2; // 获得的道具列表
+}
+
+// @desc 道具-分解请求
+// @cmd  CS_DECOMPOSE_ITEM
+message CS_Decompose_Item
+{
+    repeated ItemIdCount items = 1; // 道具列表
+}
+
+// @desc 道具-分解响应
+// @cmd  SC_DECOMPOSE_ITEM
+message SC_Decompose_Item
+{
+    int32 result = 1; // 结果
+    repeated ItemIdCount reward_items = 2; // 获得的道具列表
+}

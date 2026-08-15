@@ -1,0 +1,23 @@
+syntax="proto3";
+package msg;
+
+import "comm_data.proto";
+
+// @desc 请求公告列表
+// @cmd CS_REQ_NOTICE_LIST
+message CS_Notice_List {
+
+}
+
+// @desc 返回公告列表
+// @cmd SC_RES_NOTICE_LIST
+message SC_Notice_List {
+    int32 result = 1;                    // 获取公告列表的结果
+    repeated NoticeData notice_list = 2; // 公告列表
+}
+
+// @desc 公告开放推送通知（客户端据 id 走 HTTP 拉全文/高亮）
+// @cmd SC_NOTICE_OPEN_NTF
+message SC_Notice_Open_Ntf {
+    repeated int32 notice_ids = 1; // 新增开放的公告 id
+}

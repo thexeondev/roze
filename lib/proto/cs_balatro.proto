@@ -1,0 +1,243 @@
+syntax = "proto3";
+import "comm_data.proto";
+import "comm_macro.proto";
+package msg;
+
+// ---- 通用子消息 ----
+
+message BalatroShopItem
+{
+    uint32 item_type  = 1; // 商品类型（EBalatroShopItemType: 1=Joker, 2=Planet, 3=Tarot, 4=Package）
+    uint32 item_id    = 2; // 商品配置ID
+    bool   is_sold    = 3; // 是否已售出
+    uint32 edition    = 4; // 镀闪效果（EBalatroJokerEdition_Enum）
+    bool   is_eternal = 5; // 是否永恒
+}
+
+message BalatroInventoryItem
+{
+    uint32 item_type  = 1; // 道具类型
+    uint32 item_id    = 2; // 道具配置ID
+    uint32 count      = 3; // 数量
+    uint32 edition    = 4; // 镀闪效果（EBalatroJokerEdition_Enum）
+    bool   is_eternal = 5; // 是否永恒
+}
+
+// 对局信息（多个协议复用）
+message BalatroRunInfo
+{
+    uint64                         run_uid         = 1;  // Run UID（埋点透传）
+    uint32                         run_status      = 2;  // Run状态（EnmBalatroRunStatus）
+    uint32                         seed            = 3;  // 随机种子
+    uint32                         level_id        = 4;  // 难度等级ID
+    uint32                         round_index     = 5;  // 当前回合序号
+    uint64                         blind_uid       = 6;  // 盲注 UID（埋点透传）
+    uint32                         blind_status    = 7;  // 盲注状态
+    int32                          gold            = 8;  // 金币余额
+    repeated BalatroInventoryItem  inventory       = 9;  // 道具库存
+    bytes                          client_snapshot = 10; // 客户端快照
+    repeated BalatroShopItem       shop_items      = 11; // 当前商品列表
+    uint32                         shop_refresh_count = 12; // 当前商店已刷新次数
+}
+
+// ---- 协议消息 ----
+
+// @desc 开始Run-请求
+// @cmd  CS_BALATRO_START_REQ
+message CS_Balatro_Start_Req
+{
+    uint32 level_id = 1; // 难度等级ID（对应P_BalatroPVELevelTable.ID）
+}
+
+// @desc 开始Run-响应
+// @cmd  SC_BALATRO_START_RSP
+message SC_Balatro_Start_Rsp
+{
+    int32          result   = 1; // 结果
+    BalatroRunInfo run_info = 2; // 对局信息
+}
+
+// @desc 开始盲注-请求
+// @cmd  CS_BALATRO_BLIND_START_REQ
+message CS_Balatro_BlindStart_Req
+{
+    bytes client_snapshot = 1; // 客户端最新快照（商店阶段使用消耗品后数据可能变化）
+}
+
+// @desc 开始盲注-响应
+// @cmd  SC_BALATRO_BLIND_START_RSP
+message SC_Balatro_BlindStart_Rsp
+{
+    int32  result    = 1; // 结果
+    uint64 blind_uid = 2; // 本次盲注 UID（埋点透传）
+}
+
+// @desc 结束盲注-请求
+// @cmd  CS_BALATRO_BLIND_END_REQ
+message CS_Balatro_BlindEnd_Req
+{
+    bool   is_win          = 1; // 是否通过盲注
+    int32  gold_delta      = 2; // 金币变化量
+    bytes  client_snapshot = 3; // 客户端全量快照
+    uint64 score           = 4; // 盲注获得分数
+    repeated BalatroInventoryItem inventory = 5; // 客户端调整后的最新道具库存（全量覆盖）
+}
+
+// @desc 结束盲注-响应
+// @cmd  SC_BALATRO_BLIND_END_RSP
+message SC_Balatro_BlindEnd_Rsp
+{
+    int32          result   = 1; // 结果
+    BalatroRunInfo run_info = 2; // 更新后的对局信息
+}
+
+// @desc 购买商品-请求
+// @cmd  CS_BALATRO_SHOP_BUY_REQ
+message CS_Balatro_ShopBuy_Req
+{
+    uint32 item_index = 1; // 商品在列表中的索引
+}
+
+// @desc 购买商品-响应
+// @cmd  SC_BALATRO_SHOP_BUY_RSP
+message SC_Balatro_ShopBuy_Rsp
+{
+    int32          result   = 1; // 结果
+    BalatroRunInfo run_info = 2; // 更新后的对局信息
+}
+
+// @desc 刷新商店-请求
+// @cmd  CS_BALATRO_SHOP_REFRESH_REQ
+message CS_Balatro_ShopRefresh_Req
+{
+}
+
+// @desc 刷新商店-响应
+// @cmd  SC_BALATRO_SHOP_REFRESH_RSP
+message SC_Balatro_ShopRefresh_Rsp
+{
+    int32          result   = 1; // 结果
+    BalatroRunInfo run_info = 2; // 更新后的对局信息
+}
+
+// @desc 使用道具-请求
+// @cmd  CS_BALATRO_USE_ITEM_REQ
+message CS_Balatro_UseItem_Req
+{
+    uint32 item_type = 1; // 道具类型
+    uint32 item_id   = 2; // 道具配置ID
+}
+
+// @desc 使用道具-响应
+// @cmd  SC_BALATRO_USE_ITEM_RSP
+message SC_Balatro_UseItem_Rsp
+{
+    int32 result = 1; // 结果
+    BalatroRunInfo run_info = 2; // 更新后的对局信息
+}
+
+// @desc 卖出道具-请求
+// @cmd  CS_BALATRO_SELL_ITEM_REQ
+message CS_Balatro_SellItem_Req
+{
+    uint32 item_type = 1; // 道具类型
+    uint32 item_id   = 2; // 道具配置ID
+}
+
+// @desc 卖出道具-响应
+// @cmd  SC_BALATRO_SELL_ITEM_RSP
+message SC_Balatro_SellItem_Rsp
+{
+    int32          result   = 1; // 结果
+    BalatroRunInfo run_info = 2; // 更新后的对局信息
+}
+
+// @desc 同步客户端快照-请求
+// @cmd  CS_BALATRO_SYNC_SNAPSHOT_REQ
+message CS_Balatro_SyncSnapshot_Req
+{
+    bytes client_snapshot = 1; // 客户端最新快照
+}
+
+// @desc 同步客户端快照-响应
+// @cmd  SC_BALATRO_SYNC_SNAPSHOT_RSP
+message SC_Balatro_SyncSnapshot_Rsp
+{
+    int32 result = 1; // 结果
+}
+
+// @desc 手动退出-请求
+// @cmd  CS_BALATRO_QUIT_REQ
+message CS_Balatro_Quit_Req
+{
+}
+
+// @desc 手动退出-响应
+// @cmd  SC_BALATRO_QUIT_RSP
+message SC_Balatro_Quit_Rsp
+{
+    int32 result = 1; // 结果
+}
+
+// 牌型
+message PlayedHand
+{
+    uint32 type = 1; // 类型
+    uint32 count = 2; // 次数
+}
+
+// 特殊牌
+message CardEdition
+{
+    uint32 edition = 1; // 类型
+    uint32 count = 2; // 次数
+}
+
+// @desc 结算-请求
+// @cmd  CS_BALATRO_END_REQ
+message CS_Balatro_End_Req
+{
+    uint32 repeated_claim_count = 1; // 玩家选择的复刷奖励领取份数；0 表示不领；> 当前回合 P_BalatroPVEFieldTable.RepeatedDropNum 时服务器拒绝
+    repeated PlayedHand played_hands = 2;   // 本次 Run 中玩家打出的牌型列表（可能包含多个相同牌型，按实际打出顺序记录）
+    repeated CardEdition edition_cards = 3; // 本次 Run 中玩家打出的特殊牌列表（可能包含多个相同特殊牌，按实际打出顺序记录）
+    EnmBalatroFailReason fail_reason = 4; // 失败原因
+}
+
+// @desc 结算-响应
+// @cmd  SC_BALATRO_END_RSP
+message SC_Balatro_End_Rsp
+{
+    int32                result             = 1; // 结果
+    repeated ItemIdCount first_pass_rewards = 2; // 首通奖励（仅 Win 且首次通关该 level 时填充，对应 P_BalatroPVELevelTable.FirstReward）
+    repeated ItemIdCount repeated_rewards   = 3; // 复刷奖励（按 min(repeated_claim_count, RepeatedDropNum) × P_BalatroConst.RepeatedDropID 计算，胜负皆有）
+}
+
+// @desc 查询对局状态-请求
+// @cmd  CS_BALATRO_QUERY_REQ
+message CS_Balatro_Query_Req
+{
+}
+
+// @desc 查询对局状态-响应
+// @cmd  SC_BALATRO_QUERY_RSP
+message SC_Balatro_Query_Rsp
+{
+    int32           result       = 1; // 结果
+    bool            has_run      = 2; // 是否有对局数据（Playing/Win/Lose均为true，None为false）
+    BalatroRunInfo  run_info     = 3; // 对局信息（has_run=true时有效，具体状态看run_info.run_status）
+    repeated uint32 pass_levels  = 4; // 已通关的难度等级 ID 列表（账号级累积，跨 Run 保留）
+}
+
+// @desc 噩梦模式继续-请求（HELL_GATEWAY 状态下选择继续噩梦时调用）
+// @cmd  CS_BALATRO_HELL_CONTINUE_REQ
+message CS_Balatro_HellContinue_Req
+{
+}
+
+// @desc 噩梦模式继续-响应
+// @cmd  SC_BALATRO_HELL_CONTINUE_RSP
+message SC_Balatro_HellContinue_Rsp
+{
+    int32          result   = 1; // 结果
+    BalatroRunInfo run_info = 2; // 更新后的对局信息（run_status=Playing，blind_status=Shopping/Ready，round_index=hellStartRoundIndex）
+}

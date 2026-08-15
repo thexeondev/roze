@@ -1,0 +1,246 @@
+syntax = "proto3";
+package msg;
+
+import "comm_data.proto";
+import "cs_attrib.proto";
+
+// @desc 宝石装配状态
+enum EnmGemStatus
+{
+    EMPTY = 0;   // 空插槽
+    VALID = 1;   // 装配且有效
+    INVALID = 2; // 装配但无效
+}
+
+// @desc 单个插槽的宝石装配情况
+message GemSlotData
+{
+    uint32 gem_slot_id = 1;
+    uint32 gem_itemid = 2;
+    EnmGemStatus gem_state = 3;
+}
+
+// @desc 单个队伍成员数据
+message TeamMemberData
+{
+    uint32 member_slot_id = 1;
+    uint64 inst_id = 2;
+    uint32 character_id = 3;
+    repeated GemSlotData gem_slots = 4;
+}
+
+// @desc 编队数据
+message TeamData {
+    uint32 team_id = 1;
+    bytes name = 2;    // 队伍名字
+    repeated TeamMemberData member_data = 3; // 队伍成员数据
+}
+
+// @desc 编队来源
+message TeamSrc
+{
+    uint64 src = 1; // 编队来源
+    uint64  src_ext = 2; // 编队来源扩展
+}
+
+// @desc 当前编队数据
+message CurTeamData
+{
+    int32 team_type = 1; // 编队类型 refer to EnmTmpTeamType
+    TeamSrc team_src = 2; // 编队key
+    uint32 using_member_slot = 3; // 使用角色slot
+    TeamData team_data = 4; // 编队数据
+    ElementParamMap temporary_liquid = 5; // 临时液滴
+    repeated PBCharacterAttribData attrib_data = 6; // 当前队伍中的角色属性
+}
+
+// @desc 拉取编队列表
+// @cmd CS_CHARACTER_TEAMS
+message CS_Character_Teams
+{
+
+}
+
+// @desc 拉取编队列表 响应
+// @cmd SC_CHARACTER_TEAMS 
+message SC_Character_Teams
+{
+    int32 result = 1;
+    repeated TeamData teams = 2;     // 通常编队情况
+    CurTeamData cur_team = 3;          // 当前生效编队数据
+}
+
+// @desc 修改编队数据（除编队名外。修改编队名字单走其他协议）
+// @cmd CS_CHARACTER_UPDATE_TEAM
+message CS_Character_Update_Team
+{
+    TeamData team_data = 1;     // 最新编队数据（名字字段的填充会被忽略，可将之置为空值）
+}
+
+// @desc 修改编队名字（走屏蔽字过滤流程） 返回SC_Character_Update_Team
+// @cmd CS_CHARACTER_UPDATE_TEAM_NAME
+message CS_Character_Update_Team_Name
+{
+    uint32 team_id = 1;         // 编队id
+    bytes name = 2;     // 最新名字
+}
+
+// @desc 修改编队信息 统一响应
+// @cmd SC_CHARACTER_UPDATE_TEAM
+message SC_Character_Update_Team
+{
+    int32 result = 1;
+    TeamData team_data = 2;     // 最新编队
+    uint32 using_member_slot = 3;  // 更新前台角色位置（team_id为当前队伍且原前台位置空出来时填充）
+    repeated PBCharacterAttribData attrib_data = 4; // 当前队伍中的角色属性（team_id为当前队伍时填充）
+}
+
+// @desc 切换编队
+// @cmd CS_CHARACTER_SWITCH_TEAM
+message CS_Character_Switch_Team
+{
+    uint32 team_id = 1;     // 要切换至的编队
+}
+
+// @desc 切换编队响应
+// @cmd SC_CHARACTER_SWITCH_TEAM
+message SC_Character_Switch_Team
+{
+    int32 result = 1;
+    uint32 team_id = 2;
+    uint32 using_member_slot = 3;  // 切换后的前台角色位置
+    repeated PBCharacterAttribData attrib_data = 4; // 当前队伍中的角色属性
+}
+
+// @desc 前台角色切换
+// @cmd CS_CHARACTER_SWITCH_MEMBER
+message CS_Character_Switch_Member
+{
+    uint32 member_slot = 1;    // 切换至的角色位置
+}
+
+// @desc 前台角色切换 响应
+// @cmd SC_CHARACTER_SWITCH_MEMBER
+message SC_Character_Switch_Member
+{
+    int32 result = 1;
+    uint32 member_slot = 2;
+}
+
+// @desc 切换到主角
+// @cmd CS_SWITCH_MAIN_CHARACTER
+message CS_Switch_Main_Character
+{
+    TeamData team_data = 1; // 填充了主角后的队伍
+    uint32 using_member_slot = 2; // 切换后的主角位置
+}
+
+// desc 切换到主角响应
+// @cmd SC_SWITCH_MAIN_CHARACTER
+message SC_Switch_Main_Character
+{
+    int32 result = 1;
+    TeamData team_data = 2; // 填充了主角后的队伍
+    uint32 using_member_slot = 3; // 切换后的主角位置
+    repeated PBCharacterAttribData attrib_data = 4; // 当前队伍中的角色属性
+}
+
+// desc 临时编队数据
+message TmpTeamData
+{
+    TeamSrc team_src = 1; // 编队key
+    TeamData team_data = 2; // 编队数据    
+}
+
+// @desc 修改临时编队请求
+// @cmd CS_CHARACTER_UPDATE_TMP_TEAM
+message CS_Character_Update_Tmp_Team
+{
+    int32 team_type = 1; // 编队类型 refer to EnmTmpTeamType
+    repeated TmpTeamData tmp_team_data = 2;
+}
+
+// @desc 修改临时编队响应
+// @cmd SC_CHARACTER_UPDATE_TMP_TEAM
+message SC_Character_Update_Tmp_Team
+{
+    int32 result = 1;
+    int32 team_type = 2; // 编队类型 refer to EnmTmpTeamType
+    repeated TmpTeamData tmp_team_data = 3;
+}
+
+// @desc 临时编队更新
+// @cmd SC_CHARACTER_TEMP_TEAM_NTF
+message SC_Character_Temp_Team_Ntf
+{
+    CurTeamData cur_team = 1;
+}
+
+// @desc 查询临时编队请求
+// @cmd CS_CHARACTER_TMP_TEAM_QUERY
+message CS_Character_Tmp_Team_Query
+{
+    int32 team_type = 1; // 编队类型 refer to EnmTmpTeamType
+    repeated TeamSrc team_src = 2; // 编队来源
+}
+
+// @desc 查询临时编队响应
+// @cmd SC_CHARACTER_TMP_TEAM_QUERY
+message SC_Character_Tmp_Team_Query
+{
+    int32 result = 1;
+    int32 team_type = 2; // 编队类型 refer to EnmTmpTeamType
+    repeated TmpTeamData tmp_team_data = 3;
+}
+
+// @desc 临时池液滴变化
+// @cmd  SC_TEMPORARY_LIQUID_POOL_NTF
+message SC_Temporary_Liquid_Pool_Ntf
+{
+    int32 team_type = 1; // 编队类型 refer to EnmTmpTeamType
+    TeamSrc team_src = 2; // 编队来源
+    ElementParamMap temporary_liquid = 3; // 临时液滴
+}
+
+// @desc 设置临时编队请求
+// @cmd CS_SET_TMP_TEAM_REQ
+message CS_Set_Tmp_Team_Req
+{
+    int32 team_type = 1; // 编队类型 refer to EnmTmpTeamType
+    TeamSrc team_src = 2; // 编队来源
+}
+
+// @desc 设置临时编队响应
+// @cmd SC_SET_TMP_TEAM_RSP
+message SC_Set_Tmp_Team_Rsp
+{
+    int32 result = 1;
+    int32 team_type = 2; // 编队类型 refer to EnmTmpTeamType
+    TeamSrc team_src = 3; // 编队来源
+    CurTeamData cur_team = 4; // 当前编队数据
+}
+
+// @desc 更新临时编队宝石请求
+// @cmd CS_TMP_TEAM_UPDATE_GEM_REQ
+message CS_Tmp_Team_Update_Gem_Req
+{
+    uint32 team_type = 1; // 编队类型 refer to EnmTmpTeamType
+    TmpTeamData tmp_team_data = 2;
+}
+
+// @desc 更新临时编队宝石响应
+// @cmd SC_TMP_TEAM_UPDATE_GEM_RSP
+message SC_Tmp_Team_Update_Gem_Rsp
+{
+    int32 result = 1;
+    uint32 team_type = 2; // 编队类型 refer to EnmTmpTeamType
+    TmpTeamData tmp_team_data = 3;
+}
+
+// @desc 临时编队宝石变更通知
+// @cmd SC_TMP_TEAM_UPDATE_GEM_NTF
+message SC_Tmp_Team_Update_Gem_Ntf
+{
+    uint32 team_type = 1; // 编队类型 refer to EnmTmpTeamType
+    TmpTeamData tmp_team_data = 2;
+}

@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+package msg;
+
+// @desc 单个每日活跃任务目标数据
+message DailyMissionItem
+{
+    uint32 mission_id = 1;      // 目标ID
+    uint32 progress = 2;        // 目标进度
+    bool is_claimed = 3;        // 是否已领取活跃度
+}
+
+// @desc 每日活跃任务目标数据
+message DailyMissionListData
+{
+    repeated DailyMissionItem mission_items = 1;
+}
+
+// @desc 每日活跃奖励数据
+message DailyMissionRewardData
+{
+    repeated uint32 claimed_rewardids = 1;            // 已经领取活跃度的奖励ID
+}
+
+// @desc 每日活跃系统总数据
+message DailyMissionData
+{
+    uint32 active_point = 1;                    // 每日活跃度
+    DailyMissionListData mission_list_data = 2; // 每日活跃任务目标数据
+    DailyMissionRewardData reward_data = 3;     // 每日活跃度奖励数据
+}
+
+// @desc 每日活跃系统总数据更新通知
+// @cmd  SC_DAILY_MISSION_NTF
+message SC_Daily_Mission_Ntf
+{
+    DailyMissionData data = 1;
+}
+
+// @desc 每日活跃系统总数据请求
+// @cmd  CS_DAILY_MISSION_QUERY
+message CS_Daily_Mission_Query
+{
+}
+
+// @desc 每日活跃系统总数据返回
+// @cmd  SC_DAILY_MISSION_QUERY
+message SC_Daily_Mission_Query
+{
+    int32 result = 1;
+    DailyMissionData data = 2;
+}
+
+// @desc 每日活跃任务目标领取活跃度请求
+// @cmd  CS_DAILY_MISSION_ACTIVEPOINT_CLAIM
+message CS_Daily_Mission_ActivePoint_Claim
+{
+    uint32 mission_id = 1;
+}
+
+// @desc 每日活跃任务目标领取活跃度返回
+// @cmd  SC_DAILY_MISSION_ACTIVEPOINT_CLAIM
+message SC_Daily_Mission_ActivePoint_Claim
+{
+    int32 result = 1;
+    uint32 active_point = 2;
+    repeated DailyMissionItem mission_items = 3;
+}
+
+// @desc 领取每日活跃度奖励请求
+// @cmd  CS_DAILY_MISSION_REWARD_CLAIM
+message CS_Daily_Mission_Reward_Claim
+{
+}
+
+// @desc 领取每日活跃度奖励返回
+// @cmd  SC_DAILY_MISSION_REWARD_CLAIM
+message SC_Daily_Mission_Reward_Claim
+{
+    int32 result = 1;
+    DailyMissionRewardData reward_data = 2;
+}

@@ -1,0 +1,56 @@
+syntax = "proto3";
+package msg;
+
+// @desc 单个设置项
+message SettingEntry 
+{
+    uint32 key = 1;
+    bytes value = 2; // MAX_SETTING_VALUE_LEN
+}
+
+// @desc 模块设置项
+message ModuleSetting
+{
+    uint32 module_type = 1; // 模块名称
+    repeated SettingEntry settings = 2;
+    uint32 sub_version = 3; // 版本号
+}
+
+message CustomSettingEntry
+{
+    uint32 key = 1;
+    bytes value = 2; // max = 200
+    uint32 version = 3;
+}
+
+// @desc 请求设置
+// @cmd CS_REQ_SETTING
+message CS_Req_Setting
+{
+}
+
+// @desc 响应设置
+// @cmd SC_RES_SETTING
+message SC_Res_Setting
+{
+    int32 result = 1;
+    repeated ModuleSetting modules = 2;
+    repeated CustomSettingEntry custom_settings = 3; // max = 10
+    uint32 version = 4; // 版本号
+}
+
+// @desc 设置请求
+// @cmd CS_REQ_SET_SETTING
+message CS_Req_Set_Setting
+{
+    repeated ModuleSetting changes = 1; // 要变更的设置项,如果是要删除的情况，那么value是默认值
+    repeated CustomSettingEntry custom_settings = 2; // 自定义设置变更
+    uint32 version = 3; // 版本号
+}
+
+// @desc 响应设置请求
+// @cmd SC_RES_SET_SETTING
+message SC_Res_Set_Setting
+{
+    int32 result = 1;
+}

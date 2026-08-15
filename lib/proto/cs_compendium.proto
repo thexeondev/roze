@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package msg;
+import "comm_macro.proto";
+
+// 图鉴系统
+
+// @desc 图鉴数据
+message CompendiumInfo {
+    uint32 compendium_id = 1; // 图鉴ID
+    EnmCompendiumUnlockState unlock_state = 2; // 解锁状态
+}
+
+// @desc 客户端请求：获取图鉴数据
+// @cmd CS_COMPENDIUM_GET_DATA
+message CS_Compendium_Get_Data {
+}
+
+// @desc 服务器响应：返回图鉴数据
+// @cmd SC_COMPENDIUM_GET_DATA
+message SC_Compendium_Get_Data {
+    int32 result = 1; // 0=成功，其他值表示错误
+    repeated CompendiumInfo compendium_list = 2; // 图鉴数据列表 @len{ msg::MAX_COMPENDIUM_LEN }
+}
+
+
+// @desc 服务器通知：图鉴数据更新，哪些变化了更新哪些
+// @cmd SC_COMPENDIUM_DATA_UPDATE_NOTIFY
+message SC_Compendium_Data_Update_Notify {
+    repeated CompendiumInfo compendium_list = 1; // 图鉴数据列表 @len{ msg::MAX_COMPENDIUM_LEN }
+}

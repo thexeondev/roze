@@ -1,0 +1,117 @@
+syntax = "proto3";
+package msg;
+
+import "comm_data.proto";
+import "comm_macro.proto";
+
+message GMDocItem
+{
+    bytes CMD = 1;
+    bytes DESC = 2;
+    bytes PARAM = 3;
+    bytes EXAMPLE = 4;
+}
+
+message GMDocItemS
+{
+    repeated GMDocItem items = 1;
+}
+
+// @desc 客户端时间上报请求
+// @cmd CS_REPORT_TIME
+message CS_Report_Time
+{
+    uint64 timestamp = 1;
+}
+
+// @desc 客户端时间上报响应
+// @cmd SC_REPORT_TIME
+message SC_Report_Time
+{
+    int32  result = 1;
+    uint64 timestamp = 2;
+}
+
+// @desc 客户端查询时间请求
+// @cmd CS_QUERY_TIME
+message CS_Query_Time
+{
+}
+
+// @desc 客户端查询时间响应
+// @cmd SC_QUERY_TIME
+message SC_Query_Time
+{
+    int32  result = 1;
+    uint64 timestamp = 2;
+}
+
+// @desc 玩家等级数据变化
+// @cmd  SC_PLAYER_LEVEL_DATA_NTF
+message SC_Player_Level_Data_Ntf
+{
+    PlayerLevelData update_list = 1; // 增加或者更新的
+    uint32 result = 2;
+    PlayerLevelData before_list = 3; // 变更前的等级数据
+}
+
+// @desc 玩家改变世界等级
+// @cmd  CS_CHANGE_WORLD_LEVEL
+message CS_Change_World_Level
+{
+    uint32 world_level = 1; // 要改变的世界等级
+}
+
+// @desc 返回玩家改变世界等级
+// @cmd  SC_CHANGE_WORLD_LEVEL
+message SC_Change_World_Level
+{
+    uint32 result = 1;
+    uint32 world_level = 2; // 当前世界等级
+}
+
+
+// @desc 玩家基础数据变更推送
+// @cmd  SC_PLAYER_ATTR_UPDATE_NTF
+message SC_PlayerAttr_Update_Ntf
+{
+    repeated PlayerAttr update_attrs = 1;   // 本次更新的内容
+}
+
+// @desc 检测文本是否合规
+// @cmd CS_CHECK_TEXT
+message CS_Check_Text
+{
+    FenceEventType event_type = 1;
+    bytes text = 2;
+}
+
+// @desc 检测文本是否合规
+// @cmd SC_CHECK_TEXT
+message SC_Check_Text
+{
+    int32 result = 1;
+    FenceEventType event_type = 2;
+    bytes text = 3;
+}
+
+// @desc 创角设定性别
+// @cmd CS_INIT_ROLE_GENDER_AND_NAME
+message CS_Init_Role_Gender_And_Name
+{
+    EnmGender gender = 1;
+    bytes role_name = 2;
+    bytes second_role_name = 3; // 第二个角色(女主弟弟)的名字
+}
+
+// @desc 创角设定性别
+// @cmd SC_INIT_ROLE_GENDER_AND_NAME
+message SC_Init_Role_Gender_And_Name
+{
+    EnmGender gender = 1;
+    int32 gender_result = 2;
+    bytes role_name = 3;
+    int32 role_name_result = 4;
+    bytes second_role_name = 5;
+    int32 second_role_name_result = 6;
+}

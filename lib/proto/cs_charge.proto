@@ -1,0 +1,81 @@
+syntax = "proto3";
+package msg;
+import "comm_macro.proto";
+
+// @desc 账号请求购买充值商品
+// @cmd CS_CHAEGR_GOODS_ORDER
+message CS_Charge_Goods_Order
+{
+	uint32 goods_id = 1;  // 商品ID
+	bytes channel = 2; // 渠道
+}
+
+// @desc 返回账号购买商品的信息
+// @cmd SC_CHAEGR_GOODS_ORDER
+message SC_Charge_Goods_Order
+{
+	int32 result = 1;  // 结果
+	uint32 goods_id = 2;  // 商品ID
+	bytes currency = 3;  // 货币类型
+	bytes price = 4;  // 商品价格(小数点后2位)
+	bytes developer_payload = 5;  // 游戏自定义内容
+	bytes notify_id = 6;  // 服务器通知ID(测试用)
+	bytes order_sign = 7;  // 订单签名
+	bytes game_header_payload = 8;  // 加币请求头(非必要)
+}
+
+// @desc 返回账号购买商品的信息
+// @cmd SC_CHAEGR_FINISH
+message SC_Charge_Finish
+{
+	int32 result = 1;  // 结果
+	bytes developer_payload = 2;  // 游戏自定义内容
+	bytes order_id = 3;  // sdk订单号
+	uint32 goods_id = 4;  // 商品ID
+}
+
+message ChargeGoodsCfg
+{
+	uint32 id = 1;
+    uint32 charge_type = 2;
+    uint32 sub_id = 3;
+    bytes currency = 4;
+    bytes real_price = 5;
+    bool is_show = 6; // 是否显示
+    repeated uint32 areas_id = 7;
+	uint32 start_time = 8;
+    uint32 end_time = 9;
+    EnmPeriodType period_type = 10; // 限购类型
+    uint32 period_num = 11;  // 限购次数
+	bool is_first_charge = 12; // 是否首充
+}
+
+// @desc 玩家请求商品列表
+// @cmd CS_CHAEGR_GOODS_LIST
+message CS_Charge_Goods_List
+{
+	bytes channel = 1; // 渠道
+}
+
+// @desc 返回玩家商品列表
+// @cmd SC_CHAEGR_GOODS_LIST
+message SC_Charge_Goods_List
+{
+	repeated ChargeGoodsCfg goods_list = 1;  // 商品列表
+	int32 result = 2;  // 结果
+}
+
+// @desc 请求直充货币信息
+// @cmd CS_CHARGE_MONEY_QUERY
+message CS_Charge_Money_Query
+{
+    int32 reserved = 1;
+}
+
+// @desc 返回直充货币信息
+// @cmd SC_CHARGE_MONEY_QUERY
+message SC_Charge_Money_Query
+{
+    int32 result = 1;
+    repeated uint32 charge_money_id = 2; // 已享受过首充赠送的id(refer to P_ChargeMoneyTable)
+}

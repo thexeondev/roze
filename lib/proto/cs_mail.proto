@@ -1,0 +1,89 @@
+syntax = "proto3";
+
+package msg;
+
+import "comm_data.proto";
+
+// @desc 获取邮件数据请求
+// @cmd CS_MAIL_GET_LIST
+message CS_Mail_Get_List {
+    uint32 from_mail_id = 1;  // 从某封邮件开始往id小的邮件拉取，不填的时候从最新的开始
+    int32 count = 2;  // 拉取的数量，最大值服务器会限定某个固定值，即使超过这个值也按这个限定值数量返回；＜0 的时候表示从 from_mailid 往最新的拉取。
+}
+
+// @desc 获取邮件数据响应
+// @cmd SC_MAIL_GET_LIST
+message SC_Mail_Get_List {
+    uint32 from_mail_id = 1;
+    int32 count = 2;  // 用来给客户端标志合并方向，>0 往后面合并，<0 往前面合并
+    repeated MailData mails = 3;
+}
+
+// @desc 阅读邮件请求
+// @cmd CS_MAIL_READ
+message CS_Mail_Read {
+    uint32 mail_id = 1;
+}
+
+// @desc 阅读邮件响应
+// @cmd SC_MAIL_READ
+message SC_Mail_Read {
+    int32 result = 1;
+    uint32 mail_id = 2;
+}
+
+// @desc 领取邮件附件请求
+// @cmd CS_MAIL_RECV_ATTACHMENTS
+message CS_Mail_Recv_Attachments {
+    uint32 mail_id = 1;
+}
+
+// @desc 领取邮件附件响应
+// @cmd SC_MAIL_RECV_ATTACHMENTS
+message SC_Mail_Recv_Attachments {
+    int32 result = 1;
+    uint32 mail_id = 2;
+}
+
+// @desc 删除邮件请求
+// @cmd CS_MAIL_DEL
+message CS_Mail_Del {
+    uint32 mail_id = 1;
+}
+
+// @desc 删除邮件响应
+// @cmd SC_MAIL_DEL
+message SC_Mail_Del {
+    int32 result = 1;
+    uint32 mail_id = 2;
+}
+
+// @desc 删除已读邮件请求
+// @cmd CS_MAIL_DEL_ALL_READED
+message CS_Mail_Del_All_Readed {
+}
+
+// @desc 删除已读邮件响应
+// @cmd SC_MAIL_DEL_ALL_READED
+message SC_Mail_Del_All_Readed {
+    int32 result = 1;
+}
+
+// @desc 一键领取所有邮件附件请求
+// @cmd CS_MAIL_RECV_ALL_ATTACHMENTS
+message CS_Mail_Recv_All_Attachments {
+}
+
+// @desc 一键领取所有邮件附件响应
+// @cmd SC_MAIL_RECV_ALL_ATTACHMENTS
+message SC_Mail_Recv_All_Attachments {
+    int32 result = 1;
+    repeated uint32 mail_ids = 2;  // 被领取附件的邮件 id，可能存在客户端未拉取到的邮件 id
+}
+
+// @desc 新邮件和删除邮件通知
+// @cmd SC_MAIL_ADD_DEL_NTF
+message SC_Mail_Add_Del_Nft {
+    repeated MailData add_mails = 1;  // 新邮件内容
+    repeated uint32 del_mail_ids = 2;  // 待删除的邮件 id 列表
+}

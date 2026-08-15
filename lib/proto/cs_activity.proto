@@ -1,0 +1,72 @@
+syntax = "proto3";
+import "comm_macro.proto";
+import "comm_data.proto";
+package msg;
+
+message DisplayCurrency
+{
+    uint32 currency_id = 1; // 货币类型
+    uint32 show_add = 2;   // 是否显示+号
+}
+
+// 单个活动基本信息
+message ActivityInfo
+{
+    uint32 activity_id = 1;                         // 活动ID
+    uint32 activity_type = 2;                       // 活动类型
+    uint64 start_time = 3;                          // 开始时间戳
+    uint64 end_time = 4;                            // 结束时间戳
+    EnmActivityState state = 5;                     // 活动状态
+    uint32 sort_id = 6;                             // 活动排序ID
+    uint32 show_level = 7;                          // 活动显示的等级限制
+    uint32 open_level = 8;                          // 活动开放等级限制
+    repeated TaskIdType open_required_tasks = 9;    // 活动开放需要完成的任务
+    TaskIdType recommend_task = 10;                 // 推荐做的任务
+    bool can_early_unlock = 11;                     // 活动是否可以提前解锁
+    TaskIdType early_required_task = 12;            // 活动可提前解锁时需要完成的任务
+    repeated ItemIdCount preview_rewards = 13;      // 奖励预览
+    repeated DisplayCurrency display_currencies = 14; // 货币显示
+    uint32 show_permanent_in_limited_tab = 15;      // 常驻活动是否显示在活动页签中
+}
+
+// 所有开放的活动基本信息
+message ActivityList
+{
+    repeated ActivityInfo activity_infos = 1;
+}
+
+// @desc 活动列表数据-请求
+// @cmd  CS_ACTIVITY_LIST_REQ
+message CS_Activity_List_Req
+{
+}
+
+// @desc 活动列表数据-响应
+// @cmd  SC_ACTIVITY_LIST_RES
+message SC_Activity_List_Res
+{
+    int32 result = 1;
+    ActivityList activity_list = 2;
+}
+
+// @desc 活动列表数据-通知
+// @cmd  SC_ACTIVITY_LIST_NTF
+message SC_Activity_List_Ntf
+{
+    ActivityList activity_list = 1;
+}
+
+// @desc 解锁某个活动-请求
+// @cmd CS_ACTIVITY_UNLOCK_REQ
+message CS_Activity_Unlock_Req
+{
+    uint32 activity_id = 1;
+}
+
+// @desc 解锁活动-响应
+// @cmd SC_ACTIVITY_UNLOCK_RES
+message SC_Activity_Unlock_Res
+{
+    int32 result = 1;
+    uint32 activity_id = 2;
+}

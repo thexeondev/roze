@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package msg;
+
+// @desc 解锁功能数据
+message UnlockFeatureData // @gencstruct
+{
+    uint32 feature_id = 1; // 解锁功能ID
+    bool is_read = 2; // 是否已读
+}
+
+// @desc 获取解锁数据请求
+// @cmd CS_UNLOCK_DATA_GET
+message CS_Unlock_Data_Get
+{
+}
+
+// @desc 获取解锁数据响应
+// @cmd SC_UNLOCK_DATA_GET
+message SC_Unlock_Data_Get
+{
+    int32 result = 1; // 0=成功，其他值表示错误
+    repeated uint32 unlock_condition_list = 2; // 解锁条件列表，全量数据 @len{ msg::MAX_UNLOCK_CONDITION_LEN }
+    repeated UnlockFeatureData unlock_feature_list = 3; // 解锁功能列表，全量数据 @len{ msg::MAX_UNLOCK_FEATURE_LEN }
+}
+
+// @desc 解锁条件更新通知
+// @cmd SC_UNLOCK_CONDITION_UPDATE_NTF
+message SC_Unlock_Condition_Update_Ntf
+{
+    repeated uint32 unlock_condition_list = 1; // 解锁条件列表，全量数据 @len{ msg::MAX_UNLOCK_CONDITION_LEN }
+}
+
+
+// @desc feature解锁更新通知
+// @cmd SC_UNLOCK_FEATURE_UPDATE_NTF
+message SC_Unlock_Feature_Update_Ntf
+{
+    repeated UnlockFeatureData unlock_feature_list = 1; // 解锁功能列表，全量数据 @len{ msg::MAX_UNLOCK_FEATURE_LEN }
+}
+
+// @desc 客户端播放解锁功能动画通知请求
+// @cmd CS_UNLOCK_FEATURE_PLAY_ANIMATION_REQ
+message CS_Unlock_Feature_Play_Animation_Req
+{
+    uint32 feature_id = 1; // 解锁功能ID
+}
+
+// @desc 客户端播放解锁功能动画响应
+// @cmd SC_UNLOCK_FEATURE_PLAY_ANIMATION_RSP
+message SC_Unlock_Feature_Play_Animation_Rsp
+{
+    int32 result = 1; // 0=成功，其他值表示错误
+}

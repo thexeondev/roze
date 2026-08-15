@@ -1,0 +1,194 @@
+// CBT2新版通缉令(区域悬赏)协议
+syntax = "proto3";
+package msg;
+
+import "comm_macro.proto";
+
+// @desc 告示板栏位
+message HuntBoardColumn
+{
+    uint32 column_index       = 1;    // 栏位序号
+    uint32 hunt_id          = 2;    // 当前栏位通缉令id
+    EnmHuntBoardColumnStatus status = 3;    // 栏位状态
+    uint64 refresh_time     = 4;    // 下次刷新时间戳（秒）
+}
+
+// @desc 告示板数据
+message HuntBoard
+{
+    uint32 board_id         = 1;        // 告示板id
+    repeated HuntBoardColumn columns = 2;   // 栏位列表
+    uint32 speed_up_count   = 3;    // 今日已使用加速次数
+}
+
+// @desc 调查节点数据
+message HuntNode
+{
+    uint32 node_id              = 1; // 节点ID
+    EnmHuntNodeStatus status    = 2; // 节点状态
+}
+
+// @desc 通缉令条目（玩家持有的通缉令信息）
+message HuntEntry
+{
+    uint32 hunt_id      = 1;    // 通缉令id
+    EnmHuntStatus status       = 2;    // 当前通缉令状态
+    uint32 stage_id     = 3;    // 当前阶段id
+    repeated HuntNode nodes = 4;  // 节点列表
+}
+
+// @desc 侦探手册数据
+message HuntBook
+{
+    uint32 cur_hunt_id                    = 1;      // 当前正在进行的通缉令ID
+    repeated HuntEntry hunt_entries       = 2;      // 通缉令列表
+}
+
+// @desc 请求打开告示板
+// @cmd CS_HUNT_BOARD_QUERY_REQ
+message CS_Hunt_Board_Query_Req
+{
+    uint32 board_id = 1;    // 告示板id
+}
+
+// @desc 返回告示板数据
+// @cmd SC_HUNT_BOARD_QUERY_RSP
+message SC_Hunt_Board_Query_Rsp
+{
+    int32 result        = 1;
+    HuntBoard board     = 2;
+}
+
+// @desc 请求侦探手册数据
+// @cmd CS_HUNT_BOOK_QUERY_REQ
+message CS_Hunt_Book_Query_Req
+{
+}
+
+// @desc 返回侦探手册数据
+// @cmd SC_HUNT_BOOK_QUERY_RSP
+message SC_Hunt_Book_Query_Rsp
+{
+    int32 result        = 1;
+    HuntBook book       = 2;    // 侦探手册数据
+}
+
+// @desc 接取通缉令
+// @cmd CS_HUNT_ACCEPT_REQ
+message CS_Hunt_Accept_Req
+{
+    uint32 hunt_id  = 1;    // 接取的通缉令ID
+    EnmHuntAcceptType accept_type = 2;    // 接取来源类型
+    uint32 board_id = 3;    // 从告示板接取时，对应的告示板ID（告示板接取时为非0）
+}
+
+// @desc 接取通缉令响应
+// @cmd SC_HUNT_ACCEPT_RSP
+message SC_Hunt_Accept_Rsp
+{
+    int32 result = 1;
+    uint32 hunt_id  = 2;    // 接取的通缉令ID
+    EnmHuntAcceptType accept_type = 3;  // 接取来源类型
+    uint32 board_id = 4;                // 从告示板接取时，对应的告示板ID（告示板接取时为非0）
+    uint32 cur_hunt_id = 5;             // 当前正在激活的通缉令ID（接取成功时返回）
+    HuntEntry entry = 6;                // 接取成功的通缉令数据
+}
+
+// @desc 接取通缉令通知（当接取来源为系统发放时，服务器主动通知客户端）
+// @cmd SC_HUNT_ACCEPT_NTF
+message SC_Hunt_Accept_Ntf
+{
+    uint32 hunt_id  = 1;    // 接取的通缉令ID
+    EnmHuntAcceptType accept_type = 2;  // 接取来源类型
+    uint32 cur_hunt_id = 3;             // 当前正在激活的通缉令ID（接取成功时返回）
+    HuntEntry entry = 4;                // 接取成功的通缉令数据
+}
+
+// @desc 激活通缉令
+// @cmd CS_HUNT_ACTIVATE_REQ
+message CS_Hunt_Activate_Req
+{
+    uint32 hunt_id = 1;     // 要激活的通缉令ID
+}
+
+// @desc 激活通缉令响应
+// @cmd SC_HUNT_ACTIVATE_RSP
+message SC_Hunt_Activate_Rsp
+{
+    int32 result    = 1;
+    uint32 hunt_id  = 2;    // 要激活的通缉令ID
+}
+
+// @desc 放弃通缉令
+// @cmd CS_HUNT_GIVEUP_REQ
+message CS_Hunt_GiveUp_Req
+{
+    uint32 hunt_id = 1;     // 要放弃的通缉令ID
+}
+
+// @desc 放弃通缉令响应
+// @cmd SC_HUNT_GIVEUP_RSP
+message SC_Hunt_GiveUp_Rsp
+{
+    int32 result    = 1;
+    uint32 hunt_id  = 2;    // 要放弃的通缉令ID
+}
+
+// @desc 加速刷新栏位
+// @cmd CS_HUNT_BOARD_COLUMN_SPEEDUP_REQ
+message CS_Hunt_Board_Column_SpeedUp_Req
+{
+    uint32 board_id     = 1;    // 告示板id
+    uint32 column_index   = 2;    // 栏位序号
+}
+
+// @desc 加速刷新栏位响应
+// @cmd SC_HUNT_BOARD_COLUMN_SPEEDUP_RSP
+message SC_Hunt_Board_Column_SpeedUp_Rsp
+{
+    int32 result            = 1;
+    uint32 board_id         = 2;    // 告示板id
+    HuntBoardColumn column      = 3;    // 更新后的栏位数据
+}
+
+// @desc 请求解锁阶段
+// @cmd CS_HUNT_UNLOCK_STAGE_REQ
+message CS_Hunt_Unlock_Stage_Req
+{
+    uint32 hunt_id      = 1;    // 通缉令id
+    uint32 stage_id       = 2;    // 阶段id
+}
+
+// @desc 解锁结论阶段
+// @cmd SC_HUNT_UNLOCK_STAGE_RSP
+message SC_Hunt_Unlock_Stage_Rsp
+{
+    int32 result            = 1;
+    HuntEntry entry = 2; // 当前通缉令状态（全量node）
+}
+
+// @desc 告示板栏位变更通知
+// @cmd SC_HUNT_BOARD_COLUMN_UPDATE_NTF
+message SC_Hunt_Board_Column_Update_Ntf
+{
+    uint32 board_id                     = 1;    // 告示板id
+    EnmHuntUpdateType update_type       = 2;    // 操作类型
+    repeated HuntBoardColumn columns        = 3;    // 变更的栏位数据
+}
+
+// @desc 通缉令条目变更通知
+// @cmd SC_HUNT_ENTRY_UPDATE_NTF
+message SC_Hunt_Entry_Update_Ntf
+{
+    EnmHuntUpdateType update_type       = 1;    // 操作类型
+    repeated HuntEntry hunt_entries          = 2;    // 变更的通缉令数据
+}
+
+// @desc 节点变更通知
+// @cmd SC_HUNT_NODE_UPDATE_NTF
+message SC_Hunt_Node_Update_Ntf
+{
+    uint32 hunt_id                      = 1;    // 所属通缉令id
+    EnmHuntUpdateType update_type       = 2;    // 操作类型
+    repeated HuntNode nodes               = 3;  // 变更的节点数据
+}

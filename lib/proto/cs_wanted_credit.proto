@@ -1,0 +1,60 @@
+syntax = "proto3";
+package msg;
+
+// *************************************** 通缉令周积分协议 ***************************************
+
+// @desc 请求通缉令周积分数据
+// @cmd CS_WANTED_CREDIT_DATA
+message CS_Wanted_Credit_Data
+{
+}
+
+// @desc 返回通缉令周积分数据
+// @cmd SC_WANTED_CREDIT_DATA
+message SC_Wanted_Credit_Data
+{
+    int32 result = 1; //结果
+    uint32 weekly_credit = 2; //本周已获得积分
+    uint32 credit_group_id = 3; //本周积分组ID
+    repeated uint32 credit_claimed = 4; //已领取的奖励档位ID
+    uint32 credit_max_week = 5; //本周积分上限
+}
+
+// @desc 请求领取通缉令周积分里程碑奖励
+// @cmd CS_WANTED_CREDIT_CLAIM
+message CS_Wanted_Credit_Claim
+{
+    uint32 award_id = 1; //奖励档位ID (P_WPCreditAwardTable.ID)
+}
+
+// @desc 返回通缉令周积分里程碑奖励领取结果
+// @cmd SC_WANTED_CREDIT_CLAIM
+message SC_Wanted_Credit_Claim
+{
+    int32 result = 1; //结果
+    uint32 award_id = 2; //本次领取的奖励档位ID
+}
+
+// @desc 请求一键领取所有已达标的周积分里程碑奖励
+// @cmd CS_WANTED_CREDIT_CLAIM_ALL
+message CS_Wanted_Credit_Claim_All
+{
+}
+
+// @desc 返回一键领取周积分里程碑奖励结果
+// @cmd SC_WANTED_CREDIT_CLAIM_ALL
+message SC_Wanted_Credit_Claim_All
+{
+    int32 result = 1; //结果
+    repeated uint32 credit_claimed = 2; //本次新领取的奖励档位ID列表
+}
+
+// @desc 通缉令周积分变更通知
+// @cmd SC_WANTED_CREDIT_UPDATE_NTF
+message SC_Wanted_Credit_Update_Ntf
+{
+    uint32 weekly_credit = 1; //当前积分
+    uint32 credit_max_week = 2; //本周积分上限
+    repeated uint32 credit_claimed = 3; //已领取奖励列表
+    uint32 credit_group_id = 4; //本周积分组ID
+}

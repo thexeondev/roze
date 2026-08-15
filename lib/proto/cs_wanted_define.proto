@@ -1,0 +1,142 @@
+syntax = "proto3";
+package msg;
+
+import "comm_macro.proto";
+
+// *************************************** 通缉令自定义结构 ***************************************
+
+enum EnmAwardFrom
+{
+    ENM_WANTED_SHOP_STATUS_NONE = 0; // 无状态
+    ENM_WANTED_SHOP_STATUS_OPEN = 1; // 开放状态
+    ENM_WANTED_SHOP_STATUS_CLOSE = 2; // 关闭状态
+};
+
+// @desc 羁绊数据
+message CmdBond
+{
+    uint32 id = 1;     // 羁绊id
+    uint32 point = 2;    // 点数
+}
+
+message CmdBionics
+{
+    uint32 bionics_id = 1; //仿生品ID
+    uint64 uniq_id = 2; //仿生品唯一ID
+    uint64 replaced_uniq_id = 3; //被替换的仿生品唯一ID
+    uint64 leveluped_uniq_id = 4; //被升级的仿生品唯一ID
+}
+
+// @desc 通缉令资源数据
+message CmdWantedResource
+{
+    repeated uint32 bless_ids = 1; //祝福ID列表
+    uint32 coins_current = 2; //当前货币数量
+    uint32 coins_total = 3; //本局总共获得货币数量
+    repeated CmdBionics bionics = 4; //仿生品ID
+    repeated uint32 relics_ids = 5; //遗物ID
+    repeated CmdBond bonds = 6; //羁绊数据
+    repeated uint32 effect_ids = 7; //效果ID
+    repeated WantedGem gems = 8; //宝石数据
+}
+// @desc 一个通缉令的简略数据
+message CmdOneWantedBrief
+{
+    uint32 id = 1;
+    uint32 finish_count = 2; //完美通关次数
+}
+// @desc 通缉令局外简略数据
+message CmdWantedTypeData
+{
+    uint32 type_id = 1;//通缉令类型ID
+    repeated CmdOneWantedBrief wanted_list = 2; //不同难度通缉令简略数据
+    uint32 current_id = 3; //当前通缉令ID
+    uint32 current_step = 4; //当前步骤
+}
+
+// @desc 通缉令步骤奖励(三选一)
+message CmdWantedStepAward
+{
+    uint32 id = 1; //三选一奖励ID
+    uint32 type = 2; //奖励类型
+    bool finish = 3; //是否已经领完了
+    repeated uint64 award_id = 4;//具体奖励ID 
+    // 当type是仿生品三选一时，award_id字段：仿生品id1,仿生品id2,仿生品id3,升级的仿生品uniqId1,升级的仿生品uniqId2,升级的仿生品uniqId3
+    // 当type是宝石三选一时，award_id字段：宝石id1,是否触发机制,触发机制后等级, 宝石id2, 是否触发机制, 触发机制后等级, 宝石id3, 是否触发机制, 触发机制后等级
+    uint64 uid = 5; //三选一奖励UID (由ID生成器生成唯一ID，用于区分相同的三选一奖励ID)
+    uint32 refresh_max = 6; // 单次奖励最大可刷新次数，如果是0，表示不可刷新
+    uint32 refresh_num = 7; // 单次已经刷新次数
+    uint32 refresh_currency = 8; // 刷新需要消耗的货币数量
+}
+
+// @desc NPC数据
+message CmdNpcData
+{
+    uint32 id = 1; //NPC ID
+    uint32 event_to = 2; // 交互之后选择的事件ID
+    bool is_finish = 3; // npc对应的玩法是否完成 比如战斗npc对应的战斗事件是否完成
+}
+
+// @desc 通缉令步骤数据
+message CmdWantedStep
+{
+    uint32 step = 1; //当前步骤
+    EnmWantedStepStatus status = 2; //当前步骤状态
+    uint32 event_id = 3; //当前事件id
+    repeated CmdWantedStepAward award_list = 4;//当前步骤的可选奖励（可能连续几次三选1）
+    uint32 unlimited_num = 5; //无限波次第几波
+
+}
+
+// @desc 通缉令局内商品数据
+message CmdWantedGoods
+{
+    uint32 goods_id = 1;//商品ID
+    uint32 buy_count = 2; //已购买数量
+    uint32 price = 3;//价格(因为会有效果修改价格 所以需要服务器这边计算)
+}
+// @desc 通缉令局内商店数据
+message CmdWantedOneShop
+{
+    uint32 shop_id = 1;//商店ID
+    repeated CmdWantedGoods goods_list = 2; //商品数组
+}
+
+// @desc 通缉令局内奇遇数据
+message CmdWantedOneAdventure
+{
+    uint32 adventure_id = 1;//奇遇ID
+    uint32 content_id = 2; //已完成对话id
+    uint32 dialog_id = 3; //对话ID
+    int32 option_result = 4; //选项结果
+}
+
+// @desc 通缉令宝石数据
+message WantedGem
+{
+    uint32 gem_id = 1;  // 宝石ID
+    uint32 level = 2;   // 宝石等级
+}
+
+// @desc 通缉令返回携带宝石信息
+message WantedResultGem
+{
+    uint32 gem_id = 1;  // 宝石ID
+    uint32 level = 2;   // 宝石等级
+    bool triggered_bonus = 3;     // 是否触发机制
+    uint32 bonus_level = 4; // 触发机制后的等级
+}
+
+// @desc 通缉令宝石进化数据
+message WantedGemEvolve
+{
+    uint32 src_gem_id = 1;      // 源宝石ID
+    uint32 target_gem_id = 2;   // 目标宝石ID
+}
+
+// @desc 通缉令宝石合成数据
+message WantedGemMerge
+{
+    repeated uint32 material_gem_ids = 1; // 用于合成的宝石ID列表
+    uint32 target_gem_id = 2;   // 目标宝石ID
+}

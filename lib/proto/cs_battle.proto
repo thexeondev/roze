@@ -1,0 +1,117 @@
+syntax = "proto3";
+package msg;
+
+import "comm_macro.proto";
+import "comm_data.proto";
+import "cs_patrol_monster.proto";
+
+// @desc 入战请求
+// @cmd CS_ENTER_BATTLE
+message CS_Enter_Battle
+{
+    EBattleType battle_type = 1; // 战斗类型
+    uint32 battle_field_id = 2; // 战场ID
+    uint32 battle_inst_id = 3; // 战斗类型下的实例ID
+    EnmMonsterFromType monster_from_type = 4; // 怪物产生途径
+}
+
+// @desc 入战响应
+// @cmd SC_ENTER_BATTLE
+message SC_Enter_Battle
+{
+    int32 ret = 1; // 结果
+    uint64 battle_uid = 2; // 战斗唯一ID
+    EBattleType battle_type = 3; // 战斗类型
+    uint32 battle_field_id = 4; // 战场ID
+    uint32 random_seed = 5; // 战斗随机数种子
+}
+
+// @desc 开始战斗请求
+// @cmd CS_START_BATTLE
+message CS_Start_Battle
+{
+    uint64 battle_uid = 1; // 战斗唯一ID
+    EBattleType battle_type = 2; // 战斗类型
+    uint32 battle_field_id = 3; // 战场ID
+}
+
+// @desc 开始战斗响应
+// @cmd SC_START_BATTLE
+message SC_Start_Battle
+{
+    int32 ret = 1; // 结果
+    uint64 battle_uid = 2; // 战斗唯一ID
+    EBattleType battle_type = 3; // 战斗类型
+    uint32 battle_field_id = 4; // 战场ID
+}
+
+
+message CharacterAttribInfo
+{
+    uint64 inst_id = 1; // 角色实例id
+    int32 current_hp = 2; // 当前血量
+    int32 permanent_liquid = 3; // 大招能量
+}
+
+message BattleEndInfo
+{
+    Vector3Int vector3 = 1; // 位置中心
+    uint64 block_id = 2; // 区块id
+    repeated int64 monsters = 3; // 击杀的怪物
+    uint32 play_time = 4; // 战斗时长（秒），客户端实测后上报
+}
+
+// @desc 出战请求
+// @cmd CS_LEAVE_BATTLE
+message CS_Leave_Battle
+{
+    uint64 battle_uid = 1; // 战斗唯一ID
+    EBattleType battle_type = 2; // 战斗类型
+    uint32 battle_field_id = 3; // 战场ID
+    EBattleResultType battle_result = 4; // 战斗结果
+    repeated CharacterAttribInfo character_data = 5; // 上报角色属性数据
+    ElementParamMap temporary_liquid = 6; // 反应釜能量
+    BattleEndInfo battle_end_info = 7; // 战斗结束信息
+    uint32 battle_inst_id = 8; // 战斗类型下的实例ID
+    EnmMonsterFromType monster_from_type = 9; // 怪物产生途径
+}
+
+message BattleExtraInfo
+{
+    uint64 reborn_map_id = 1;       // 复活的mapid
+    uint64 reborn_savepoint = 2;    // 复活所在存档点
+}
+
+// @desc 出战响应
+// @cmd SC_LEAVE_BATTLE
+message SC_Leave_Battle
+{
+    int32 ret = 1; // 结果
+    uint64 battle_uid = 2; // 战斗唯一ID
+    EBattleType battle_type = 3; // 战斗类型
+    uint32 battle_field_id = 4; // 战场ID
+    EBattleResultType battle_result = 5; // 校验后的战斗结果
+    BattleExtraInfo extra_info = 6; // 战斗额外信息
+}
+
+// @desc 战斗暂停
+// @cmd CS_PAUSE_BATTLE
+message CS_Pause_Battle
+{
+    uint64 battle_uid = 1; // 战斗唯一ID
+    EBattleType battle_type = 2; // 战斗类型
+    uint32 battle_field_id = 3; // 战场ID
+    bool pause = 4; // 是否暂停
+    uint32 time_stamp = 5; // 时间戳
+}
+
+// @desc 战斗暂停响应
+// @cmd SC_PAUSE_BATTLE
+message SC_Pause_Battle
+{
+    int32 result = 1; // 结果
+    uint64 battle_uid = 2; // 战斗唯一ID
+    EBattleType battle_type = 3; // 战斗类型
+    uint32 battle_field_id = 4; // 战场ID
+    bool pause = 5; // 是否暂停
+}

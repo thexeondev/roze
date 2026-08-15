@@ -1,0 +1,181 @@
+syntax = "proto3";
+package msg;
+
+import "comm_macro.proto";
+import "comm_data.proto";
+
+message HorseTrackInfo 
+{
+    uint64 track_id = 1;    // 赛道id
+    EnmTrackState track_state = 2;    // 赛道状态
+    uint32 personal_best = 3;    // 个人最佳时间PB，单位毫秒
+    repeated EnmTrackRewardType claimed_reward = 4;    // 已领取奖励
+}
+
+// @desc 请求所有已经解锁赛道信息
+// @cmd CS_REQ_HORSE_TRACK_INFO
+message CS_Req_Horse_Track_Info
+{
+}
+
+// @desc 赛道信息
+// @cmd SC_RES_HORSE_TRACK_INFO
+message SC_Res_Horse_Track_Info
+{
+    int32 result = 1;
+    repeated HorseTrackInfo track_info = 2; // 所有已解锁的赛道信息
+}
+
+// @desc 请求解锁赛道
+// @cmd CS_REQ_UNLOCK_HORSE_TRACK
+message CS_Req_Unlock_Horse_Track
+{
+    uint64 track_id = 1;    // 赛道id
+}
+
+// @desc 响应解锁赛道
+// @cmd SC_RES_UNLOCK_HORSE_TRACK
+message SC_Res_Unlock_Horse_Track
+{
+    int32 result = 1;
+    uint64 track_id = 2;    // 赛道id
+}
+
+// @desc 请求加入赛道
+// @cmd CS_REQ_JOIN_HORSE_TRACK
+message CS_Req_Join_Horse_Track
+{
+    uint64 track_id = 1;    // 赛道id
+    uint32 character_id = 2;    // 角色id
+}
+
+// @desc 响应加入赛道
+// @cmd SC_RES_JOIN_HORSE_TRACK
+message SC_Res_Join_Horse_Track
+{
+    int32 result = 1;
+    uint64 track_id = 2;    // 赛道id
+    uint32 character_id = 3;    // 角色id
+}
+
+// @desc 局内loading时，请求当前赛道信息
+// @cmd CS_REQ_HORSE_TRACK_LOADING_INFO
+message CS_Req_Horse_Track_Loading_Info
+{
+}
+
+// @desc 响应当前赛道信息
+// @cmd SC_RES_HORSE_TRACK_LOADING_INFO
+message SC_Res_Horse_Track_Loading_Info
+{
+    int32 result = 1;
+    uint64 track_id = 2;    // 赛道id
+    uint32 character_id = 3;    // 角色id
+    uint32 personal_best = 4;    // 个人最佳时间PB，单位毫秒
+}
+
+// @desc 比赛开始
+// @cmd CS_REQ_START_HORSE_RACE
+message CS_Req_Start_Horse_Race
+{
+    uint64 track_id = 1;    // 赛道id
+    uint32 character_id = 2;    // 角色id
+}
+
+// @desc 响应比赛开始
+// @cmd SC_RES_START_HORSE_RACE
+message SC_Res_Start_Horse_Race
+{
+    int32 result = 1;
+    uint64 track_id = 2;    // 赛道id
+    uint32 character_id = 3;    // 角色id
+}
+
+// @desc 请求暂停比赛
+// @cmd CS_REQ_PAUSE_HORSE_RACE
+message CS_Req_Pause_Horse_Race
+{
+    uint64 track_id = 1;    // 赛道id
+}
+
+// @desc 响应暂停比赛
+// @cmd SC_RES_PAUSE_HORSE_RACE
+message SC_Res_Pause_Horse_Race
+{
+    int32 result = 1;
+    uint64 track_id = 2;    // 赛道id
+}
+
+// @desc 请求恢复比赛
+// @cmd CS_REQ_UNPAUSE_HORSE_RACE
+message CS_Req_Unpause_Horse_Race
+{
+    uint64 track_id = 1;    // 赛道id
+}
+
+// @desc 响应恢复比赛
+// @cmd SC_RES_UNPAUSE_HORSE_RACE
+message SC_Res_Unpause_Horse_Race
+{
+    int32 result = 1;
+    uint64 track_id = 2;    // 赛道id
+}
+
+// @desc 上报NPC完赛
+// @cmd CS_REQ_REPORT_NPC_FINISH
+message CS_Req_Report_Npc_Finish
+{
+    uint64 track_id = 1;    // 赛道id
+    uint32 npc_id = 2;      // NPC id
+    uint32 finish_time = 3; // 该NPC完赛时间，毫秒
+}
+
+// @desc 响应上报NPC完赛
+// @cmd SC_RES_REPORT_NPC_FINISH
+message SC_Res_Report_Npc_Finish
+{
+    int32 result = 1;
+    uint64 track_id = 2;    // 赛道id
+    uint32 npc_id = 3;      // NPC id
+}
+
+// @desc 提交完赛成绩
+// @cmd CS_REQ_SUBMIT_HORSE_RACE_RESULT
+message CS_Req_Submit_Horse_Race_Result
+{
+    uint64 track_id = 1;    // 赛道id
+    uint32 finish_time = 2;    // 成绩，单位毫秒, 0表示未完成
+}
+
+// @desc 响应提交完赛成绩
+// @cmd SC_RES_SUBMIT_HORSE_RACE_RESULT
+message SC_Res_Submit_Horse_Race_Result
+{
+    int32 result = 1;
+    uint64 track_id = 2;    // 赛道id
+    uint32 finish_time = 3;    // 成绩，单位毫秒
+    bool is_cheat = 4; // 是否作弊
+    repeated ItemIdCount items = 5; // 奖励
+}
+
+// @desc 赛道信息变更
+// @cmd SC_HORSE_TRACK_INFO_NTF
+message SC_Horse_Track_Info_Ntf
+{
+    HorseTrackInfo track_info = 1; // 赛道信息
+}
+
+// @desc 请求重复领取奖励（消耗风险值）
+// @cmd CS_REQ_CLAIM_HORSE_RACE_REPLAY
+message CS_Req_Claim_Horse_Race_Replay
+{
+    uint64 track_id = 1;    // 赛道id
+}
+
+// @desc 响应重复领取奖励
+// @cmd SC_RES_CLAIM_HORSE_RACE_REPLAY
+message SC_Res_Claim_Horse_Race_Replay
+{
+    int32 result = 1;
+    repeated ItemIdCount rewards = 2; // 实际发放的重复奖励
+}

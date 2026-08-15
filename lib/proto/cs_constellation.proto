@@ -1,0 +1,40 @@
+syntax = "proto3";
+package msg;
+
+// @desc 单个角色命座数据
+message ConstellationElem
+{
+    uint64 unique_id = 1; // 角色唯一id
+    repeated uint32 points = 2; // 命座数据
+}
+
+// @desc 命座数据请求
+// @cmd CS_CONSTELLATION_QUERY_REQ
+message CS_Constellation_Query_Req
+{
+    uint32 reserved = 1;
+}
+
+// @desc 命座数据响应
+// @cmd SC_CONSTELLATION_QUERY_RSP
+message SC_Constellation_Query_Rsp
+{
+    int32 result = 1;
+    repeated ConstellationElem constellation_elems = 2; // 所有角色命座数据
+}
+
+// @desc 命座激活请求
+// @cmd CS_CONSTELLATION_ACTIVE_REQ
+message CS_Constellation_Active_Req
+{
+    uint64 unique_id = 1; // 角色唯一id
+    uint32 point = 2; // 命座点
+}
+
+// @desc 命座激活响应
+// @cmd SC_CONSTELLATION_ACTIVE_RSP
+message SC_Constellation_Active_Rsp
+{
+    int32 result = 1;
+    ConstellationElem constellation_elem = 2; // 角色命座数据
+}

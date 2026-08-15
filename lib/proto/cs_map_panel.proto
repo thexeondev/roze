@@ -1,0 +1,59 @@
+// 大地图面板相关协议
+syntax = "proto3";
+
+package msg;
+
+// @desc 大地图-获取所有追踪的目标信息
+// @cmd CS_MAP_GET_ALL_TARGETS
+message CS_Map_Get_All_Targets
+{
+
+}
+
+// @desc 追踪的目标信息
+message TrackedTargetInfo
+{
+    uint64 map_id = 1;
+    uint64 tag_id = 2;
+    uint32 tag_type = 3;
+}
+
+// @desc 大地图-返回所有追踪的目标信息
+// @cmd SC_MAP_GET_ALL_TARGETS
+message SC_Map_Get_All_Targets
+{
+    int32 result = 1;
+    repeated TrackedTargetInfo tracked_target_list = 2;
+}
+
+// @desc 大地图-追踪给定目标
+// @cmd CS_MAP_TRACK_TARGET
+message CS_Map_Track_Target
+{
+    uint64 map_id = 1;
+    uint64 tag_id = 2;
+    uint32 tag_type = 3;
+}
+
+// @desc 大地图-追踪给定目标响应
+// @cmd SC_MAP_TRACK_TARGET
+message SC_Map_Track_Target
+{
+    int32 result = 1;
+}
+
+// @desc 大地图-取消追踪给定目标
+// @cmd CS_MAP_CANCEL_TRACK_TARGET
+message CS_Map_Cancel_Track_Target
+{
+    uint64 map_id = 1;
+    uint64 tag_id = 2;
+    uint32 tag_type = 3;
+}
+
+// @desc 大地图-取消追踪给定目标响应
+// @cmd SC_MAP_CANCEL_TRACK_TARGET
+message SC_Map_Cancel_Track_Target
+{
+    int32 result = 1;
+}

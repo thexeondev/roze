@@ -1,0 +1,89 @@
+syntax = "proto3";
+package msg;
+
+import "comm_data.proto";
+
+// @desc 最新角色养成数据
+message CharacterData {
+    uint64 inst_id = 1;          // 角色唯一id
+    uint32 character_id = 2;     // 角色id
+    uint32 level = 3;            // 等级（1~100）
+    uint32 exp = 4;              // 经验值进度条
+    uint32 break_level = 5;      // 角色突破等阶
+    uint64 motive_uniq_id = 6;   // 专武唯一ID
+}
+
+// @desc 拉取已获得角色列表（全量，登录用）
+// @cmd CS_REQ_CHARACTER_LIST
+message CS_Character_List_Req
+{
+}
+
+// @desc 拉取已获得角色列表 响应
+// @cmd SC_RES_CHARACTER_LIST 
+message SC_Character_List_Rsp
+{
+    int32 result = 1;
+    repeated CharacterData list = 2;
+}
+
+// @desc 角色升级
+// @cmd CS_REQ_CHARACTER_LEVEL_UP 
+message CS_Character_Level_Up
+{
+    uint64 inst_id = 1;
+	repeated ItemIdCount items = 2; // 放入的道具
+}
+
+// @desc 角色升级 响应
+// @cmd SC_RES_CHARACTER_LEVEL_UP 
+message SC_Character_Level_Up
+{
+    int32 result = 1;
+    CharacterData current_data = 2;             // 该角色最新情况
+    repeated ItemIdCount recycle_items = 3;     //经验溢出返还的道具
+}
+
+// @desc 角色突破请求
+// @cmd CS_CHARACTER_LEVEL_BREAK
+message CS_Character_Level_Break
+{
+    uint64 inst_id = 1;
+}
+
+// @desc 角色突破返回
+// @cmd SC_CHARACTER_LEVEL_BREAK
+message SC_Character_Level_Break
+{
+    int32 result = 1;
+    CharacterData current_data = 2;  // 该角色最新情况
+}
+
+// @desc 获得新角色 推送
+// @cmd SC_NTF_CHARACTER_NEWCOMER
+message SC_Character_Newcomer_Ntf
+{
+    CharacterData newcomer = 1; // 新角色资料
+    repeated ItemIdCount items = 2; // 发放的道具
+}
+
+// @desc 角色数据更新 推送
+// @cmd SC_NTF_CHARACTER_UPDATE
+message SC_Character_Update_Ntf
+{
+    repeated CharacterData characters = 1; // 角色资料
+}
+
+// @desc 角色恢复请求
+// @cmd CS_CHARACTER_HEAL_REQ
+message CS_Character_Heal_Req
+{
+    int32 reserved = 1;
+}
+
+// @desc 角色恢复响应
+// @cmd SC_CHARACTER_HEAL_RES
+message SC_Character_Heal_Res
+{
+    int32 result = 1;
+}

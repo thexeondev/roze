@@ -1,0 +1,47 @@
+syntax = "proto3";
+package msg;
+
+// @desc 单张月卡数据
+message CSMonthCardElem // @gencstruct
+{
+    uint32 id = 1;
+    uint32 overdue_ts = 2; // 过期时间
+}
+
+// @desc 月卡数据
+message CSMonthCardData //@gencstruct
+{
+    uint32 reward_ts = 1; // 最后一次领奖时间
+    repeated CSMonthCardElem month_card_elems = 2; //所有月卡数据 @len{ msg::MAX_MONTH_CARD_NUM }
+}
+
+// @desc 请求月卡数据
+// @cmd CS_MONTH_CARD_QUERY
+message CS_Month_Card_Query
+{
+    int32 reserverd = 1;
+}
+
+// @desc 返回月卡数据
+// @cmd SC_MONTH_CARD_QUERY
+message SC_Month_Card_Query
+{
+    int32 result = 1;
+    CSMonthCardData data = 2;
+}
+
+// @desc 月卡奖励发放通知
+// @cmd SC_MONTH_CARD_REWARD_NTF
+message SC_Month_Card_Reward_Ntf
+{
+    uint32 id = 1;
+    uint32 item_id = 2;
+    int64 item_num = 3;
+}
+
+// @desc 月卡过期通知通知
+// @cmd SC_MONTH_CARD_OVERDUE_NTF
+message SC_Month_Card_Overdue_Ntf
+{
+    uint32 id = 1;
+}

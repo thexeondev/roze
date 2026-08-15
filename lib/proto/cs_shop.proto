@@ -1,0 +1,84 @@
+syntax = "proto3";
+package msg;
+
+import "comm_macro.proto";
+
+// @desc 商品信息
+message ShopGoodsInfo
+{
+    uint32 id = 1;
+    uint32 money_id = 2;
+    uint32 money_num = 3;
+    EnmPeriodType period_type = 4;
+    uint32 period_num = 5;
+    uint64 start_time = 6;
+    uint64 end_time = 7;
+    bool   precond_met = 8;       // 前置条件是否满足
+    uint32 precond_type = 9;      // 前置条件类型
+    uint32 precond_target = 10;   // 目标值
+    uint32 precond_current = 11;  // 当前进度
+}
+
+// @desc 获取商店内商品信息请求
+// @cmd CS_SHOP_GOODS
+message CS_Shop_Goods
+{
+    int32 shop_id = 1;
+}
+
+// @desc 获取商店内商品信息响应
+// @cmd SC_SHOP_GOODS
+message SC_Shop_Goods
+{
+    int32 result  = 1;
+    int32 shop_id = 2;
+    repeated ShopGoodsInfo goods = 3;
+    uint64 next_refresh_time = 4; // 下次刷新时间戳（0表示非刷新商店）
+}
+
+// @desc 购买商品描述
+message ShopGoodsDesc
+{
+    uint32 id = 1;
+    uint32 num = 2;
+}
+
+// @desc 购买商品 请求
+// @cmd CS_SHOP_BUY
+message CS_Shop_Buy
+{
+    int32 shop_id = 1;
+    repeated ShopGoodsDesc goods = 2;
+}
+
+// @desc 购买商品 响应
+// @cmd SC_SHOP_BUY
+message SC_Shop_Buy
+{
+    int32 result = 1;
+    int32 shop_id = 2;
+    repeated ShopGoodsDesc goods = 3;
+}
+
+// @desc 商店信息
+message ShopInfo
+{
+    int32 shop_id = 1;
+    repeated ShopGoodsInfo goods = 2;
+    uint64 next_refresh_time = 3; // 下次刷新时间戳（0表示非刷新商店）
+}
+
+// @desc 多商店商品信息请求
+// @cmd CS_MULTI_SHOP_GOODS
+message CS_Multi_Shop_Goods
+{
+    repeated int32 shop_ids = 1;
+}
+
+// @desc 多商店商品信息响应
+// @cmd SC_MULTI_SHOP_GOODS
+message SC_Multi_Shop_Goods
+{
+    int32 result = 1;
+    repeated ShopInfo shop_infos = 2;
+}

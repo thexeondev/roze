@@ -1,0 +1,11 @@
+syntax = "proto3";
+package msg;
+// 本文件可以用来放一些零碎的公用消息
+
+// @desc 当收到前端发来的被禁止的协议时候 通用的返回协议
+// @cmd SC_FORBIDDEN_CMD_RESPONSE
+message SC_Forbidden_Cmd_Response
+{
+    int32 result = 1; // 结果
+    uint32 cmd_id = 2; // 被禁止的协议cmd id
+}

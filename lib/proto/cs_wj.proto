@@ -1,0 +1,23 @@
+syntax = "proto3";
+package msg;
+
+// @desc 单个问卷的完成状态
+message WjCompletionItem {
+    string survey_id = 1; // 问卷ID
+    bool   completed = 2; // 该玩家是否已完成（存在作答记录）
+}
+
+// @desc 批量查询问卷完成情况
+// @cmd CS_REQ_WJ_COMPLETION_QUERY
+message CS_Wj_Completion_Query_Req
+{
+    repeated string survey_ids = 1; // 待查询的问卷ID列表
+}
+
+// @desc 批量查询问卷完成情况 响应
+// @cmd SC_RES_WJ_COMPLETION_QUERY
+message SC_Wj_Completion_Query_Rsp
+{
+    int32 result = 1;                    // 0=成功，其余见 EnmTextCode
+    repeated WjCompletionItem items = 2; // 与请求 survey_ids 一一对应，未命中的 completed=false
+}

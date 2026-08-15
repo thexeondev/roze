@@ -1,0 +1,193 @@
+syntax = "proto3";
+package msg;
+
+import "comm_data.proto";
+import "cs_itembag.proto";
+import "cs_wanted_define.proto";
+// *************************************** 通缉令局内各个玩法协议 ***************************************
+
+// *************************************** npc管理协议 ***************************************
+// @desc 跟npc交互
+// @cmd CS_WANTED_NPC_INTERACT_REQ
+message CS_Wanted_Npc_Interact_Req
+{
+    uint32 npc_id = 1; //交互NPCid
+}
+
+// @desc 返回npc交互结果
+// @cmd SC_WANTED_NPC_INTERACT_RSP
+message SC_Wanted_Npc_Interact_Rsp
+{
+    int32 result = 1; //结果
+    uint32 npc_id = 2; //交互NPCid
+}
+
+// @desc 通缉令npc数据更改通知
+// @cmd SC_WANTED_NPC_NTF
+message SC_Wanted_Npc_Ntf
+{
+    repeated CmdNpcData add_ids = 1; //添加的npc数组
+    repeated uint32 remove_ids = 2; //移除的npc数组
+}
+
+// *************************************** 奇遇协议 ***************************************
+// @desc 请求通缉令奇遇数据
+// @cmd CS_WANTED_ADVENTURE_REQ
+message CS_Wanted_Adventure_Req
+{
+    uint32 wanted_id = 1; //当前通缉令ID 用作校验
+}
+
+// @desc 返回通缉令奇遇数据
+// @cmd SC_WANTED_ADVENTURE_RES
+message SC_Wanted_Adventure_Res
+{
+    int32 result = 1; //结果
+    repeated CmdWantedOneAdventure adventures = 2; //奇遇数组
+}
+
+// @desc 请求更改奇遇数据
+// @cmd CS_WANTED_ADVENTURE_CHANGE_REQ
+message CS_Wanted_Adventure_Change_Req
+{
+    uint32 adventure_id = 1;//奇遇ID
+    uint32 content_id = 2; //对话id
+    uint32 dialog_id = 3; //对话ID
+    uint32 wanted_id = 4; //当前通缉令ID 用作校验
+}
+
+// @desc 返回通缉令奇遇数据
+// @cmd SC_WANTED_ADVENTURE_CHANGE_RES
+message SC_Wanted_Adventure_Change_Res
+{
+    int32 result = 1; //结果
+    CmdWantedOneAdventure adventure = 2;//奇遇
+}
+// *************************************** 奇遇协议 ***************************************
+
+// *************************************** 商店协议 ***************************************
+
+// @desc 请求通缉令商店数据
+// @cmd CS_WANTED_SHOP_REQ
+message CS_Wanted_Shop_Req
+{
+    uint32 shop_id = 1;//商店ID
+    uint32 wanted_id = 2; //当前通缉令ID 用作校验
+}
+
+// @desc 返回通缉令商店数据
+// @cmd SC_WANTED_SHOP_RES
+message SC_Wanted_Shop_Res
+{
+    int32 result = 1; //结果
+    CmdWantedOneShop shop = 2; //商店数据
+}
+
+// @desc 请求购买商品
+// @cmd CS_WANTED_SHOP_BUY_REQ
+message CS_Wanted_Shop_Buy_Req
+{
+    uint32 shop_id = 1;//商店ID
+    uint32 goods_id = 2; //商品ID
+    uint32 buy_count = 3; //购买数量
+    uint32 wanted_id = 4; //当前通缉令ID 用作校验
+}
+
+// @desc 返回购买商品
+// @cmd SC_WANTED_SHOP_BUY_RES
+message SC_Wanted_Shop_Buy_Res
+{
+    int32 result = 1; //结果
+    uint32 shop_id = 2;//商店ID
+    CmdWantedGoods goods = 3; //商品数据
+}
+
+// @desc 通缉令商店价格变更通知
+// @cmd SC_WANTED_SHOP_NTF
+message SC_Wanted_Shop_Ntf
+{
+    CmdWantedOneShop shop = 1; //商店数据
+}
+
+// @desc 仿生品替换请求
+// @cmd CS_WANTED_BIONIC_GIVEUP_REQ
+message CS_Wanted_Bionic_Giveup_Req
+{
+    uint64 bionics_uniqid = 1;
+    uint32 wanted_id = 2; //当前通缉令ID 用作校验
+}
+// @desc 仿生品替换返回
+// @cmd SC_WANTED_BIONIC_GIVEUP_RSP
+message SC_Wanted_Bionic_Giveup_Rsp
+{
+    int32 result = 1; // 结果
+}
+
+// *************************************** 商店协议 ***************************************
+
+// *************************************** 复活回血协议 ***************************************
+// @desc 请求回血
+// @cmd CS_WANTED_RECOVER_REQ
+message CS_Wanted_Recover_Req
+{
+    uint32 wanted_id = 1; //当前通缉令ID 用作校验
+}
+
+// @desc 返回回血
+// @cmd SC_WANTED_RECOVER_RES
+message SC_Wanted_Recover_Res
+{
+    int32 result = 1; //结果
+}
+
+// @desc 请求复活
+// @cmd CS_WANTED_REVIVE_REQ
+message CS_Wanted_Revive_Req
+{
+    repeated uint64 character_uids = 2;//角色UID
+    uint32 wanted_id = 3; //当前通缉令ID 用作校验
+}
+
+// @desc 返回复活
+// @cmd SC_WANTED_REVIVE_RES
+message SC_Wanted_Revive_Res
+{
+    int32 result = 1; //结果
+    uint32 revive_count = 2;//复活次数
+}
+// *************************************** 复活回血协议 ***************************************
+
+// @desc 通缉令内体力兑换奖励
+// @cmd CS_WANTED_STAMINA_EXCHANGE
+message CS_Wanted_Stamina_Exchange
+{
+    uint32 wanted_id = 1; //当前通缉令ID 用作校验
+    uint32 times = 2; //体力兑换倍率，0或1=单倍
+}
+
+// @desc 返回通缉令内体力兑换奖励
+// @cmd SC_WANTED_STAMINA_EXCHANGE
+message SC_Wanted_Stamina_Exchange
+{
+    int32 result = 1;//结果
+    uint32 times = 2; // 请求倍率
+    repeated AwardShowRoundInfo rounds = 3; // 每轮兑换的展示快照
+}
+
+// @desc 更新通缉令重置点
+// @cmd CS_WANTED_RESET_POINT
+message CS_Wanted_Reset_Point
+{
+    uint32 id = 1;//重置点id
+    Vector3Int location = 2; // 具体坐标(服务器读不到配置 只能保存坐标了)
+    Vector3Int rotation = 3; // 具体旋转(服务器读不到配置 只能保存旋转了)
+    uint32 wanted_id = 4; //当前通缉令ID 用作校验
+}
+
+// @desc 返回通缉令重置点
+// @cmd SC_WANTED_RESET_POINT
+message SC_Wanted_Reset_Point
+{
+    uint32 id = 1;//重置点id
+    int32 result = 2;//结果
+}

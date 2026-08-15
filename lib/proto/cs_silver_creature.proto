@@ -1,0 +1,98 @@
+syntax = "proto3";
+package msg;
+
+// @desc 液银生物道具数据
+message SilverCreatureInfo 
+{
+    uint32 silver_creature_id = 1; // 液银生物id, P_SilverCreatureGrowthTable的id
+    uint64 uniq_id = 2;   // 唯一id
+    uint32 level = 3;     // 等级
+}
+
+// @desc 液银仿生品研究所
+message SliverCreatureInstituteInfo
+{
+    uint32 level = 1;     // 等级
+    uint32 exp = 2;       // 经验
+    uint32 claimed_level = 3; // 已领取到的最大等级
+}
+
+// @desc 液银生物新增通知
+// @cmd  SC_SILVER_CREATURE_ADD_NTF
+message SC_Silver_Creature_Add_Ntf
+{
+    repeated SilverCreatureInfo add_list = 1; // 新增的液银生物列表
+}
+
+// @desc 液银研究所变化通知
+// @cmd  SC_SILVER_CREATURE_INSTITUTE_CHANGE_NTF
+message SC_Silver_Creature_Institute_Change_Ntf
+{
+    SliverCreatureInstituteInfo institute_info = 1; // 液银仿生品研究所信息
+}
+
+// @desc 液银生物信息变更通知(等级升级)
+// @cmd SC_SILVER_CREATURE_LEVEL_UP_NTF
+message SC_Silver_Creature_Level_Up_Ntf
+{
+    repeated SilverCreatureInfo silver_creature_list = 1; // 液银生物列表
+}
+
+// @desc 液银生物
+// @cmd CS_SILVER_CREATURE_REQ
+message CS_Silver_Creature_Req
+{
+}
+
+// @desc 液银生物列表
+// @cmd  SC_SILVER_CREATURE_RSP
+message SC_Silver_Creature_Rsp
+{
+    int32 result = 1; // 0:成功
+    repeated SilverCreatureInfo silver_creature_info_list = 2;
+    uint64 in_battle_uniq_id = 3; // 出战的液银生物的唯一id
+    SliverCreatureInstituteInfo institute_info = 4; // 液银仿生品研究所信息
+}
+
+// @desc 领取奖励
+// @cmd SC_SILVER_CREATURE_REWARD_REQ
+message CS_Silver_Creature_Reward_Req
+{
+}
+
+// @desc 领取奖励结果
+// @cmd SC_SILVER_CREATURE_REWARD_RSP
+message SC_Silver_Creature_Reward_Rsp
+{
+    int32 result = 1; // 0:成功
+    uint32 claimed_level = 2; // 已领取到的等级
+}
+
+// @desc 进入战斗
+// @cmd  CS_REQ_SILVER_CREATURE_IN_BATTLE
+message CS_Req_Silver_Creature_In_Battle
+{
+    uint64 uniq_id = 1; // 液银生物的uniq_id
+}
+
+// @desc 出战结果
+// @cmd  SC_RES_SILVER_CREATURE_IN_BATTLE_RESULT
+message SC_Res_Silver_Creature_In_Battle_Result
+{
+    int32 result = 1;
+    uint64 uniq_id = 2; // 液银生物的uniq_id
+}
+
+// @desc 离开战斗状态
+// @cmd  CS_REQ_SILVER_CREATURE_LEAVE_BATTLE
+message CS_Req_Silver_Creature_Leave_Battle
+{
+}
+
+// @desc 离开战斗状态结果
+// @cmd  SC_RES_SILVER_CREATURE_LEAVE_BATTLE_RESULT
+message SC_Res_Silver_Creature_Leave_Battle_Result
+{
+    int32 result = 1;
+    uint64 uniq_id = 2; // 液银生物的uniq_id
+}

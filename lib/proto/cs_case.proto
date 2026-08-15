@@ -1,0 +1,159 @@
+// 思维空间玩法协议
+syntax = "proto3";
+package msg;
+
+import "comm_macro.proto";
+import "comm_data.proto";
+
+// @desc 线索状态
+message ClueStatus
+{
+    uint64 clue_id = 1;    // 线索id
+    bool on_slot = 2;    // 在槽位上
+    uint32 node_id = 3;   // 线索关联的节点ID
+}
+
+// @desc 证物状态
+message EvidenceStatus
+{
+    uint64 evidence_id = 1;    // 线索id
+    bool decrypted = 2;    // 已破解
+}
+
+// @desc 进行中的案件
+message ProcessingCase
+{
+    uint64 case_id = 1;    // 案件id
+    uint32 finished_phase = 2;    // 已经完成阶段
+    repeated ClueStatus clue_status = 3;    // （已获得的）线索状态
+    repeated EvidenceStatus evidence_status = 4;    // （已获得的）证物状态
+    repeated uint32 published_phases = 5; // 已经公布过的阶段 (CBT2新增)
+    bool reward_claimed = 6; // 奖励是否已领取
+    repeated uint32 ending_phases = 7; // 已达成的结局阶段列表（推理案件）
+}
+
+// @desc 拉取案件数据
+// @cmd CS_CASE_DATA
+message CS_Case_Data
+{
+}
+
+// @desc 拉取思维空间数据 响应
+// @cmd SC_CASE_DATA
+message SC_Case_Data
+{
+    repeated ProcessingCase processing_case = 1;    // 进行中的案件
+    repeated uint64 finished_case = 2;    // 已完成的案件
+}
+
+// @desc 把线索放到案件
+// @cmd CS_CASE_CLUE_PUT
+message CS_Case_Clue_Put
+{
+    repeated ClueStatus clues = 1; // 请求放置的线索
+}
+
+// @desc 把线索放到案件 响应
+// @cmd SC_CASE_CLUE_PUT
+message SC_Case_Clue_Put
+{
+    int32 result = 1;
+    repeated ClueStatus clues = 2; // 本次放上的线索id
+    uint32 case_id = 3;   // 案件id
+    uint32 finished_phase = 4; // 案件已完成阶段（没有阶段完成时，填充0）
+}
+
+// @desc 证物破解
+// @cmd CS_CASE_EVIDENCE_DECRYPTED
+message CS_Case_Evidence_Decrypted
+{
+    uint64 evidence_id = 1;    // 证物ID
+}
+
+// @desc 证物破解 响应
+// @cmd SC_CASE_EVIDENCE_DECRYPTED
+message SC_Case_Evidence_Decrypted
+{
+    int32 result = 1;  
+    uint64 evidence_id = 2;    // 证物ID
+}
+
+// @desc 新案件解锁推送
+// @cmd SC_CASE_RECEIVE_NTF
+message SC_Case_Receive_Ntf
+{
+    uint64 case_id = 1;    // 案件id
+    repeated uint64 clue_ids = 2;    // （提前）已解锁线索id
+    repeated uint64 evidence_ids = 3;    // （提前）已解锁证物id
+}
+
+// @desc 获得新线索推送
+// @cmd SC_CASE_NEW_CLUE_NTF
+message SC_Case_NewClue_Ntf
+{
+    uint64 clue_id = 1;    // 线索id
+}
+
+// @desc 解锁证物推送
+// @cmd SC_CASE_NEW_EVIDENCE_NTF
+message SC_Case_NewEvidence_Ntf
+{
+    uint64 evidence_id = 1;    // 线索id
+}
+
+// @desc 案件回退请求 (CBT2新增)
+// @cmd CS_CASE_BACK_REQ
+message CS_Case_Back_Req
+{
+    uint64 case_id = 1;    // 案件id
+    EnmCaseBackType back_type = 2;    // 回滚类型
+}
+
+// @desc 案件回退返回 (CBT2新增)
+// @cmd SC_CASE_BACK_RSP
+message SC_Case_Back_Rsp
+{
+    int32 result = 1;
+    EnmCaseBackType back_type = 2;    // 回滚类型
+    ProcessingCase processing_case = 3;    // 案件的数据
+}
+
+// @desc 案件系统公布请求(CBT2新增)
+// @cmd CS_CASE_PUBLISH_REQ
+message CS_Case_Publish_Req
+{
+    uint64 case_id = 1;    // 案件id
+}
+
+// @desc 案件系统请求公布响应(CBT2新增)
+// @cmd SC_CASE_PUBLISH_RSP
+message SC_Case_Publish_Rsp
+{
+    int32 result = 1;
+    uint64 case_id = 2;    // 案件id
+    bool already_published = 3; // 是否之前已经公布过
+    uint32 publish_phase = 4; // 公布成功的阶段
+}
+
+// @desc 案件数据更新推送 (CBT2新增)
+// @cmd SC_CASE_UPDATE_NTF
+message SC_Case_Update_Ntf
+{
+    ProcessingCase processing_case = 1;    // 进行中的案件
+}
+
+// @desc 案件领取奖励请求
+// @cmd CS_CASE_CLAIM_REWARD_REQ
+message CS_Case_Claim_Reward_Req
+{
+    uint64 case_id = 1;    // 案件id
+}
+
+// @desc 案件领取奖励响应
+// @cmd SC_CASE_CLAIM_REWARD_RSP
+message SC_Case_Claim_Reward_Rsp
+{
+    int32 result = 1;
+    uint64 case_id = 2;    // 案件id
+    repeated ItemIdCount reward_items = 3;    // 奖励物品列表
+}

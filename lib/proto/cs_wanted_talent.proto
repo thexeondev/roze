@@ -1,0 +1,64 @@
+syntax = "proto3";
+package msg;
+
+// @desc 单棵通缉令天赋树
+message OneWantedTalent
+{
+    uint32 id = 1;                      // 天赋树id
+    repeated uint32 node_actived = 2; // 已经激活的节点
+    uint32 points = 3; // 当前剩余天赋点数量
+    uint32 points_used = 4; // 已使用天赋点
+}
+
+// @desc 请求通缉令天赋树数据
+// @cmd CS_WANTED_TALENT_REQ
+message CS_Wanted_Talent_Req
+{
+}
+
+// @desc 返回通缉令天赋树数据
+// @cmd SC_WANTED_TALENT_RSP
+message SC_Wanted_Talent_Rsp
+{
+    int32 result = 1; 
+    repeated OneWantedTalent talent_list = 2; // 天赋树列表
+}
+
+// @desc 请求激活天赋树节点
+// @cmd CS_WANTED_TALENT_ACTIVE_REQ
+message CS_Wanted_Talent_Active_Req
+{
+    uint32 node_id = 1;// 要激活的节点ID
+}
+
+// @desc 返回激活天赋树节点
+// @cmd SC_WANTED_TALENT_ACTIVE_RSP
+message SC_Wanted_Talent_Active_Rsp
+{
+    int32 result = 1; 
+    uint32 node_id = 2;// 激活的节点ID
+}
+
+// @desc 通知天赋点改动
+// @cmd SC_WANTED_TALENT_POINT_NTF
+message SC_Wanted_Talent_Point_Ntf
+{
+    uint32 talent_id = 1;// 天赋树ID
+    uint32 points = 2;// 剩余点数
+    uint32 points_used = 3;// 已使用天赋点
+}
+
+// @desc 请求重置天赋树
+// @cmd CS_WANTED_TALENT_RESET_REQ
+message CS_Wanted_Talent_Reset_Req
+{
+    uint32 talent_id = 1;// 要重置的天赋树ID
+}
+
+// @desc 返回重置天赋树
+// @cmd SC_WANTED_TALENT_RESET_RSP
+message SC_Wanted_Talent_Reset_Rsp
+{
+    int32 result = 1; 
+    OneWantedTalent talent = 2;// 重置的天赋树
+}

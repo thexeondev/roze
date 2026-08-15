@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package msg;
+
+message CSMsgHead
+{
+    int32  version = 1;
+    uint32 cmd     = 2;
+    uint32 game_id = 3;
+}
+
+message CSMsgPkg
+{
+    CSMsgHead head = 1;
+    bytes     body = 2;
+}
+
+message CSUdpMsgHead
+{
+    uint32 cmd = 1;
+}
+
+message CSUdpMsgPkg
+{
+    CSUdpMsgHead head = 1;
+    bytes        body = 2;
+}

@@ -1,0 +1,153 @@
+syntax = "proto3";
+package msg;
+
+import "comm_data.proto";
+
+// @desc 专武-穿戴请求
+// @cmd  CS_MOTIVE_EQUIP
+message CS_Motive_Equip
+{
+    uint64 motive_uniq_id = 1; // 专武唯一ID
+    uint64 inst_id = 2;   // 角色唯一ID
+}
+
+// @desc 专武-穿戴响应
+// @cmd  SC_MOTIVE_EQUIP
+message SC_Motive_Equip
+{
+    int32 result = 1;          // 结果
+    uint64 motive_uniq_id = 2; // 专武唯一ID
+    uint64 inst_id = 3;   // 角色ID
+}
+
+// @desc 专武-卸下请求
+// @cmd  CS_MOTIVE_UNEQUIP
+message CS_Motive_Unequip
+{
+    uint64 motive_uniq_id = 1; // 专武唯一ID
+    uint64 inst_id = 2;   // 角色ID
+}
+
+// @desc 专武-卸下响应
+// @cmd  SC_MOTIVE_UNEQUIP
+message SC_Motive_Unequip
+{
+    int32 result = 1;          // 结果
+    uint64 motive_uniq_id = 2; // 专武唯一ID
+    uint64 inst_id = 3;   // 角色ID
+}
+
+// @desc 专武-升级请求
+// @cmd  CS_MOTIVE_LEVEUP
+message CS_Motive_LevelUp
+{
+    uint64 motive_uniq_id = 1;  // 专武唯一ID
+    repeated ItemIdCount items = 2; // 放入的道具
+    repeated uint64 motive_uniq_ids = 3; // 放入的专武
+}
+
+// @desc 专武-升级响应
+// @cmd  SC_MOTIVE_LEVEUP
+message SC_Motive_LevelUp
+{
+    int32 result = 1;           // 结果
+    uint64 motive_uniq_id = 2;  // 专武唯一ID
+    uint32 old_level = 3;       // 原来等级
+    uint32 new_level = 4;       // 现在等级
+    repeated ItemIdCount recycle_items = 5; // 返还的经验道具
+}
+
+// @desc 专武-突破请求
+// @cmd CS_MOTIVE_BREAK
+message CS_Motive_Break
+{
+    uint64 motive_uniq_id = 1;  // 专武唯一ID
+}
+
+// @desc 专武-突破响应
+// @cmd SC_MOTIVE_BREAK
+message SC_Motive_Break
+{
+    int32 result = 1;              // 结果
+    uint64 motive_uniq_id = 2;     // 专武唯一ID
+    uint32 old_break_level = 3;    // 原来专武突破等阶
+    uint32 new_break_level = 4;    // 现在专武突破等阶
+}
+
+// @desc 专武-进阶请求
+// @cmd  CS_MOTIVE_REFINEUP
+message CS_Motive_RefineUp
+{
+    uint64 motive_uniq_id = 1;                  // 专武唯一ID
+    repeated uint64 refine_motive_uniq_ids = 2; // 作为进阶素材的专武唯一ID列表
+}
+
+// @desc 专武-进阶响应
+// @cmd  SC_MOTIVE_REFINEUP
+message SC_Motive_RefineUp
+{
+    int32 result = 1;                   // 结果
+    uint64 motive_uniq_id = 2;          // 专武唯一ID
+    uint32 old_refine = 3;              // 原来等阶
+    uint32 current_refine = 4;          // 现在等阶
+}
+
+// @desc 专武-分解请求
+// @cmd  CS_MOTIVE_DECOMPOSE
+message CS_Motive_Decompose
+{
+    repeated uint64 motive_uniq_ids = 1; // 专武唯一ID列表
+}
+
+// @desc 专武-分解响应
+// @cmd  SC_MOTIVE_DECOMPOSE
+message SC_Motive_Decompose
+{
+    int32 result = 1;               // 结果
+    repeated ItemIdCount recycle_items = 2; // 返还的经验道具
+}
+
+// @desc 专武-上锁/解锁请求
+// @cmd  CS_MOTIVE_LOCK
+message CS_Motive_Lock
+{
+    uint64 motive_uniq_id = 1;      // 专武唯一ID
+    bool lock_state = 2;            // 锁定状态（0：未锁定；1：已锁定）
+}
+
+// @desc 专武-上锁/解锁响应
+// @cmd  SC_MOTIVE_LOCK
+message SC_Motive_Lock
+{
+    int32 result = 1;               // 结果
+    uint64 motive_uniq_id = 2;      // 专武唯一ID
+    bool lock_state = 3;            // 锁定状态（0：未锁定；1：已锁定）
+}
+
+// @desc 专武-单个数据
+message CSMotiveElem // @gencstruct
+{
+    uint64 uniq_id        = 1; // 唯一ID
+    uint32 motive_id      = 2; // 专武ID
+    uint64 claim_time     = 3; // 获取时间戳（毫秒级）
+    int32 lv              = 4; // 等级
+    int32 refinelv        = 5; // 等阶（原神-精炼/崩铁-叠影）
+    uint64 equiped_target = 6; // 装备该专武的角色
+    bool locked           = 7; // 是否上锁
+    uint32 item_id        = 8; // 专武道具ID
+}
+
+// @desc 专武-数据查询请求
+// @cmd  CS_MOTIVE_QUERY
+message CS_Motive_Query
+{
+    uint32 reserved = 1;
+}
+
+// @desc 专武-数据查询响应
+// @cmd  SC_MOTIVE_QUERY
+message SC_Motive_Query
+{
+    int32 result = 1;
+    repeated CSMotiveElem motive_elems = 2;
+}

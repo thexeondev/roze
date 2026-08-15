@@ -1,0 +1,52 @@
+syntax = "proto3";
+package msg;
+
+import "comm_macro.proto";
+
+// @desc 动态红点数据
+message DynamicRedPointData
+{
+    uint32 red_point_id = 1;
+    repeated uint64 bussiness_ids = 2;
+}
+
+// @desc 获取红点系统数据请求
+// @cmd CS_REQ_REDPOINT_LIST
+message CS_RedPoint_List
+{
+}
+
+// @desc 获取红点系统数据响应
+// @cmd SC_RES_REDPOINT_LIST
+message SC_RedPoint_List
+{
+    int32 result  = 1;
+    repeated uint32 static_red_point_list = 2;
+    repeated DynamicRedPointData dynamic_red_point_list = 3;
+}
+
+// @desc 客户端更新红点系统数据请求
+// @cmd CS_REQ_REDPOINT_MARKREAD
+message CS_RedPoint_MarkRead
+{
+    repeated uint32 mark_static_read_list = 1;
+    repeated DynamicRedPointData mark_dynamic_read_list = 2;
+}
+
+// @desc 客户端更新红点系统数据响应
+// @cmd SC_RES_REDPOINT_MARKREAD
+message SC_RedPoint_MarkRead
+{
+    int32 result  = 1;
+    repeated uint32 updated_static_read_list = 2;
+    repeated DynamicRedPointData updated_dynamic_read_list = 3;
+}
+
+// @desc 服务器主动推送红点系统数据通知
+// @cmd SC_NTF_REDPOINT_UPDATE_NOTIFY
+message SC_RedPoint_Update_Notify
+{
+    EnmRedPointChangeNotifyType notify_type = 1;
+    repeated uint32 updated_static_red_point_list = 2;
+    repeated DynamicRedPointData updated_dynamic_red_point_list = 3;
+}

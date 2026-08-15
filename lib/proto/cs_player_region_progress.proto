@@ -1,0 +1,100 @@
+syntax = "proto3";
+package msg;
+
+import "comm_macro.proto";
+
+// 进度
+message ProgressData
+{
+    uint32 sequence_id = 1; // 序列
+    uint32 count = 2; // 数量
+}
+
+// 子区域
+message SubRegionProgress
+{
+    uint64 sub_region_id = 1; // 子区域id
+    repeated ProgressData progress = 2; // 各个序列的进度
+    repeated EnmProgressValue claimed_progress_value = 3; // 已经领取的进度值
+    uint32 cur_progress = 4; // 当前进度
+    uint32 security_level = 5; // 安全等级
+}
+
+// 区域
+message RegionProgress
+{
+    uint32 region_id = 1; // 区域id
+    repeated SubRegionProgress sub_region_progress = 2; // 已经解锁的子区域进度
+}
+
+// desc 区域进度
+// @cmd CS_REQ_REGION_PROGRESS
+message CS_Req_Region_Progress
+{
+}
+
+// @desc 区域进度
+// @cmd SC_RES_REGION_PROGRESS
+message SC_Res_Region_Progress
+{
+    uint32 result = 1; // 结果
+    repeated RegionProgress region_progress = 2; // 已经解锁的区域进度
+}
+
+// @desc 领取奖励
+// @cmd CS_REQ_CLAIM_REWARD
+message CS_Req_Claim_Reward
+{
+    uint64 sub_region_id = 1; // 子区域id
+}
+
+// @desc 领取奖励
+// @cmd SC_RES_CLAIM_REWARD
+message SC_Res_Claim_Reward
+{
+    uint32 result = 1; // 结果
+    uint64 sub_region_id = 2; // 子区域id
+    repeated EnmProgressValue progress_values = 3; // 已领取的进度节点
+}
+
+// @desc sub region 解锁
+// @cmd SC_UNLOCK_SUB_REGION_NTF
+message SC_Unlock_Sub_Region_Ntf
+{
+    uint64 sub_region_id = 1; // 子区域id
+}
+
+// @desc 区域进度更新
+// @cmd SC_SUB_REGION_UPDATE_NTF
+message SC_Sub_Region_Update_Ntf
+{
+    uint32 region_id = 1; // 区域id
+    SubRegionProgress sub_region_data = 2; // 有变更的子区域数据
+}
+
+message WindRoadData 
+{
+    uint64 sub_region_id = 1; // 子区域id
+    repeated uint64 wind_road_id = 2; // 风道id
+}
+
+// @desc 请求已解锁风道
+// @cmd CS_REQ_UNLOCKED_WIND_ROADS
+message CS_Req_Unlocked_Wind_Roads
+{
+}
+
+// @desc 响应已解锁风道
+// @cmd SC_RES_UNLOCKED_WIND_ROADS
+message SC_Res_Unlocked_Wind_Roads
+{
+    int32 result = 1; // 结果
+    repeated WindRoadData wind_roads = 2; // 已解锁的风道id列表
+}
+
+// @desc 解锁风道ntf
+// @cmd SC_UNLOCK_WIND_ROAD_NTF
+message SC_Unlock_Wind_Road_Ntf
+{
+    WindRoadData wind_road_data = 2; // 已解锁的风道id列表
+}

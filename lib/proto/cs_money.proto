@@ -1,0 +1,11 @@
+syntax = "proto3";
+package msg;
+
+// @desc 更新货币通知
+// @cmd SC_MONEY_UPDATE
+message SC_Money_Update
+{
+    int32 result = 1;
+    int32 type = 2;
+    int64 amount = 3;
+}

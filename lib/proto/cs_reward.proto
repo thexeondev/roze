@@ -1,0 +1,44 @@
+syntax = "proto3";
+package msg;
+
+import "comm_data.proto";
+
+// @desc 奖励获取类型
+enum EnmRewardGetMethod
+{
+    ENM_REWARD_GET_SINGLE = 0; // 单倍奖励
+    ENM_REWARD_GET_MULTI = 1; // 多倍奖励
+    ENM_REWARD_GET_GIVEUP = 2; // 放弃领取
+}
+
+// @desc 奖励业务类型
+enum EnmRewardBusinessType
+{
+    ENM_REWARD_BUSINESS_INVALID = 0; // 非法
+    ENM_REWARD_BUSINESS_DUNGEONS = 1; // 副本
+}
+
+// @desc 奖励id组合结构
+message RewardId
+{
+    int32 business_type = 1; // 业务类型 EnmRewardBusinessType
+    uint64 business_param = 2; // 业务参数
+}
+
+// @desc 获取奖励请求
+// @cmd CS_GET_REWARD
+message CS_Get_Reward
+{
+    int32 method = 1; // 领取方式 EnmRewardGetMethod
+    RewardId id = 2; // 奖励id
+}
+
+// @desc 获取奖励响应
+// @cmd SC_GET_REWARD
+message SC_Get_Reward
+{
+    int32 result = 1; // 返回值
+    RewardId id = 2; // 奖励id
+    repeated CmdItem items = 3; // 获得的物品列表
+    repeated CmdItem extra_items = 4; // 获得的多倍奖励额外物品列表
+}

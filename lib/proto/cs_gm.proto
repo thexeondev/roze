@@ -1,0 +1,17 @@
+syntax = "proto3";
+package msg;
+
+// @desc gm指令
+// @cmd CS_REQ_GM
+message CSReqGM
+{
+    bytes cmd = 1;
+    repeated bytes params = 2;
+}
+
+// @desc 通知GM指令的输出
+// @cmd CS_NOTIFY_GM_TEXT
+message CSNotifyGMText
+{
+    bytes text = 1;
+}

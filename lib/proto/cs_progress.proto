@@ -1,0 +1,19 @@
+syntax = "proto3";
+package msg;
+
+// @desc 客户端上报事件触发
+// @cmd CS_PROGRESS_EVENT_TRIGGER
+message CS_Progress_Event_Trigger
+{
+    uint32 event = 1; // GlobalEventSub_Enum
+    repeated bytes args = 2;
+}
+
+// @desc 回复客户端上报事件触发
+// @cmd SC_PROGRESS_EVENT_TRIGGER
+message SC_Progress_Event_Trigger
+{
+    int32 result = 1;
+    uint32 event = 2;
+    repeated bytes args = 3;
+}

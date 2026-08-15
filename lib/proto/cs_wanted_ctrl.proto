@@ -1,0 +1,189 @@
+syntax = "proto3";
+package msg;
+
+import "comm_data.proto";
+import "cs_wanted_define.proto";
+import "cs_character_team.proto";
+
+// *************************************** 通缉令主流程控制协议 ***************************************
+
+// *************************************** 局外协议 ***************************************
+
+// @desc 请求肉鸽局外数据
+// @cmd CS_WANTED_OUTSIDE_DATA
+message CS_Wanted_Outside_Data
+{
+    uint32 group_id = 1; //
+}
+
+// @desc 返回肉鸽局外数据
+// @cmd SC_WANTED_OUTSIDE_DATA
+message SC_Wanted_Outside_Data
+{
+    int32 result = 1; //结果
+    repeated CmdWantedTypeData wanted_types = 2; //选中的肉鸽类型数据
+    
+}
+// @desc 通缉令局外数据Ntf
+// @cmd SC_WANTED_OUTSIDE_DATA_NTF
+message SC_Wanted_Outside_Data_Ntf
+{
+    CmdWantedTypeData data = 1; //通缉令局外数据
+}
+
+// @desc 请求进入通缉令
+// @cmd CS_ENTER_WANTED
+message CS_Enter_Wanted
+{
+    uint32 id = 1; //通缉令id
+    repeated uint32 character_ids = 2; //编队
+}
+
+// @desc 返回进入通缉令
+// @cmd SC_ENTER_WANTED
+message SC_Enter_Wanted
+{
+    int32 result = 1;
+}
+// *************************************** 局外协议 ***************************************
+
+// *************************************** 局内流程控制协议 ***************************************
+// @desc 请求通缉令局内完整数据
+// @cmd CS_WANTED_INSIDE_DATA
+message CS_Wanted_Inside_Data
+{
+    uint32 wanted_id = 1; //通缉令id
+}
+
+// @desc 返回通缉令局内完整数据
+// @cmd SC_WANTED_INSIDE_DATA
+message SC_Wanted_Inside_Data
+{
+    int32 result = 1; //结果
+    CmdWantedStep step_data = 2; //步骤数据
+    repeated uint32 event_history = 3; //历史事件
+    uint32 reset_point = 4; //重置点id
+    uint32 wanted_id = 5; //通缉令id
+    uint32 max_step = 6; //通缉令最大步骤
+    //uint32 exchange_max_step = 7;// 体力兑换过的最大步骤
+    uint32 router_id = 8;//路线ID
+    uint32 revive_count = 9;//复活次数
+    repeated CmdNpcData npc_list = 10; //NPC列表
+    bool gem_auto_equip_off = 11; //宝石自动装配开关关闭标记 false=开启(默认) true=关闭
+}
+
+
+// @desc 通知通缉令步骤更新
+// @cmd SC_WANTED_STEP_NTF
+message SC_Wanted_Step_Ntf
+{
+    CmdWantedStep step_data = 1; //步骤数据
+}
+
+// @desc 通知通缉令奖励
+// @cmd SC_WANTED_AWARD_NTF
+message SC_Wanted_Award_Ntf
+{
+    repeated CmdWantedStepAward award_list = 1;//当前步骤的可选奖励（可能连续几次三选1）
+}
+
+// @desc 玩家选择奖励
+// @cmd CS_WANTED_CHOOSE_AWARD
+message CS_Wanted_Choose_Award
+{
+    uint32 step_award_id = 1; //三选一奖励ID
+    uint32 award = 2; //选择的奖励
+    uint64 replaced_bionics_uniqid = 3; //替换的液银仿生品id
+    uint32 wanted_id = 4; //当前通缉令ID 用作校验
+    uint64 step_award_uid = 5; //三选一奖励UID
+}
+
+// @desc 返回玩家选择奖励
+// @cmd SC_WANTED_CHOOSE_AWARD
+message SC_Wanted_Choose_Award
+{
+    int32 result = 1; //返回结果
+    uint32 step_award_id = 2; //三选一奖励ID
+    uint32 award = 3; //选择的奖励
+    bool finish = 4;  // 是否已经领完所有三选一
+    uint64 step_award_uid = 5; //三选一奖励UID
+}
+
+// @desc 请求三选一奖励刷新
+// @cmd CS_WANTED_AWARD_REFRESH_REQ
+message CS_Wanted_Award_Refresh_Req
+{
+    uint32 wanted_id = 1; //当前通缉令ID 用作校验
+    uint32 award_id = 2;  //三选一奖励ID
+    uint64 award_uid = 3; //三选一奖励UID
+}
+
+// @desc 返回三选一奖励刷新
+// @cmd SC_WANTED_AWARD_REFRESH_RSP
+message SC_Wanted_Award_Refresh_Rsp
+{
+    int32 result = 1; //返回结果
+    uint32 wanted_id = 2; //通缉令ID
+    repeated CmdWantedStepAward award_list = 3; //刷新后的可选奖励列表
+}
+
+// @desc 请求三选一奖励数据
+// @cmd CS_WANTED_AWARD_DATA_REQ
+message CS_Wanted_Award_Data_Req
+{
+    uint32 wanted_id = 1; //当前通缉令ID 用作校验
+}
+
+// @desc 返回三选一奖励数据
+// @cmd SC_WANTED_AWARD_DATA_RSP
+message SC_Wanted_Award_Data_Rsp
+{
+    int32 result = 1; //返回结果
+    uint32 wanted_id = 2; //通缉令ID
+    repeated CmdWantedStepAward award_list = 3; //当前步骤的可选奖励列表
+}
+
+// @desc 玩家请求结算
+// @cmd CS_WANTED_OVER
+message CS_Wanted_Over
+{
+    uint32 wanted_id = 1; //要结算的通缉令entryid
+}
+
+// @desc 通缉令结算 (主动和胜利结算可以都用这个 到时候跟前端商议)
+// @cmd SC_WANTED_OVER
+message SC_Wanted_Over
+{
+    int32 result = 1; //结果
+    uint32 wanted_id = 2; //通缉令id
+    repeated CmdItem award_first = 3; //首通奖励
+    repeated CmdItem award_common = 4; //普通奖励
+    CmdWantedResource resource = 5; //通缉令资源数据
+    uint32 finish_step = 6; //已完成步骤
+    bool victory = 7; //是否胜利
+    uint32 finish_count = 8; //完美通关次数 先加再发
+    uint32 battle_pass_add_score = 9; //本次增加战令积分
+    uint32 battle_pass_total_score = 10; //战令总积分
+    uint32 battle_pass_id = 11; //战令id
+    uint32 max_step = 12; //最大步骤
+    uint32 unlimited_num = 13; //无限波次第几波
+    TeamData team_data = 14; //当前队伍数据
+    uint32 talent_point = 15; //当前获得天赋点数量
+    uint32 router_id = 16; //路线id
+    CurTeamData cur_team = 17; // 当前编队数据
+}
+
+// @desc 离开通缉令
+// @cmd CS_WANTED_LEAVE
+message CS_Wanted_Leave
+{
+    uint32 wanted_id = 1; //当前通缉令ID 用作校验
+}
+
+// @desc 返回离开通缉令
+// @cmd SC_WANTED_LEAVE
+message SC_Wanted_Leave
+{
+    int32 result = 1;//结果
+}
+// *************************************** 通缉令局内流程控制协议 ***************************************

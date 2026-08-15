@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+import "comm_data.proto"; 
+package msg;
+
+// @desc 任务活动数据
+message TaskActivityData
+{
+    uint32 activity_task_id = 1; // 任务活动id
+    uint32 progress = 2; // 任务活动进度
+    bool is_finished = 3; // 是否完成
+    bool has_claimed = 4; // 是否已领取奖励
+}
+
+// @desc 任务活动数据请求
+// @cmd CS_TASK_ACTIVITY_DATA_REQ
+message CS_Task_Activity_Data_Req
+{
+    uint32 activity_id = 1; // 活动id
+}
+
+// @desc 任务活动数据返回
+// @cmd SC_TASK_ACTIVITY_DATA_RSP
+message SC_Task_Activity_Data_Rsp
+{
+    int32 result = 1; // 返回结果
+    uint32 activity_id = 2; // 活动id
+    repeated TaskActivityData activity_data = 3; // 任务活动的数据
+}
+
+// @desc 领取任务活动奖励请求
+// @cmd CS_TASK_ACTIVITY_REWARD_REQ
+message CS_Task_Activity_Reward_Req
+{
+    uint32 activity_task_id = 1; // 任务活动id
+}
+
+// @desc 领取任务活动奖励返回
+// @cmd SC_TASK_ACTIVITY_REWARD_RSP
+message SC_Task_Activity_Reward_Rsp
+{
+    int32 result = 1; // 返回结果
+    uint32 activity_task_id = 2; // 任务活动id
+    repeated ItemIdCount reward_items = 3; // 奖励物品信息
+}
+
+// @desc 一键领取任务活动全部奖励请求
+// @cmd CS_TASK_ACTIVITY_CLAIM_ALL_REQ
+message CS_Task_Activity_Claim_All_Req
+{
+    uint32 activity_id = 1; // 活动id
+}
+
+// @desc 一键领取任务活动全部奖励返回
+// @cmd SC_TASK_ACTIVITY_CLAIM_ALL_RSP
+message SC_Task_Activity_Claim_All_Rsp
+{
+    int32 result = 1; // 返回结果
+    uint32 activity_id = 2; // 活动id
+    repeated uint32 claimed_task_ids = 3; // 领取成功的任务ID列表
+}

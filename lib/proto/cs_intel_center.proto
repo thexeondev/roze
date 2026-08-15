@@ -1,0 +1,151 @@
+syntax = "proto3";
+package msg;
+
+import "comm_data.proto";
+
+// ============================================================================
+// Common data structures
+// ============================================================================
+
+// 情报建筑收益明细
+message IntelBuildingIncome
+{
+    uint32 house_id = 1;                      // 建筑配置ID
+    uint32 income = 2;                        // 该建筑本次领取的情报碎片
+    uint32 income_per_minute = 3;             // 该建筑每分钟产出（含倍率加成，仅Intel类型有值）
+    repeated ItemIdCount timed_items = 4;     // 该建筑本次领取的 TimedItemOutput 道具
+}
+
+// ============================================================================
+// Risk value — query & notification
+// ============================================================================
+
+// @desc 风险值数据请求
+// @cmd CS_INTEL_RISK_VALUE_REQ
+message CS_Intel_Risk_Value_Req
+{
+}
+
+// @desc 风险值数据响应
+// @cmd SC_INTEL_RISK_VALUE_RSP
+message SC_Intel_Risk_Value_Rsp
+{
+    int32 result = 1;                 // 结果
+    int32 risk_value = 2;             // 当前风险值
+    int64 full_recover_time = 3;      // 恢复满的时间戳（已满则为0）
+}
+
+// @desc 风险值变化通知
+// @cmd SC_INTEL_RISK_VALUE_NTF
+message SC_Intel_Risk_Value_Ntf
+{
+    int32 risk_value = 1;             // 变化后的当前风险值
+    int64 full_recover_time = 2;      // 恢复满的时间戳
+}
+
+// ============================================================================
+// Favorite gameplay — query & change
+// ============================================================================
+
+// @desc 玩法收藏全量数据请求
+// @cmd CS_FAVORITE_GAMEPLAY_FULL_REQ
+message CS_Favorite_Gameplay_Full_Req
+{
+}
+
+// @desc 玩法收藏全量数据响应
+// @cmd SC_FAVORITE_GAMEPLAY_FULL_RSP
+message SC_Favorite_Gameplay_Full_Rsp
+{
+    int32 result = 1;                          // 结果
+    repeated uint32 favorite_ids = 2;          // 全量收藏玩法ID列表
+}
+
+// @desc 玩法收藏变更请求
+// @cmd CS_FAVORITE_GAMEPLAY_CHANGE_REQ
+message CS_Favorite_Gameplay_Change_Req
+{
+    uint32 entry_id = 1;      // 玩法入口ID
+    bool is_add = 2;          // true=收藏 false=取消收藏
+}
+
+// @desc 玩法收藏变更响应
+// @cmd SC_FAVORITE_GAMEPLAY_CHANGE_RSP
+message SC_Favorite_Gameplay_Change_Rsp
+{
+    int32 result = 1;                 // 结果
+    uint32 entry_id = 2;             // 操作的玩法入口ID
+    bool is_add = 3;                 // true=收藏 false=取消
+}
+
+// ============================================================================
+// Intel center — info & upgrade notification
+// ============================================================================
+
+// @desc 情报中心信息请求
+// @cmd CS_INTEL_CENTER_INFO_REQ
+message CS_Intel_Center_Info_Req
+{
+}
+
+// @desc 情报中心信息响应
+// @cmd SC_INTEL_CENTER_INFO_RSP
+message SC_Intel_Center_Info_Rsp
+{
+    int32 result = 1;                 // 结果
+    uint32 intel_level = 2;           // 情报中心等级
+    uint32 pending_income = 3;        // 待领取池当前总量
+    uint64 total_intel_coin_earned = 4; // 历史累计获得碎片
+    repeated ItemIdCount timed_item_pending_list = 5; // 所有 Intel 建筑待领取道具（合并全量）
+    repeated IntelTimedOutputCharInfo timed_output_char_list = 6; // 所有派遣角色的 TimedItemOutput 定时器状态
+}
+
+// @desc 情报碎片累计量变化通知（碎片增加时推送，客户端据此刷新升级按钮状态）
+// @cmd SC_INTEL_COIN_EARNED_NTF
+message SC_Intel_Coin_Earned_Ntf
+{
+    uint64 total_intel_coin_earned = 1;        // 历史累计获得碎片
+}
+
+// @desc 情报中心主动升级请求
+// @cmd CS_INTEL_UPGRADE_REQ
+message CS_Intel_Upgrade_Req
+{
+}
+
+// @desc 情报中心主动升级响应
+// @cmd SC_INTEL_UPGRADE_RSP
+message SC_Intel_Upgrade_Rsp
+{
+    int32 result = 1;                          // 结果
+    uint32 new_level = 2;                      // 升级后等级
+    repeated ItemIdCount rewards = 3;          // 升级奖励道具
+    uint64 total_intel_coin_earned = 4;        // 升级消耗后剩余的累积进度
+}
+
+// ============================================================================
+// Intel building income — claim
+// ============================================================================
+
+// @desc 领取情报建筑收益请求
+// @cmd CS_CLAIM_INTEL_INCOME_REQ
+message CS_Claim_Intel_Income_Req
+{
+}
+
+// @desc 领取情报建筑收益响应
+// @cmd SC_CLAIM_INTEL_INCOME_RSP
+message SC_Claim_Intel_Income_Rsp
+{
+    int32 result = 1;                                  // 结果
+    uint32 total_income = 2;                           // 本次领取总情报碎片
+    repeated IntelBuildingIncome details = 3;           // 各建筑收益明细
+}
+
+// @desc TimedItemOutput 触发通知（定时成功产出道具时推送）
+// @cmd SC_INTEL_TIMED_ITEM_OUTPUT_NTF
+message SC_Intel_Timed_Item_Output_Ntf
+{
+    repeated ItemIdCount timed_item_pending_list = 1;       // 所有 Intel 建筑当前待领取道具（合并全量）
+    repeated IntelTimedOutputCharInfo timed_output_char_list = 2; // 所有派遣角色最新定时器状态
+}

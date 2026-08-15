@@ -1,0 +1,380 @@
+syntax = "proto3";
+package msg;
+
+import "comm_macro.proto";
+import "comm_data.proto";
+
+// ============================================================================
+// Common data structures
+// ============================================================================
+
+message HouseInfo
+{
+    uint32 house_id = 1; // 房子id
+    EnmHouseState state = 2; // 状态
+    uint32 level = 3; // 等级
+    uint32 attr_fame = 4;       // 知名度
+    uint32 attr_positive = 5;   // 好评
+    uint32 attr_passenger = 6;  // 客流
+    uint32 income = 7; // 可领取产出
+    repeated uint64 char_uid = 8; // 角色id
+    int64 dispatch_time = 9; // 派遣开始时间戳
+    int64 last_settle_time = 10; // 上次结算时间戳
+    uint32 income_per_minute = 11; // 每分钟产出
+    uint32 intel_income_per_minute = 12; // 情报建筑每分钟产出（含倍率加成，仅Intel类型有值）
+    uint32 intel_pending_income = 13; // 情报建筑待领取货币（仅Intel类型有值）
+    int64 intel_last_settle_time = 14; // Intel建筑上次结算累加池时间戳（仅Intel类型有值）
+    repeated ItemIdCount timed_item_pending_list = 15; // Intel 建筑待领取道具（合并全量）
+    repeated IntelTimedOutputCharInfo timed_output_char_list = 16; // 派遣角色的 TimedItemOutput 定时器状态
+}
+
+message HouseSysInfo
+{
+    uint32 level = 1; // 等级
+    uint64 exp = 2; // 经验
+    uint32 attr_fame = 3;       // 知名度
+    uint32 attr_positive = 4;   // 好评
+    uint32 attr_passenger = 5;  // 客流
+    uint32 cur_target_group = 6; // 当前目标组
+    repeated uint32 completed_target_list = 7; // 当前目标组已完成的目标
+    int64 last_claim_time = 8; // 上次领取奖励时间戳
+    uint64 acc_income = 9; // 累计产出
+    repeated FragmentEntryInfo fragment_list = 10; // 线索累积列表
+}
+
+message FragmentEntryInfo
+{
+    uint32 frag_id = 1; // 线索ID
+    uint32 count = 2;   // 当前累积数量
+}
+
+message HouseShopGoodsInfo
+{
+    uint32 item_id = 1; // 道具id
+    uint32 price = 2; // 价格
+    uint32 item_count = 3; // 每份商品包含的道具数量
+    bool is_bought = 4; // 是否已购买（本轮货架）
+}
+
+message HouseShopMemberShip
+{
+    uint32 level = 1;  // 会员等级
+    uint32 exp = 2; // 会员经验
+    uint32 refresh_cost = 3; // 刷新货架消耗
+}
+
+message HouseShopInfo
+{
+    HouseShopMemberShip member_ship = 1; // 会员信息
+    repeated HouseShopGoodsInfo goods_list = 2; // 商店商品列表
+}
+
+// ============================================================================
+// House info query
+// ============================================================================
+
+// @desc 房子信息
+// @cmd CS_HOUSE_INFO_REQ
+message CS_House_Info_Req
+{
+}
+
+// @desc 房子信息
+// @cmd SC_HOUSE_INFO_RSP
+message SC_House_Info_Rsp
+{
+    int32 result = 1; // 结果
+    repeated HouseInfo house_list = 2;  // 房子列表 @len{ msg::MAX_HOUSE_LEN }
+    HouseSysInfo house_sys_info = 3; // 房地产系统的信息
+}
+
+// ============================================================================
+// House system — upgrade & target reward
+// ============================================================================
+
+// @desc 房产系统变化Ntf, 目标相关
+// @cmd SC_HOUSE_SYS_CHANGE_NTF
+message SC_House_Sys_Change_Ntf
+{
+    HouseSysInfo house_sys_info = 1; // 房地产系统的信息
+}
+
+// @desc 房产信息变更Ntf（角色升级跨阈值导致 effect 三维/收益速率变化时下发）
+// @cmd SC_UPDATE_HOUSE_INFO_NTF
+message SC_Update_House_Info_Ntf
+{
+    repeated HouseInfo house_list = 1; // 受影响的房产列表 @len{ msg::MAX_HOUSE_LEN }
+    HouseSysInfo house_sys_info = 2; // 房地产系统的信息
+}
+
+// @房产系统升级
+// @cmd CS_UPGRADE_HOUSE_SYS_REQ
+message CS_Upgrade_House_Sys_Req
+{
+}
+
+// @desc 房产系统升级
+// @cmd SC_UPGRADE_HOUSE_SYS_RSP
+message SC_Upgrade_House_Sys_Rsp
+{
+    int32 result = 1; // 结果
+    HouseSysInfo house_sys_info = 2; // 房地产系统的信息
+}
+
+// @desc 领取房产系统目标组奖励
+// @cmd CS_CLAIM_HOUSE_TARGET_GROUP_REWARD_REQ
+message CS_Claim_House_Target_Group_Reward_Req
+{
+
+}
+
+// @desc 房产系统组目标完成发奖励
+// @cmd SC_CLAIM_HOUSE_TARGET_GROUP_REWARD_RSP
+message SC_Claim_House_Target_Group_Reward_Rsp
+{
+    int32 result = 1; // 结果
+    uint32 group_id = 2; // 目标组id
+    repeated ItemIdCount items = 3; // 奖励物品列表
+    uint32 attr_fame = 4;       // 知名度
+    uint32 attr_positive = 5;   // 好评
+    uint32 attr_passenger = 6;  // 客流
+    uint32 unlock_house_id = 7; // 解锁的房子id
+    uint32 accept_task_id = 8; // 接受的任务id
+}
+
+// ============================================================================
+// House operation — unlock, buy, upgrade, income
+// ============================================================================
+
+// @desc 解锁房子
+// @cmd CS_UNLOCK_HOUSE_REQ
+message CS_Unlock_House_Req
+{
+    uint32 house_id = 1; // 房子id
+}
+
+// @desc 解锁房子
+// @cmd SC_UNLOCK_HOUSE_RSP
+message SC_Unlock_House_Rsp
+{
+    int32 result = 1; // 结果
+    HouseInfo house_info = 2; // 房子信息
+}
+
+// @desc 购买房子
+// @cmd CS_BUY_HOUSE_REQ
+message CS_Buy_House_Req
+{
+    uint32 house_id = 1; // 房子id
+}
+
+// @desc 购买房子
+// @cmd SC_BUY_HOUSE_RSP
+message SC_Buy_House_Rsp
+{
+    int32 result = 1; // 结果
+    HouseInfo house_info = 2; // 房子信息
+    HouseSysInfo house_sys_info = 3; // 房地产系统信息
+}
+
+// @desc 房子升级
+// @cmd CS_UPGRADE_HOUSE_REQ
+message CS_Upgrade_House_Req
+{
+    uint32 house_id = 1; // 房子id
+}
+
+// @desc 房子升级
+// @cmd SC_UPGRADE_HOUSE_RSP
+message SC_Upgrade_House_Rsp
+{
+    int32 result = 1; // 结果
+    HouseInfo house_info = 2; // 房子信息
+    HouseSysInfo house_sys_info = 3; // 房地产系统信息
+}
+
+// @desc 领取房子产出
+// @cmd CS_CLAIM_HOUSE_INCOME_REQ
+message CS_Claim_House_Income_Req
+{
+}
+
+// @desc 领取房子产出
+// @cmd SC_CLAIM_HOUSE_INCOME_RSP
+message SC_Claim_House_Income_Rsp
+{
+    int32 result = 1; // 结果
+    repeated HouseInfo house_info_list = 2; // 有变化的房子
+    HouseSysInfo house_sys_info = 3; // 房地产系统的信息
+}
+
+// ============================================================================
+// Character dispatch — single & batch, exit, reward
+// ============================================================================
+
+// @desc 派遣角色到房子
+// @cmd CS_DISPATCH_CHARACTER_TO_HOUSE_REQ
+message CS_Dispatch_Character_To_House_Req
+{
+    uint32 house_id = 1; // 房子id
+    repeated uint64 char_uid = 2; // 角色id
+}
+
+// @desc 派遣角色到房子
+// @cmd SC_DISPATCH_CHARACTER_TO_HOUSE_RSP
+message SC_Dispatch_Character_To_House_Rsp
+{
+    int32 result = 1; // 结果
+    repeated HouseInfo house_info = 2; // 房子信息
+    HouseSysInfo house_sys_info = 3; // 房地产系统的信息
+}
+
+// 批量派遣项
+message BatchDispatchItem
+{
+    uint32 house_id = 1; // 房子id
+    repeated uint64 char_uid = 2; // 角色id
+}
+
+// 批量派遣结果项
+message BatchDispatchResultItem
+{
+    uint32 house_id = 1; // 房子id
+    int32 result = 2; // 结果
+}
+
+// @desc 批量派遣角色到房子
+// @cmd CS_BATCH_DISPATCH_CHARACTER_REQ
+message CS_Batch_Dispatch_Character_Req
+{
+    repeated BatchDispatchItem dispatch_list = 1; // 派遣列表
+}
+
+// @desc 批量派遣角色到房子
+// @cmd SC_BATCH_DISPATCH_CHARACTER_RSP
+message SC_Batch_Dispatch_Character_Rsp
+{
+    int32 result = 1; // 结果
+    repeated BatchDispatchResultItem dispatch_result_list = 2; // 每个房子的派遣结果
+    repeated HouseInfo house_info_list = 3; // 有变化的房子信息
+    HouseSysInfo house_sys_info = 4; // 房地产系统的信息
+}
+
+// @desc 角色从房子中退出
+// @cmd CS_EXIT_CHARACTER_FROM_HOUSE_REQ
+message CS_Exit_Character_From_House_Req
+{
+    uint32 house_id = 1; // 房子id
+}
+
+// @desc 角色从房子中退出
+// @cmd SC_EXIT_CHARACTER_FROM_HOUSE_RSP
+message SC_Exit_Character_From_House_Rsp
+{
+    int32 result = 1; // 结果
+    HouseInfo house_info = 2; // 房子信息
+    HouseSysInfo house_sys_info = 3; // 房地产系统的信息
+}
+
+// @desc 领取派遣奖励
+// @cmd CS_CLAIM_DISPATCH_REWARD_REQ
+message CS_Claim_Dispatch_Reward_Req
+{
+    uint32 house_id = 1; // 房子id
+}
+
+// @desc 领取派遣奖励
+// @cmd SC_CLAIM_DISPATCH_REWARD_RSP
+message SC_Claim_Dispatch_Reward_Rsp
+{
+    int32 result = 1; // 结果
+    HouseInfo house_info = 2; // 房子信息
+    HouseSysInfo house_sys_info = 3; // 房地产系统的信息
+    repeated ItemIdCount dispatch_rewards = 4; // 派遣基础道具奖励
+    repeated ItemIdCount effect_item_rewards = 5; // 派遣技能效果额外道具奖励
+    uint32 fragment_id = 6; // 本次抽中的线索ID（0=未抽中）
+    uint32 fragment_count = 7; // 本次抽中的线索数量
+    uint32 unlock_house_id = 8; // 线索累积达 LimitNum 触发解锁的新 HouseID（0=无解锁）
+}
+
+// 单个房产领取结果
+message BatchClaimDispatchRewardItem
+{
+    uint32 house_id = 1; // 房子id
+    int32 result = 2; // 该房产的领取结果码
+    repeated ItemIdCount dispatch_rewards = 3; // 基础道具奖励
+    repeated ItemIdCount effect_item_rewards = 4; // 技能效果额外道具奖励
+    uint32 fragment_id = 5; // 本笔抽中的线索ID（0=未抽中）
+    uint32 fragment_count = 6; // 本笔抽中的线索数量
+    uint32 unlock_house_id = 7; // 本笔解锁的新 HouseID（0=无解锁）
+}
+
+// @desc 一键领取所有到期派遣奖励
+// @cmd CS_BATCH_CLAIM_DISPATCH_REWARD_REQ
+message CS_Batch_Claim_Dispatch_Reward_Req
+{
+}
+
+// @desc 一键领取派遣奖励结果
+// @cmd SC_BATCH_CLAIM_DISPATCH_REWARD_RSP
+message SC_Batch_Claim_Dispatch_Reward_Rsp
+{
+    int32 result = 1; // 整体结果
+    repeated BatchClaimDispatchRewardItem claim_result_list = 2; // 每个房子的领取结果和奖励
+    repeated HouseInfo house_info_list = 3; // 成功领取变化的房子信息
+    HouseSysInfo house_sys_info = 4; // 房地产系统信息
+}
+
+// ============================================================================
+// House shop
+// ============================================================================
+
+// @desc 请求商店信息
+// @cmd CS_HOUSE_SHOP_INFO_REQ
+message CS_House_Shop_Info_Req
+{
+}
+
+// @desc 商店商品信息
+// @cmd SC_HOUSE_SHOP_INFO_RSP
+message SC_House_Shop_Info_Rsp
+{
+    int32 result = 1; // 结果
+    HouseShopInfo house_shop_info = 2; // 商店信息
+}
+
+// @desc 刷新商店商品列表
+// @cmd CS_REFRESH_HOUSE_SHOP_GOODS_REQ
+message CS_Refresh_House_Shop_Goods_Req
+{
+}
+
+// @desc 刷新商店商品列表
+// @cmd SC_REFRESH_HOUSE_SHOP_GOODS_RSP
+message SC_Refresh_House_Shop_Goods_Rsp
+{
+    int32 result = 1; // 结果
+    HouseShopInfo house_shop_info = 2; // 商店信息
+}
+
+// @desc 购买商店商品
+// @cmd CS_BUY_HOUSE_SHOP_GOODS_REQ
+message CS_Buy_House_Shop_Goods_Req
+{
+    uint32 item_id = 1; // 道具id
+}
+
+// @desc 购买商店商品
+// @cmd SC_BUY_HOUSE_SHOP_GOODS_RSP
+message SC_Buy_House_Shop_Goods_Rsp
+{
+    int32 result = 1; // 结果
+    HouseShopInfo house_shop_info = 2; // 商店信息
+}
+
+// @desc 跨天刷新商店信息
+// @cmd SC_UPDATE_HOUSE_SHOP_INFO_NTF
+message SC_Update_House_Shop_Info_Ntf
+{
+    HouseShopMemberShip member_ship = 1; // 会员信息
+}

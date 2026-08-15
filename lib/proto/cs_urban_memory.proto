@@ -1,0 +1,159 @@
+syntax = "proto3";
+
+package msg;
+import "comm_data.proto";
+import "comm_macro.proto";
+
+
+message ObserveCollectionInfo
+{
+    uint32 observe_cfg_id = 1; // 可观察收集品配置ID
+    EnmObserveCollectibleState observe_state = 2; // 收集品状态
+}
+
+message UrbanMemoryRewardInfo
+{
+    uint32 urban_memory_id = 1; // 城区记忆ID
+    uint32 level = 2; // 城区记忆等级
+    bool is_rewarded = 3; // 是否已领取奖励
+}
+
+message UrbanMemoryInfo
+{
+    uint32 urban_memory_id = 1; // 城区记忆ID
+    uint32 level = 2; // 城区记忆等级
+    uint32 experience = 3; // 当前等级经验值
+    repeated UrbanMemoryRewardInfo level_rewards = 4; // 城区记忆等级奖励列表 @len{ msg::MAX_URBAN_MEMORY_LEVEL_REWARDS_LEN }
+}
+
+// @desc 客户端请求：获取城区记忆数据
+// @cmd CS_URBAN_MEMORY_GET_DATA
+message CS_Urban_Memory_Get_Data
+{
+}
+
+// @desc 服务器响应：返回城区记忆数据
+// @cmd SC_URBAN_MEMORY_GET_DATA
+message SC_Urban_Memory_Get_Data
+{
+    int32 result = 1; // 0=成功，其他值表示错误
+    repeated UrbanMemoryInfo urban_memory_list = 2; // 城区记忆信息列表 @len{ msg::MAX_URBAN_MEMORY_LEN }
+    repeated ObserveCollectionInfo observe_collection_list = 3; // 观察收集品信息列表 @len{ msg::MAX_CORE_OBSERVE_COLLECTION_LEN }
+
+}
+
+// @desc 客户端请求：观察收集品信息
+// @cmd CS_URBAN_MEMORY_OBSERVE_REQUEST
+message CS_Urban_Memory_Observe_Request
+{
+    uint32 observe_cfg_id = 1; // 可观察收集品配置ID
+}
+
+// @desc 服务器响应：观察收集品信息结果
+// @cmd SC_URBAN_MEMORY_OBSERVE_RESPONSE
+message SC_Urban_Memory_Observe_Response
+{
+    int32 result = 1; // 0=成功，其他值表示错误
+    uint32 observe_cfg_id = 2; // 可观察收集品配置ID
+    EnmObserveCollectibleState observe_state = 3; // 更新后的观察状态
+    uint32 new_level = 4; // 新等级
+    uint32 new_experience = 5; // 新经验值
+}
+
+// @desc 客户端请求：阅读书籍类收集品
+// @cmd CS_URBAN_MEMORY_READ_BOOK_REQUEST
+message CS_Urban_Memory_Read_Book_Request
+{
+    uint32 book_item_id = 1; // 书籍类收集品物品ID
+}
+// @desc 服务器响应：阅读书籍类收集品结果
+// @cmd SC_URBAN_MEMORY_READ_BOOK_RESPONSE
+message SC_Urban_Memory_Read_Book_Response
+{
+    int32 result = 1; // 0=成功，其他值表示错误
+    uint32 book_item_id = 2; // 书籍类收集品物品ID
+}
+
+// @desc 客户端请求：提交收集品给城区记忆NPC
+// @cmd CS_URBAN_MEMORY_SUBMIT_REQUEST
+message CS_Urban_Memory_Submit_Request
+{
+    uint32 urban_memory_id = 1; // 城区记忆ID
+    repeated ItemIdCount submit_items = 2; // 提交的收集品物品列表
+}
+
+// @desc 服务器响应：提交收集品给城区记忆NPC结果
+// @cmd SC_URBAN_MEMORY_SUBMIT_RESPONSE
+message SC_Urban_Memory_Submit_Response
+{
+    int32 result = 1; // 0=成功，其他值表示错误
+    uint32 urban_memory_id = 2; // 城区记忆ID
+    repeated ItemIdCount submitted_items = 3; // 已提交的收集品物品列表
+    uint32 new_level = 4; // 新等级
+    uint32 new_experience = 5; // 新经验值
+}
+
+
+// @desc 服务器通知：城区记忆等级提升通知
+// @cmd SC_URBAN_MEMORY_LEVEL_UP_NTF
+message SC_Urban_Memory_Level_Up_Ntf
+{
+    uint32 urban_memory_id = 1; // 城区记忆ID
+    uint32 old_level = 2; // 旧等级
+    uint32 new_level = 3; // 新等级
+    uint32 new_experience = 4; // 新经验值
+    EnmLevelUpReason reason = 5; // 提升原因
+}
+
+// @desc 客户端请求：领取城区记忆等级奖励
+// @cmd CS_URBAN_MEMORY_CLAIM_LEVEL_REWARD_REQUEST
+message CS_Urban_Memory_Claim_Level_Reward_Request
+{
+    uint32 urban_memory_id = 1; // 城区记忆ID
+}
+
+// @desc 服务器响应：领取城区记忆等级奖励结果
+// @cmd SC_URBAN_MEMORY_CLAIM_LEVEL_REWARD_RESPONSE
+message SC_Urban_Memory_Claim_Level_Reward_Response
+{
+    int32 result = 1; // 0=成功，其他值表示错误
+    uint32 urban_memory_id = 2; // 城区记忆ID
+    repeated UrbanMemoryRewardInfo rewarded_list = 3; // 已领取的城区记忆等级奖励列表
+}
+
+// @desc 服务器通知：获得城区记忆道具通知
+// @cmd SC_URBAN_MEMORY_OBTAIN_ITEM_NTF
+message SC_Urban_Memory_Obtain_Item_Ntf
+{
+    uint32 item_id = 1; // 获得的道具ID
+    uint32 count = 2; // 获得的道具数量
+}
+
+// @desc 客户端请求：设置/清除核心收集品追踪目标
+// @cmd CS_URBAN_MEMORY_SET_TRACK_REQ
+message CS_Urban_Memory_Set_Track_Req
+{
+    uint64 tracked_core_collection_id = 1; // 核心收集品ID（0 表示清除追踪）
+}
+
+// @desc 服务器响应：设置/清除核心收集品追踪目标结果
+// @cmd SC_URBAN_MEMORY_SET_TRACK_RSP
+message SC_Urban_Memory_Set_Track_Rsp
+{
+    int32 result = 1; // 0=成功
+    uint64 tracked_core_collection_id = 2; // 最新的追踪ID（0=未追踪）
+}
+
+// @desc 客户端请求：查询核心收集品追踪目标
+// @cmd CS_URBAN_MEMORY_GET_TRACK_REQ
+message CS_Urban_Memory_Get_Track_Req
+{
+}
+
+// @desc 服务器响应：查询核心收集品追踪目标结果
+// @cmd SC_URBAN_MEMORY_GET_TRACK_RSP
+message SC_Urban_Memory_Get_Track_Rsp
+{
+    int32 result = 1; // 0=成功
+    uint64 tracked_core_collection_id = 2; // 当前追踪ID（0=未追踪）
+}

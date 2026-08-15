@@ -1,0 +1,249 @@
+syntax = "proto3";
+package msg;
+
+import "comm_macro.proto";
+import "comm_data.proto";
+
+// @desc 角色列表单个角色简要信息
+message RoleListBriefInfo
+{
+	uint64 role_id = 1;  // 角色id
+}
+
+// @desc 账号登录请求
+// @cmd CS_ACCOUNT_LOGIN
+message CS_Account_Login
+{
+    bytes userid     = 1; // 登录账号
+    bytes passwd     = 2; // 临时密码
+    bool   standalone = 3; // 是否是单机版登录
+    bytes version    = 4; //客户端版本号
+    bool   iseditor   = 5; //是否编辑器版本
+
+    bytes appid         = 6;  // appid
+    bytes channel_name  = 7;  // 渠道名
+    bytes channel_token = 8;  // 渠道token
+    bytes hei_token     = 9;  // 中台sdktoken (如果不为空就是sdk登录 否则就是账号密码登录)
+    bytes channel_uid   = 10; // 渠道uid
+    bytes udid = 11;          // 设备唯一标识
+    bytes proto_md5 = 12;     // 协议标识id
+    bytes auth_ver = 13;      // 鉴权版本号，匹配new_auth_ver时走新URL
+}
+
+// @desc 账号登录响应
+// @cmd SC_ACCOUNT_LOGIN
+message SC_Account_Login
+{
+    int32             result              = 1; // 登录结果
+    uint64            connect_identify_id = 2; // 连接标识ID
+    uint32            world_id            = 3; // 登录小区ID
+    int64             timestamp           = 5; // 当前时间戳（秒）
+    RoleListBriefInfo brief_role          = 6; // 角色简要信息
+    bytes            errormsg            = 7; // 错误信息
+    bytes            userid              = 8; // userid
+}
+
+// @desc 数据埋点信息同步请求
+// @cmd CS_SCHEMA_INFO_SYNC
+message CS_Schema_Info_Sync
+{
+    bytes game_version = 1;      // 客户端版本号
+    bytes game_version_code = 2; // 客户端版本号码
+    bytes user_platform = 3;     // 平台信息
+    bytes udid = 4;              // 设备唯一标识
+}
+
+// @desc 数据埋点信息同步响应
+// @cmd SC_SCHEMA_INFO_SYNC
+message SC_Schema_Info_Sync
+{
+    int32 result = 1;    // 结果
+    uint64 login_id = 2; // 登录id
+}
+
+// @desc 被踢下线原因
+enum EnmKickReason
+{
+    ENM_KICK_REASON_NONE           = 0; // 未定义原因
+    ENM_KICK_REASON_ACCLOING_FAILE = 1; // 账号登录失败
+}
+
+// @desc 创建角色请求
+// @cmd CS_CREATE_ROLE
+message CS_Create_Role
+{
+    bytes role_name = 1; // 角色名字
+    bytes second_role_name = 2; // 第二个角色的名字
+}
+
+// @desc 创建角色响应
+// @cmd SC_CREATE_ROLE
+message SC_Create_Role
+{
+	int32 result = 1;  // 创建角色结果	
+	RoleListBriefInfo brief_role = 2;  // 角色简要信息
+}
+
+// @desc 角色登录请求
+// @cmd CS_ROLE_LOGIN
+message CS_Role_Login
+{
+    uint64 role_id = 1; // 角色ID
+}
+
+// @desc 角色登录应答
+// @cmd SC_ROLE_LOGIN
+message SC_Role_Login
+{
+    int32           result            = 1; // 角色登录结果
+    bytes          game_svr_url      = 2; // url
+    int32           port              = 3; // 端口
+    uint64          map_id            = 5; // 上次所在的地图编号
+    bool            today_first_login = 6; // 是否本日第一次登录
+    uint64          current_savepoint = 7; // 上次记录存档点
+    SC_UDP_Info_Ntf udp_info          = 8; // udp信息 (废弃)
+    bool            is_inited_name = 9; // 是否已经初始化名字
+    int32           time_zone_offset_seconds = 10; // 时区偏移秒数（基于UTC+8，可正负）
+}
+
+// @desc 角色登出请求
+// @cmd CS_REQ_ROLE_LOGOUT
+message CS_Role_Logout
+{
+    uint64 role_id = 1; // 角色ID
+}
+
+// @desc 角色登出应答
+// @cmd SC_ROLE_LOGOUT
+message SC_Role_Logout
+{
+    int32  result  = 1; // 角色登出结果
+    uint64 role_id = 2; // 角色ID
+}
+
+// @desc 角色请求进入地图
+// @cmd CS_ENTER_MAP
+message CS_Enter_Map
+{
+    uint64     role_id  = 1; // 角色ID
+    uint64     map_id   = 2; // 地图id
+    EnmMapType map_type = 3; //地图类型
+    uint64     teleport_id = 4; // 传送点id
+    uint64 savepoint_id = 5; // 存档点id
+}
+
+// @desc 响应角色请求进入地图
+// @cmd SC_ENTER_MAP
+message SC_Enter_Map
+{
+    int32  result  = 1;
+    uint64 role_id = 2; // 角色ID
+    uint64 map_id  = 3; // 地图id
+    uint64 teleport_id = 4; // 传送点id
+    RoleMapInfo map_info = 5; // 角色地图信息
+    uint64 savepoint_id = 6; // 存档点id
+                        // RoleInfo role_info = 4;	// 玩家信息
+    // repeated uint64 unlocked_savepoints = 5; // 已解锁存档点列表
+    // Vector3Int last_logout_location = 6;	// 上次下线时坐标
+    // uint64 current_savepoint = 7; // 当前存档点
+    // EnmBornPosType born_pos_type = 8; //玩家出生位置类型
+}
+
+// @desc 角色请求完成加载地图
+// @cmd CS_FIN_ENTER_MAP
+message CS_Fin_Enter_Map
+{
+    uint64     role_id  = 1; // 角色ID
+    uint64     map_id   = 2; // 地图id
+    EnmMapType map_type = 3; //地图类型
+}
+
+// @desc 响应角色完成加载地图
+// @cmd SC_FIN_ENTER_MAP
+message SC_Fin_Enter_Map
+{
+    int32           result               = 1;
+    uint64          role_id              = 2;  // 角色ID
+    uint64          map_id               = 3;  // 地图id
+    RoleInfo        role_info            = 4;  // 玩家信息
+    repeated uint64 unlocked_savepoints  = 5;  // 已解锁存档点列表
+    Vector3Int      last_logout_location = 6;  // 上次下线时坐标
+    uint64          current_savepoint    = 7;  // 当前存档点
+    EnmBornPosType  born_pos_type        = 8;  //玩家出生位置类型
+    PlayerTaskData  task_data            = 9;  // 玩家任务信息
+    uint64          world_map_id         = 10; // 玩家所在大世界地图
+    repeated uint64 unlocked_teleport_id_list     = 11; // 解锁的传送点id
+}
+
+// @desc 通知前端场景已经准备好(CE版本前端希望加的，后端暂时无逻辑)
+// @cmd SC_MAP_READY_NTF
+message SC_Map_Ready_Ntf
+{
+    uint64          map_id = 1; // 地图id
+    Vector3Int      last_logout_location = 3;  // 上次下线时坐标
+    uint64          current_savepoint    = 4;  // 当前存档点
+    EnmBornPosType  born_pos_type        = 5;  //玩家出生位置类型
+    repeated uint64 unlocked_savepoints  = 6;  // 已解锁存档点列表
+    repeated uint64 unlocked_teleport_id_list     = 7; // 解锁的传送点id
+    uint64          teleport_id     = 8; // 
+    Vector3Int rotation = 9; // 出生朝向
+    uint64 savepoint_id = 10; // 存档点id
+
+}
+
+message SCSceneUdpInfo
+{
+    bytes ip   = 1; // ip
+    uint32 port = 2; //端口
+};
+
+// @desc 响应角色完成加载地图
+// @cmd SC_NOTIFY_UDP_INFO
+message SC_UDP_Info_Ntf
+{
+    SCSceneUdpInfo info = 1;
+}
+
+// @desc sdk版本 账号登录请求(作废)
+// @cmd CS_ACCOUNT_LOGIN_SDK
+message CS_Account_Login_Sdk
+{
+    bytes appid         = 1; // appid
+    bytes channel_name  = 2; // 渠道名
+    bytes channel_token = 3; // 渠道token
+    bytes hei_token     = 4; // 中台sdktoken
+}
+
+// @desc sdk版本 账号登录响应(作废)
+// @cmd SC_ACCOUNT_LOGIN_SDK
+message SC_Account_Login_Sdk
+{
+    int32  result   = 1; // 登录结果
+    bytes userid   = 2; // userID
+    bytes errormsg = 3; // 错误信息
+}
+
+// @desc 通知封禁用户
+// @cmd SC_BAN_USER_NTF
+message SC_Ban_User_Ntf
+{
+    uint64 role_id = 1; // 角色ID
+    bytes reason = 2; // 封禁原因
+    int64 duration = 3; // 封禁时间,单位小时
+}
+
+// @desc 登录排队状态枚举
+enum EnmLoginQueueStatus
+{
+    ENM_LOGIN_QUEUE_STATUS_ENTER  = 0; // 直接进入游戏
+    ENM_LOGIN_QUEUE_STATUS_QUEUED = 1; // 正在排队
+}
+
+// @desc 通知客户端登录排队状态
+// @cmd SC_LOGIN_QUEUE_NTF
+message SC_Login_Queue_Ntf
+{
+    EnmLoginQueueStatus status   = 1; // 目前占位用
+    int32               position = 2; // 排队位置
+    int32               est_wait = 3; // 预估等待秒数
+}

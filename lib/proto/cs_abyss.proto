@@ -1,0 +1,152 @@
+syntax = "proto3";
+package msg;
+
+import "comm_data.proto";
+import "comm_macro.proto";
+
+message CmdRoomInfo
+{
+    uint32 room_id = 1; // 房间ID
+    uint64 finish_time = 2;   // 完成时间(ms)
+}
+
+// @desc 深渊信息
+message CmdOneLayerData
+{
+    uint32 layer = 1;  // 深渊层数
+    repeated CmdRoomInfo room_list = 2;   // 房间ID
+    uint32 star = 3;// 历史最高星数
+    bool is_passed = 4; // 是否通关过
+}
+
+// @desc 深渊信息
+message CmdOneAbyssData
+{
+    uint32 abyss_id = 1; // 深渊ID
+    repeated CmdOneLayerData layer_list = 2; // 深渊层数据
+    uint32 star_total = 3; // 深渊总星数
+    uint32 star_awarded = 4; // 已领取星数奖励
+}
+// @desc 深渊信息
+message CmdAbyssData
+{
+    repeated CmdOneAbyssData abyss_list = 1; // 深渊列表
+    uint32 cur_abyss_id = 3; // 当前挑战的深渊ID 打完一层就清掉
+    uint32 cur_layer = 4; // 当前层数index 打完一层就清掉
+    uint32 cur_room = 5; // 当前房间index 没完成的也算 从1开始 打完一层就清掉
+}
+
+// @desc 请求深渊信息
+// @cmd CS_REQ_ABYSS_INFO
+message CS_Req_Abyss_Info
+{
+}
+
+// @desc 当前开启中的深渊信息
+message CmdActiveAbyssInfo
+{
+    uint32 abyss_id = 1;    // 深渊ID
+    uint32 start_time = 2;  // 开启时间(秒)
+    uint32 end_time = 3;    // 结束时间(秒)
+}
+
+// @desc 响应深渊信息
+// @cmd SC_RES_ABYSS_INFO
+message SC_Res_Abyss_Info
+{
+    int32 result = 1; // 结果
+    CmdAbyssData abyss_data = 2; // 深渊数据
+    repeated CmdActiveAbyssInfo active_abyss_list = 3; // 当前正在开启的深渊列表
+}
+
+// @desc 请求进入深渊
+// @cmd CS_REQ_ABYSS_ENTER
+message CS_Req_Abyss_Enter
+{
+    uint32 abyss_id = 1; // 深渊ID
+    uint32 layer = 2; // 层数
+    uint32 room = 3; // 房间index
+}
+
+// @desc 响应进入深渊
+// @cmd SC_RES_ABYSS_ENTER
+message SC_Res_Abyss_Enter
+{
+    int32 result = 1; // 结果
+}
+
+// @desc 请求进入深渊完成
+// @cmd CS_REQ_ABYSS_ENTER_ALREADY
+message CS_Req_Abyss_Enter_Already
+{
+    
+}
+
+// @desc 响应进入深渊
+// @cmd SC_RES_ABYSS_ENTER_ALREADY
+message SC_Res_Abyss_Enter_Already
+{
+    int32 result = 1; // 结果
+    uint32 abyss_id = 2; // 深渊ID
+    uint32 layer = 3; // 层数index
+    uint32 room = 4; // 房间数index
+}
+
+// @desc 请求完成深渊结算
+// @cmd CS_REQ_ABYSS_FINISH
+message CS_Req_Abyss_Finish
+{
+    uint32 abyss_id = 1; // 深渊ID
+    //uint32 layer = 2; // 层数index
+    //uint32 room = 3; // 房间数index
+    repeated uint32 task_finish = 4;   // 完成任务id列表
+    EnmAbyssFinishReason finish_reason = 5; // 结束原因；is_win=true 时必须为 NORMAL
+    bool is_win = 6; // 是否胜利
+}
+
+// @desc 响应完成深渊结算
+// @cmd SC_RES_ABYSS_FINISH
+message SC_Res_Abyss_Finish
+{
+    int32 result = 1; // 结果
+    uint32 abyss_id = 2; // 深渊ID
+    uint32 layer = 3; // 层数index
+    uint32 cur_star = 4; // 本次星数
+    uint32 layer_star = 5; // 本层历史最高星数
+    uint32 abyss_star = 6; // 深渊总星数
+}
+
+// @desc 请求更新深渊进度
+// @cmd CS_REQ_ABYSS_PROGRESS_UPDATE
+message CS_Req_Abyss_Progress_Update
+{
+    uint32 abyss_id = 1; // 深渊ID
+    uint32 layer = 2; // 层数
+    uint32 room = 3; // 已完成的房间索引 从1开始
+    uint64 finish_time = 4; // 本房间完成时间 毫秒
+}
+
+// @desc 响应更新深渊进度
+// @cmd SC_RES_ABYSS_PROGRESS_UPDATE
+message SC_Res_Abyss_Progress_Update
+{
+    int32 result = 1; // 结果
+}
+
+// @desc 请求领取深渊星级奖励
+// @cmd CS_REQ_ABYSS_STAR_AWARD
+message CS_Req_Abyss_Star_Award
+{
+    uint32 abyss_id = 1; // 深渊ID
+    //uint32 star_count = 2; // 星数 应该是一键领取吧 不需要这个了
+}
+
+// @desc 响应领取深渊星级奖励
+// @cmd SC_RES_ABYSS_STAR_AWARD
+message SC_Res_Abyss_Star_Award
+{
+    int32 result = 1; // 结果
+    uint32 star_count = 2; // 星数
+    repeated CmdItem award_list = 3; // 奖励列表
+    uint32 abyss_id  = 4; //深渊ID
+}

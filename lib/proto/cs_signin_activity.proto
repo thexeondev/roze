@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+import "comm_data.proto"; 
+package msg;
+
+// @desc 每天的签到数据
+message DaySignInData
+{
+    uint32 day = 1; // 第几天
+    bool is_signed_in = 2; // 是否已签到
+    bool has_claimed = 3; // 是否已领取奖励
+}
+
+message DayRewardConf
+{
+    uint32 day = 1;
+    repeated ItemIdCount items = 2;
+}
+
+// @desc 签到活动数据
+message SignInActivityData
+{
+    uint32 activity_id = 1; // 活动id
+    repeated DaySignInData signin_datas = 2; // 每天的签到数据
+    repeated DayRewardConf reward_confs = 3; // 每日的奖励配置
+}
+
+// @desc 签到活动奖励物品信息
+message SignInRewardItem
+{
+    uint32 item_id = 1;     // 物品ID
+    uint32 item_count = 2;  // 奖励数量
+}
+
+// @desc 签到活动数据请求
+// @cmd CS_SIGNIN_ACTIVITY_DATA
+message CS_SignIn_Activity_Data
+{
+    uint32 activity_id = 1; // 活动id
+}
+
+// @desc 签到活动数据返回
+// @cmd SC_SIGNIN_ACTIVITY_DATA
+message SC_SignIn_Activity_Data
+{
+    int32 result = 1; // 返回结果
+    SignInActivityData activity_data = 2; // 签到活动的数据
+
+}
+
+// @desc 领取签到奖励请求
+// @cmd CS_SIGNIN_ACTIVITY_REWARD
+message CS_SignIn_Activity_Reward
+{
+    uint32 activity_id = 1; // 活动id
+}
+
+// @desc 领取签到奖励返回
+// @cmd SC_SIGNIN_ACTIVITY_REWARD
+message SC_SignIn_Activity_Reward
+{
+    int32 result = 1; // 返回结果
+    uint32 activity_id = 2; // 活动id
+    uint32 day = 3; // 一键领取了哪几天的奖励
+    repeated ItemIdCount reward_items = 4; // 一键领取的奖励物品列表
+}
+
+// @desc 签到活动拍脸弹窗
+// @cmd SC_SIGNIN_ACTIVITY_POP
+message SC_SignIn_Activity_Pop
+{
+    SignInActivityData activity_data = 1; // 签到活动的数据
+}

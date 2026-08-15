@@ -1,0 +1,66 @@
+syntax = "proto3";
+package msg;
+
+// @desc 成就数据
+message Achievement
+{
+    uint32 achievement_id = 1; // 成就ID
+    uint64 progress = 2; // 当前进度
+    uint64 finish_time = 3; // 完成时间 时间戳
+    bool is_rewarded = 4; // 是否已领取奖励
+}
+
+// @desc 成就组数据
+message AchievementGroup
+{
+    uint32 achievement_group_id = 1; // 成就组ID
+    uint64 finish_time = 2; // 完成时间 时间戳
+    bool is_rewarded = 3; // 是否已领取奖励
+}
+
+// @desc 玩家所有成就数据
+message AchievementData {
+    repeated Achievement achievement_list = 1; // 成就列表 @len{ msg::MAX_ACHIEVEMENT_LEN }
+    repeated AchievementGroup achievement_group_list = 2; // 成就组列表 @len{ msg::MAX_ACHIEVEMENT_GROUP_LEN }
+};
+
+
+// @desc 请求成就数据
+// @cmd CS_ACHIEVEMENT_QUERY
+message CS_Achievement_Query
+{
+}
+
+// @desc 请求成就数据响应
+// @cmd SC_ACHIEVEMENT_QUERY
+message SC_Achievement_Query
+{
+    int32 result = 1;
+    AchievementData data = 2;
+}
+
+// @desc 领取成就奖励 也许有一键领取 所以是数组
+// @cmd CS_ACHIEVEMENT_CLAIM_REWARD
+message CS_Achievement_Claim_Reward
+{
+    repeated uint32 all_achievement_ids = 1;
+    repeated uint32 all_achievement_group_ids = 2;
+}
+
+// @desc 领取成就奖励响应，部分成功result返回0
+// @cmd SC_ACHIEVEMENT_CLAIM_REWARD
+message SC_Achievement_Claim_Reward
+{
+    int32 result = 1;
+    repeated uint32 all_achievement_ids = 2;     // 成功领取的成就ID列表
+    repeated uint32 all_achievement_group_ids = 3; // 成功领取的成就组ID列表
+}
+
+// @desc 成就完成更新通知
+// @cmd SC_ACHIEVEMENT_COMPLETE_NOTIFY
+message SC_Achievement_Complete_Notify
+{
+    uint32 achievement_id = 1; // 成就ID
+    uint64 progress = 2; // 当前进度
+    uint64 finish_time = 3; // 完成时间 时间戳
+}

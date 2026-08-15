@@ -1,0 +1,30 @@
+syntax = "proto3";
+package msg;
+
+// @desc 单个限次组数据
+message CmdLimitGroup
+{
+    uint32 id = 1; //限次组ID
+    uint32 count = 2; //当前次数
+}
+
+// @desc 请求限次组数据
+// @cmd CS_LIMIT_GROUP_REQ
+message CS_Limit_Group_Req
+{
+}
+
+// @desc 返回限次组数据
+// @cmd SC_LIMIT_GROUP_RES
+message SC_Limit_Group_Res
+{
+    int32 result = 1;
+    repeated CmdLimitGroup groups = 2;
+}
+
+// @desc 限次组数据变化通知
+// @cmd SC_LIMIT_GROUP_NTF
+message SC_Limit_Group_Ntf
+{
+    repeated CmdLimitGroup groups = 1;
+}

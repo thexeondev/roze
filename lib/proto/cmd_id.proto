@@ -1,0 +1,819 @@
+syntax = "proto3";
+
+package msg;
+option  go_package = "proto/GameMsg";
+
+//////////////// cs之间的命令字
+enum EClientServerCmds {
+    CS_CMD_BEGIN = 0;
+
+    CS_PING = 1;
+    SC_PONG = 2;
+
+    // gate 直接处理的 ping/pong (用于 gate_bench 等不登录的压测场景, 不转发到 scenesvr)
+    CS_GATE_PING = 3;
+    SC_GATE_PONG = 4;
+
+    CS_REQ_GM         = 104; //  GM指令
+    CS_NOTIFY_GM_TEXT = 105; //  通知客户端GM指令输出文本信息
+
+    SC_NOTIFY_UDP_INFO        = 120; // 通知UDP连接信息  @@udp_flag@@
+    SC_FORBIDDEN_CMD_RESPONSE = 121; // 当收到前端发来的被禁止的协议时候 通用的返回协议
+
+    CS_ACCOUNT_LOGIN             = 10001; // 请求账号登录
+    SC_ACCOUNT_LOGIN             = 10002; // 响应账号登录
+    CS_REQ_ROLE_LIST             = 10003; // 请求角色列表
+    CS_RES_ROLE_LIST             = 10004; //  响应角色列表
+    CS_CREATE_ROLE               = 10005; // 创建角色
+    SC_CREATE_ROLE               = 10006; // 创建角色响应
+    CS_ROLE_LOGIN                = 10007; // 请求角色登录
+    SC_ROLE_LOGIN                = 10008; // 响应角色登录
+    SC_LOGIN_QUEUE_NTF           = 10009; // 通知客户端排队位置
+    CS_REQ_ROLE_LOGOUT           = 10011; // 请求角色登出
+    SC_ROLE_LOGOUT               = 10012; // 响应角色登出
+    CS_ENTER_MAP                 = 10013; // 请求进入地图 @scenesvr
+    SC_ENTER_MAP                 = 10014; // 响应进入地图
+    CS_FIN_ENTER_MAP             = 10015; // 请求完成进入地图 @scenesvr
+    SC_FIN_ENTER_MAP             = 10016; // 响应完成进入地图
+    SC_MAP_READY_NTF             = 10017; // 通知前端场景已经准备好
+    CS_UDP_PING_PONG             = 10018; // UDP Ping 请求
+    SC_UDP_PING_PONG             = 10019; // UDP Pong 响应 @@udp_flag@@
+    CS_INIT_ROLE_GENDER_AND_NAME = 10020; // 初始化角色性别和名字
+    SC_INIT_ROLE_GENDER_AND_NAME = 10021; // 初始化角色性别和名字
+    CS_CHECK_TEXT                = 10022; // 检测文本是否合规
+    SC_CHECK_TEXT                = 10023; // 检测文本是否合规
+    CS_SCHEMA_INFO_SYNC          = 10024; // 数据埋点信息同步请求
+    SC_SCHEMA_INFO_SYNC          = 10025; // 数据埋点信息同步响应
+    SC_BAN_USER_NTF              = 10026; // 响应封禁用户
+
+    // 临时的时间方案
+    CS_REPORT_TIME = 10051; // 上报时间
+    SC_REPORT_TIME = 10052;
+    CS_QUERY_TIME  = 10053; // 查询时间
+    SC_QUERY_TIME  = 10054;
+
+    // [10101,10199] 角色养成相关
+    CS_REQ_CHARACTER_LIST         = 10101; //获取角色列表 req
+    SC_RES_CHARACTER_LIST         = 10102; //获取角色列表 resp
+    CS_REQ_CHARACTER_LEVEL_UP     = 10103; // 角色养成-增加经验 Req
+    SC_RES_CHARACTER_LEVEL_UP     = 10104; // 角色养成-增加经验 Resp
+    CS_CHARACTER_LEVEL_BREAK      = 10105; // 角色养成-突破 Req
+    SC_CHARACTER_LEVEL_BREAK      = 10106; // 角色养成-突破 Resp
+    SC_NTF_CHARACTER_NEWCOMER     = 10107; // 角色养成-获得新角色 Notify
+    CS_CHARACTER_UPDATE_TEAM      = 10108; // 修改编队
+    SC_CHARACTER_UPDATE_TEAM      = 10109;
+    CS_CHARACTER_SWITCH_TEAM      = 10110; // 切换编队
+    SC_CHARACTER_SWITCH_TEAM      = 10111;
+    CS_CHARACTER_SWITCH_MEMBER    = 10112; // 切换队伍角色
+    SC_CHARACTER_SWITCH_MEMBER    = 10113;
+    SC_NTF_CHARACTER_UPDATE       = 10114; //角色更新
+    SC_TEMPORARY_LIQUID_POOL_NTF  = 10115; //推送临时池液滴变化
+    SC_PLAYER_LEVEL_DATA_NTF      = 10117; //玩家等级数据变化
+    CS_CHANGE_WORLD_LEVEL         = 10118; //玩家改变世界等级
+    SC_CHANGE_WORLD_LEVEL         = 10119; //返回玩家改变世界等级
+    CS_CHARACTER_TEAMS            = 10120; // 获取编队信息
+    SC_CHARACTER_TEAMS            = 10121; // 返回编队信息
+    CS_CHARACTER_UPDATE_TEAM_NAME = 10122; // 修改编队名字
+    SC_CHARACTER_TEMP_TEAM_NTF    = 10123; // 临时编队更新
+    CS_CHARACTER_UPDATE_TMP_TEAM  = 10124; // 修改临时编队请求
+    SC_CHARACTER_UPDATE_TMP_TEAM  = 10125; // 修改临时编队响应
+    CS_CHARACTER_TMP_TEAM_QUERY   = 10126; // 查询临时编队
+    SC_CHARACTER_TMP_TEAM_QUERY   = 10127; // 查询临时编队响应
+    CS_CHARACTER_HEAL_REQ         = 10128; // 角色恢复请求
+    SC_CHARACTER_HEAL_RES         = 10129; // 角色恢复响应
+    CS_SWITCH_MAIN_CHARACTER      = 10130; // 切换主角色
+    SC_SWITCH_MAIN_CHARACTER      = 10131; // 切换主角色响应
+    CS_SET_TMP_TEAM_REQ           = 10132; // 设置临时编队请求
+    SC_SET_TMP_TEAM_RSP           = 10133; // 设置临时编队响应
+    CS_TMP_TEAM_UPDATE_GEM_REQ    = 10134; // 更新临时编队宝石请求
+    SC_TMP_TEAM_UPDATE_GEM_RSP    = 10135; // 更新临时编队宝石响应
+    SC_TMP_TEAM_UPDATE_GEM_NTF    = 10136; // 临时编队宝石变更通知
+
+    // [10200,10300) 左闭右开， 道具相关
+    CS_ITEM_GET_LIST           = 10200; //道具列表
+    SC_ITEM_GET_LIST           = 10201;
+    CS_ITEM_USE                = 10202; //使用道具
+    SC_ITEM_USE                = 10203;
+    SC_ITEM_CHANGE_NTF         = 10204; //推送变化 使用，新增按需推送
+    SC_PLAYER_ATTR_UPDATE_NTF  = 10205; // 玩家基础属性变化通知
+    SC_PRECIOUS_AWARD_SHOW_NTF = 10206; // 珍贵奖励展示
+    // 新道具系统
+    CS_ITEM_BAG_GET_LIST   = 10210;
+    SC_ITEM_BAG_GET_LIST   = 10211;
+    SC_ITEM_BAG_CHANGE_NTF = 10212;
+    CS_ITEM_USE_COUNT      = 10213;
+    SC_ITEM_USE_COUNT      = 10214;
+    SC_ITEM_CD_NTF         = 10215; // 物品CD变化推送
+    SC_ITEM_ADD_ERROR_NTF  = 10216; //
+    SC_AWARD_SHOW_NTF      = 10217; // 奖励展示通知
+
+    // [10300,10399] 任务系统使用
+    CS_REQ_TASK_LIST            = 10300;
+    SC_RES_TASK_LIST            = 10301;
+    SC_NTF_TASK_PROGRESS_UPDATE = 10302;
+    CS_TASK_ACTION_UPDATE       = 10303;
+    SC_TASK_ACTION_UPDATE       = 10304;
+    CS_TASK_ONRECONNECT         = 10305;
+    SC_TASK_ONRECONNECT         = 10306;
+    CS_TASK_ACTIVATE_REQ        = 10307;
+    SC_TASK_ACTIVATE_RSP        = 10308;
+    CS_TASK_RESET_REQ           = 10309;
+    SC_TASK_RESET_RSP           = 10310;
+    CS_TASK_ACCEPT_REQ          = 10311;
+    SC_TASK_ACCEPT_RSP          = 10312;
+    CS_TASK_ACCEPT_INFO_REQ     = 10313;
+    SC_TASK_ACCEPT_INFO_RSP     = 10314;
+    SC_TASK_ACCEPT_INFO_NTF     = 10315;
+    CS_TASK_ACCEPT_COND_UPDATE_REQ = 10316;
+    SC_TASK_ACCEPT_COND_UPDATE_RSP = 10317;
+
+    // [10400,10500) 商店使用
+    CS_SHOP_GOODS   = 10400;
+    SC_SHOP_GOODS   = 10401;
+    CS_SHOP_BUY     = 10402;
+    SC_SHOP_BUY     = 10403;
+    SC_MONEY_UPDATE = 10404;
+    CS_MULTI_SHOP_GOODS = 10405;
+    SC_MULTI_SHOP_GOODS = 10406;
+
+    // [10500, 10600) 天赋使用
+    CS_TALENT_QUERY     = 10500;
+    SC_TALENT_QUERY     = 10501;
+    CS_TALENT_LEVEL_UP    = 10502;
+    SC_TALENT_LEVEL_UP    = 10503;
+    SC_TALENT_LEVEL_CHANGED_NTF = 10504;
+    // [10600, 10700) buff使用
+    CS_BUFF_SYNC   = 10600; // buff全量同步
+    SC_BUFF_SYNC   = 10601;
+    SC_BUFF_ADD    = 10602; // 上buff
+    SC_BUFF_DEL    = 10603; // 删buff
+    SC_BUFF_UPDATE = 10604; // 更新buff
+
+    // [10700, 10720) 案件系统
+    CS_CASE_DATA               = 10700; // 拉取思维空间数据
+    SC_CASE_DATA               = 10701; // 拉取思维空间数据 响应
+    CS_CASE_CLUE_PUT           = 10702; // 把线索放到槽位
+    SC_CASE_CLUE_PUT           = 10703; // 把线索放到槽位 响应
+    SC_CASE_RECEIVE_NTF        = 10704; // 新案件解锁推送
+    SC_CASE_NEW_CLUE_NTF       = 10705; // 获得新线索推送
+    SC_CASE_NEW_EVIDENCE_NTF   = 10706; // 获得新证物推送
+    CS_CASE_EVIDENCE_DECRYPTED = 10707; // 证物破解
+    SC_CASE_EVIDENCE_DECRYPTED = 10708; // 证物破解响应
+    SC_CASE_UPDATE_NTF         = 10709; // 案件数据更新推送
+    CS_CASE_BACK_REQ           = 10710; // 案件回退请求
+    SC_CASE_BACK_RSP           = 10711; // 案件回退响应
+    CS_CASE_PUBLISH_REQ        = 10712; // 案件系统公布请求
+    SC_CASE_PUBLISH_RSP        = 10713; // 案件系统公布响应
+    CS_CASE_CLAIM_REWARD_REQ   = 10714; // 案件领取奖励请求
+    SC_CASE_CLAIM_REWARD_RSP   = 10715; // 案件领取奖励响应
+
+    // [10720, 10740) 抽卡使用
+    CS_Do_Gacha_Req      = 10720; // 抽卡请求
+    SC_Gacha_Result      = 10721; //抽卡结果
+    CS_Get_Pool_Info_Req = 10722; //获取玩家卡池信息
+    SC_Get_Pool_Info_Ack = 10723;
+
+    // [10740, 10770) 左闭右开， 红点系统
+    CS_REQ_REDPOINT_LIST          = 10740; // 获取红点系统数据请求
+    SC_RES_REDPOINT_LIST          = 10741; // 获取红点系统数据响应
+    CS_REQ_REDPOINT_MARKREAD      = 10742; // 客户端更新红点系统数据请求
+    SC_RES_REDPOINT_MARKREAD      = 10743; // 客户端更新红点系统数据响应
+    SC_NTF_REDPOINT_UPDATE_NOTIFY = 10744; // 服务器主动推送红点系统数据通知
+    
+    // [10810, 10850) 左闭右开， 城区记忆系统
+    CS_URBAN_MEMORY_GET_DATA                    = 10810; // 客户端请求：获取城区记忆数据
+    SC_URBAN_MEMORY_GET_DATA                    = 10811; // 服务器响应：返回城区记忆数据
+    CS_URBAN_MEMORY_OBSERVE_REQUEST             = 10812; // 客户端请求：观察城区记忆信息
+    SC_URBAN_MEMORY_OBSERVE_RESPONSE            = 10813; // 服务器响应：观察城区记忆信息结果
+    CS_URBAN_MEMORY_READ_BOOK_REQUEST           = 10814; // 客户端请求：阅读书籍类城区记忆
+    SC_URBAN_MEMORY_READ_BOOK_RESPONSE          = 10815; // 服务器响应：阅读书籍类城区记忆结果
+    CS_URBAN_MEMORY_SUBMIT_REQUEST              = 10816; // 客户端请求：提交城区记忆给NPC
+    SC_URBAN_MEMORY_SUBMIT_RESPONSE             = 10817; // 服务器响应：提交城区记忆给NPC结果
+    SC_URBAN_MEMORY_LEVEL_UP_NTF                = 10818; // 服务器通知：区域阅历等级提升通知
+    CS_URBAN_MEMORY_CLAIM_LEVEL_REWARD_REQUEST  = 10819; // 客户端请求：领取区域阅历等级奖励
+    SC_URBAN_MEMORY_CLAIM_LEVEL_REWARD_RESPONSE = 10820; // 服务器响应：领取区域阅历等级奖励结果
+    SC_URBAN_MEMORY_OBTAIN_ITEM_NTF             = 10821; // 服务器通知：获得城区记忆道具通知
+    CS_URBAN_MEMORY_SET_TRACK_REQ               = 10822; // 客户端请求：设置/清除核心收集品追踪目标
+    SC_URBAN_MEMORY_SET_TRACK_RSP               = 10823; // 服务器响应：设置/清除核心收集品追踪目标结果
+    CS_URBAN_MEMORY_GET_TRACK_REQ               = 10824; // 客户端请求：查询核心收集品追踪目标
+    SC_URBAN_MEMORY_GET_TRACK_RSP               = 10825; // 服务器响应：查询核心收集品追踪目标结果
+
+    // [10850,10900) 左闭右开，新手历程
+    CS_NEWBIE_GET_DATA_REQUEST             = 10850; // 获取玩家前期历程状态
+    SC_NEWBIE_GET_DATA_RESPONSE            = 10851; // 返回玩家前期历程状态
+    SC_NEWBIE_PROGRESS_UPDATE_NTF          = 10852; // 前期历程事件进度更新通知
+    CS_NEWBIE_CLAIM_STAGE_REWARD_REQUEST   = 10853; // 领取阶段奖励
+    SC_NEWBIE_CLAIM_STAGE_REWARD_RESPONSE  = 10854; // 领取阶段奖励
+    CS_NEWBIE_CLAIM_NEWBIE_REWARD_REQUEST  = 10855; // 领取事件奖励
+    SC_NEWBIE_CLAIM_NEWBIE_REWARD_RESPONSE = 10856; // 领取事件奖励
+
+    // [10900, 10910) 左闭右开，进度事件系统
+    CS_PROGRESS_EVENT_TRIGGER = 10900; // 客户端上报事件触发
+    SC_PROGRESS_EVENT_TRIGGER = 10901; // 回复客户端上报事件触发
+
+    // [10910, 10930) 左闭右开，解锁系统
+    CS_UNLOCK_DATA_GET             = 10910; // 获取解锁数据请求
+    SC_UNLOCK_DATA_GET             = 10911; // 获取解锁数据响应
+    SC_UNLOCK_CONDITION_UPDATE_NTF = 10912; // 解锁条件更新通知
+    SC_UNLOCK_FEATURE_UPDATE_NTF   = 10913; // 解锁功能更新通知
+    CS_UNLOCK_FEATURE_PLAY_ANIMATION_REQ = 10914; // 客户端播放解锁功能动画通知请求
+    SC_UNLOCK_FEATURE_PLAY_ANIMATION_RSP = 10915; // 客户端播放解锁功能动画通知响应
+
+
+    // [10930, 10950) 左闭右开， 图鉴系统
+    CS_COMPENDIUM_GET_DATA = 10930; // 客户端请求：获取图鉴数据
+    SC_COMPENDIUM_GET_DATA = 10931; // 服务器响应：返回图鉴数据
+    SC_COMPENDIUM_DATA_UPDATE_NOTIFY = 10932; // 服务器通知：图鉴数据更新，哪些变化了更新哪些
+
+
+    // [20000, ?) 大世界地图协议
+    CS_SAVEPOINT_UNLOCK        = 20000; // 解锁存档点
+    SC_SAVEPOINT_UNLOCK        = 20001;
+    CS_LOCATION_SYNC           = 20002; // 同步角色当前坐标  @@udp_flag@@
+    CS_NPC_DIALOGUE            = 20003; // 与NPC对话
+    CS_ENTITY_OPERATION        = 20004; // 交互物操作
+    CS_SAVEPOINT_SYNC          = 20005; // 同步当前存档点
+    SC_SAVEPOINT_SYNC          = 20006;
+    SC_GAMETIME_SLIP_NTF       = 20007; // 游戏内时间变化推送
+    CS_EXPOSE_GET_MONSTER_LIST = 20008; // 请求揭发怪列表
+    SC_EXPOSE_GET_MONSTER_LIST = 20009; // 响应揭发怪列表
+    CS_REQ_UNLOCK_TELEPORT     = 20010; // 请求解锁传送点
+    SC_RES_UNLOCK_TELEPORT     = 20011; // 返回解锁传送点
+    CS_GAMETIME_SETUP_REQ      = 20012; // 游戏内设置时间请求
+    SC_GAMETIME_SETUP_RES      = 20013; // 游戏内设置时间响应
+    CS_GAMETIME_ALIGN_REQ      = 20014; // 游戏内时间对齐请求
+    SC_GAMETIME_ALIGN_RSP      = 20015; // 游戏内时间对齐响应
+
+    // [20100,20150) 左闭右开， 采集相关
+    CS_COLLECTION_GET_LIST = 20100; //采集列表（登陆拉取）
+    SC_COLLECTION_GET_LIST = 20101;
+    CS_COLLECTION_OPERATE  = 20102; //操作采集点
+    SC_COLLECTION_OPERATE  = 20103;
+    SC_COLLECTION_DATA_NTF = 20104; //通知采集 (在线推送)
+
+    // [20150,20200) 左闭右开， 专武系统
+    CS_MOTIVE_EQUIP     = 20150; // 专武-穿戴
+    SC_MOTIVE_EQUIP     = 20151;
+    CS_MOTIVE_LEVEUP    = 20152; // 专武-升级
+    SC_MOTIVE_LEVEUP    = 20153;
+    CS_MOTIVE_REFINEUP  = 20154; // 专武-进阶
+    SC_MOTIVE_REFINEUP  = 20155;
+    CS_MOTIVE_DECOMPOSE = 20156; // 专武-分解
+    SC_MOTIVE_DECOMPOSE = 20157;
+    CS_MOTIVE_LOCK      = 20158; // 专武-上锁/解锁
+    SC_MOTIVE_LOCK      = 20159;
+    CS_MOTIVE_UNEQUIP   = 20160; // 专武-卸下
+    SC_MOTIVE_UNEQUIP   = 20161;
+    CS_MOTIVE_QUERY     = 20162; // 专武-查询
+    SC_MOTIVE_QUERY     = 20163;
+    CS_MOTIVE_BREAK     = 20164; // 专武-突破
+    SC_MOTIVE_BREAK     = 20165;
+
+    // [20200,20250) 左闭右开， 战斗系统
+    CS_BATTLE_REPORT_BATTLEEND = 20200; //上报战斗结束
+    SC_BATTLE_REPORT_BATTLEEND = 20201;
+    CS_DUNGEONS_ENTER          = 20202; //请求进入副本
+    SC_DUNGEONS_ENTER          = 20203; //返回进入副本
+    CS_DUNGEONS_FINISH         = 20204; //请求完成副本
+    SC_DUNGEONS_FINISH         = 20205; //返回完成副本
+    SC_DUNGEONS_DATA_NTF       = 20206; //同步副本数据
+    CS_DUNGEONS_ENTER_ALREADY  = 20207; //客户端确认进入副本
+    CS_DUNGEONS_CURRENT_DATA   = 20208; //客户端通知副本类型数据变化
+    SC_DUNGEONS_CURRENT_DATA   = 20209; //服务器通知当前副本数据变化
+    SC_DUNGEONS_ENTER_ALREADY  = 20210; //客户端返回进入副本
+    SC_DUNGEONS_GROUP_ACTIVATE_NTF = 20211; // 副本组激活通知
+    CS_DUNGEONS_GROUP_UNLOCK_REQ   = 20212; // 副本组解锁请求
+    SC_DUNGEONS_GROUP_UNLOCK_RSP   = 20213; // 副本组解锁回复
+    CS_DUNGEONS_REPLAY             = 20214; // 请求重新挑战副本（原地重开，客户端不播跳图loading）
+    SC_DUNGEONS_REPLAY             = 20215; // 返回重新挑战副本
+
+    // [20300,20350) 左闭右开， 充值系统
+    CS_CHAEGR_GOODS_ORDER = 20300; //请求购买商品
+    SC_CHAEGR_GOODS_ORDER = 20301; //返回购买商品的信息
+    SC_CHAEGR_FINISH      = 20302; //购买商品完成
+    CS_ACCOUNT_LOGIN_SDK  = 20303; // sdk登录
+    SC_ACCOUNT_LOGIN_SDK  = 20304; // sdk登录返回
+    CS_CHAEGR_GOODS_LIST  = 20305; //请求商品列表
+    SC_CHAEGR_GOODS_LIST  = 20306; //返回商品列表
+    CS_CHARGE_MONEY_QUERY = 20307; // 请求直充货币信息
+    SC_CHARGE_MONEY_QUERY = 20308; // 返回直充货币信息
+
+    // [20350,20400) 左闭右开，大地图面板相关协议
+    CS_MAP_GET_ALL_TARGETS     = 20350; // 获取所有追踪的目标信息
+    SC_MAP_GET_ALL_TARGETS     = 20351; // 追踪的目标信息
+    CS_MAP_TRACK_TARGET        = 20352; // 追踪给定目标
+    SC_MAP_TRACK_TARGET        = 20353; // 追踪给定目标响应
+    CS_MAP_CANCEL_TRACK_TARGET = 20354; // 取消追踪给定目标
+    SC_MAP_CANCEL_TRACK_TARGET = 20355; // 取消追踪给定目标响应
+
+    // [20400,20450) 左闭右开，液银生物相关
+    CS_SILVER_CREATURE_REQ       = 20400; // 请求生物列表
+    SC_SILVER_CREATURE_RSP           = 20401; // 返回生物列表
+    SC_SILVER_CREATURE_ADD_NTF = 20402; // 新增液银生物通知
+    SC_SILVER_CREATURE_INSTITUTE_CHANGE_NTF   = 20403; // 液银研究所变化通知
+    CS_REQ_SILVER_CREATURE_IN_BATTLE      = 20408; // 请求出战
+    SC_RES_SILVER_CREATURE_IN_BATTLE_RESULT = 20409; // 返回出战结果
+    CS_REQ_SILVER_CREATURE_LEAVE_BATTLE = 20410; // 请求离开战斗
+    SC_RES_SILVER_CREATURE_LEAVE_BATTLE_RESULT = 20411; // 返回离开战斗结果
+    SC_SILVER_CREATURE_REWARD_REQ = 20412; // 请求领取奖励
+    SC_SILVER_CREATURE_REWARD_RSP = 20413; // 返回领取奖励结果
+    SC_SILVER_CREATURE_LEVEL_UP_NTF = 20414; // 液银生物等级升级通知
+
+    // [20450,20500) 左闭右开，成就相关
+    CS_ACHIEVEMENT_QUERY        = 20450; // 请求成就数据
+    SC_ACHIEVEMENT_QUERY        = 20451; // 请求成就数据响应
+    CS_ACHIEVEMENT_CLAIM_REWARD = 20452; // 领取成就奖励
+    SC_ACHIEVEMENT_CLAIM_REWARD = 20453; // 领取成就奖励响应
+    SC_ACHIEVEMENT_COMPLETE_NOTIFY = 20454; // 成就完成更新通知
+
+    // [20500,20550) 左闭右开， 房产相关
+    CS_HOUSE_INFO_REQ = 20500; // 请求房子信息
+    SC_HOUSE_INFO_RSP = 20501; // 返回房子信息
+    CS_BUY_HOUSE_REQ = 20502; // 请求购买房子
+    SC_BUY_HOUSE_RSP = 20503; // 返回购买房子
+    CS_UPGRADE_HOUSE_REQ = 20506; // 请求房子升级
+    SC_UPGRADE_HOUSE_RSP = 20507; // 返回房子升级
+    CS_CLAIM_HOUSE_INCOME_REQ = 20509; // 请求领取房子产出
+    SC_CLAIM_HOUSE_INCOME_RSP = 20510; // 返回领取房子产出
+    CS_DISPATCH_CHARACTER_TO_HOUSE_REQ = 20511; // 请求派遣角色到房子
+    SC_DISPATCH_CHARACTER_TO_HOUSE_RSP = 20512; // 返回派遣角色到房子
+    CS_EXIT_CHARACTER_FROM_HOUSE_REQ = 20513; // 请求角色从房子中退出
+    SC_EXIT_CHARACTER_FROM_HOUSE_RSP = 20514; // 返回角色从房子中退出
+    CS_CLAIM_DISPATCH_REWARD_REQ = 20515; // 请求领取派遣奖励
+    SC_CLAIM_DISPATCH_REWARD_RSP = 20516; // 返回领取派遣奖励
+    CS_UNLOCK_HOUSE_REQ = 20517; // 请求解锁房子
+    SC_UNLOCK_HOUSE_RSP = 20518; // 返回解锁房子
+    SC_HOUSE_SYS_CHANGE_NTF = 20519; // 房产系统经验等级变化Ntf
+    CS_CLAIM_HOUSE_TARGET_GROUP_REWARD_REQ = 20521; // 请求领取房子目标组奖励
+    SC_CLAIM_HOUSE_TARGET_GROUP_REWARD_RSP = 20522; // 返回领取房子目标组奖励
+    CS_UPGRADE_HOUSE_SYS_REQ = 20523; // 请求房产系统升级
+    SC_UPGRADE_HOUSE_SYS_RSP = 20524; // 返回房产系统升级
+    CS_HOUSE_SHOP_INFO_REQ = 20525; // 请求商店信息
+    SC_HOUSE_SHOP_INFO_RSP = 20526; // 返回商店信息
+    CS_REFRESH_HOUSE_SHOP_GOODS_REQ = 20527; // 请求刷新商店商品
+    SC_REFRESH_HOUSE_SHOP_GOODS_RSP = 20528; // 返回刷新商店商品
+    CS_BUY_HOUSE_SHOP_GOODS_REQ = 20529; // 请求购买商店商品
+    SC_BUY_HOUSE_SHOP_GOODS_RSP = 20530; // 返回购买商店商品
+    SC_UPDATE_HOUSE_SHOP_INFO_NTF = 20531; // 刷新商店通知
+    CS_BATCH_DISPATCH_CHARACTER_REQ = 20532; // 请求批量派遣角色到房子
+    SC_BATCH_DISPATCH_CHARACTER_RSP = 20533; // 返回批量派遣角色到房子
+    CS_BATCH_CLAIM_DISPATCH_REWARD_REQ = 20534; // 请求一键领取所有到期派遣奖励
+    SC_BATCH_CLAIM_DISPATCH_REWARD_RSP = 20535; // 返回一键领取派遣奖励结果
+    SC_UPDATE_HOUSE_INFO_NTF = 20536; // 房产信息变更通知（角色升级跨阈值导致 effect 三维/收益速率变化时下发）
+
+    // [20550,20600) 左闭右开，月卡
+    CS_MONTH_CARD_QUERY       = 20550; // 请求月卡数据
+    SC_MONTH_CARD_QUERY       = 20551; // 返回月卡数据
+    SC_MONTH_CARD_REWARD_NTF  = 24552; // 月卡奖励发放通知
+    SC_MONTH_CARD_OVERDUE_NTF = 20553; // 月卡过期通知
+
+    // [20600,20650) 左闭右开， 邮件相关
+    CS_MAIL_GET_LIST             = 20600; // 请求获取邮件数据
+    SC_MAIL_GET_LIST             = 20601; // 返回邮件数据
+    CS_MAIL_READ                 = 20602; // 阅读邮件
+    SC_MAIL_READ                 = 20603;
+    CS_MAIL_RECV_ATTACHMENTS     = 20604; // 领取邮件附件
+    SC_MAIL_RECV_ATTACHMENTS     = 20605;
+    CS_MAIL_DEL                  = 20606; // 删除邮件
+    SC_MAIL_DEL                  = 20607;
+    CS_MAIL_DEL_ALL_READED       = 20608; // 删除已读
+    SC_MAIL_DEL_ALL_READED       = 20609;
+    CS_MAIL_RECV_ALL_ATTACHMENTS = 20610; // 全部领取
+    SC_MAIL_RECV_ALL_ATTACHMENTS = 20611;
+    SC_MAIL_ADD_DEL_NTF          = 20612; // 新邮件和删除通知
+
+    // [20650,20700) 左闭右开，公告相关
+    CS_REQ_NOTICE_LIST = 20650; // 请求公告列表
+    SC_RES_NOTICE_LIST = 20651; // 返回公告列表
+    SC_MARQUEE_NTF     = 20652; // 跑马灯推送
+    SC_NOTICE_OPEN_NTF = 20653; // 公告开放推送
+    // [20700,20750) 左闭右开，尸潮副本
+    // CS_HORDE_GET_AWARD = 20600; // 获取尸潮副本奖励
+    // SC_HORDE_GET_AWARD = 20601; // 返回尸潮副本奖励
+    SC_HORDE_DATA_NTF     = 20702; //通知尸潮数据变化
+    CS_DUNGEONS_FULL_DATA = 20703; //请求副本数据
+    SC_DUNGEONS_FULL_DATA = 20704; // 返回副本数据
+
+    // [20750, 20800) ，签到活动相关
+    CS_SIGNIN_ACTIVITY_DATA   = 20751; // 签到活动数据请求
+    SC_SIGNIN_ACTIVITY_DATA   = 20752; // 签到活动数据返回
+    CS_SIGNIN_ACTIVITY_REWARD = 20753; // 领取签到奖励请求
+    SC_SIGNIN_ACTIVITY_REWARD = 20754; // 领取签到奖励返回
+    SC_SIGNIN_ACTIVITY_POP    = 20755; // 签到活动拍脸弹窗
+
+    // [20800, 20850) 左闭右开，属性
+    CS_OUTSIDE_ATTRIB_QUERY        = 20800; // 请求局外属性数据
+    SC_OUTSIDE_ATTRIB_QUERY        = 20801; // 返回局外属性数据
+    SC_OUTSIDE_ATTRIB_NTF          = 20802; // 局外属性变化通知
+    CS_WANTED_BIONICS_ATTRIB_QUERY = 20803; // 请求通缉令仿生品属性数据
+    SC_WANTED_BIONICS_ATTRIB_QUERY = 20804; // 返回通缉令仿生品属性数据
+    SC_WANTED_BIONICS_ATTRIB_NTF   = 20805; // 通缉令仿生品属性变化通知
+
+    // [20900, 21000) 左闭右开，战斗
+    CS_ENTER_BATTLE = 20900; // 进入战斗请求
+    SC_ENTER_BATTLE = 20901; // 进入战斗响应
+    CS_LEAVE_BATTLE = 20902; // 退出战斗请求
+    SC_LEAVE_BATTLE = 20903; // 退出战斗响应
+    CS_PAUSE_BATTLE = 20904; // 暂停战斗请求
+    SC_PAUSE_BATTLE = 20905; // 暂停战斗响应
+    CS_START_BATTLE = 20906; // 开始战斗请求
+    SC_START_BATTLE = 20907; // 开始战斗响应
+
+    // [21000,21100) 左闭右开，通缉令相关
+    //通缉令局外协议
+    CS_WANTED_OUTSIDE_DATA     = 21000; //请求通缉令局外数据
+    SC_WANTED_OUTSIDE_DATA     = 21001; //返回通缉令局外数据
+    SC_WANTED_OUTSIDE_DATA_NTF = 21002; //通缉令局外数据Ntf
+    CS_ENTER_WANTED            = 21003; //进入通缉令
+    SC_ENTER_WANTED            = 21004; //返回进入通缉令结果
+    //通缉令内流程控制相关协议
+    CS_WANTED_INSIDE_DATA      = 21005; //请求通缉令局内数据
+    SC_WANTED_INSIDE_DATA      = 21006; //返回通缉令局内数据
+    SC_WANTED_STEP_NTF         = 21007; //通缉令步骤更新
+    CS_WANTED_CHOOSE_AWARD     = 21008; //玩家选择奖励
+    SC_WANTED_CHOOSE_AWARD     = 21009; //返回步骤奖励
+    CS_WANTED_OVER             = 21010; //玩家请求结算
+    SC_WANTED_OVER             = 21011; //通缉令结算
+    CS_WANTED_STAMINA_EXCHANGE = 21012; //通缉令内体力兑换奖励
+    SC_WANTED_STAMINA_EXCHANGE = 21013; //返回通缉令内体力兑换奖励
+    CS_WANTED_RESET_POINT      = 21014; //请求重置通缉令
+    SC_WANTED_RESET_POINT      = 21015; //返回重置通缉令
+    CS_WANTED_LEAVE            = 21016; //请求离开通缉令
+    SC_WANTED_LEAVE            = 21017; //返回离开通缉令
+    // 通缉令内资源数据同步协议
+    CS_WANTED_BLESS_BOND_REQ = 21018; // 请求通缉令祝福和羁绊数据
+    SC_WANTED_BLESS_BOND_RES = 21019; // 返回通缉令祝福和羁绊数据
+    SC_WANTED_BLESS_NTF      = 21020; // 通缉令祝福数据Ntf
+    SC_WANTED_BOND_NTF       = 21021; // 通缉令羁绊数据Ntf
+    CS_WANTED_BIONICS_REQ    = 21022; // 请求通缉令仿生品数据
+    SC_WANTED_BIONICS_RES    = 21023; // 返回通缉令仿生品数据
+    SC_WANTED_BIONICS_NTF    = 21024; // 通缉令仿生品数据Ntf
+    SC_WANTED_RELICS_NTF     = 21025; // 通缉令遗物数据Ntf
+    CS_WANTED_RELICS_REQ     = 21026; // 请求通缉令遗物数据
+    SC_WANTED_RELICS_RES     = 21027; // 返回通缉令遗物数据
+    // 通缉令内奇遇协议
+    CS_WANTED_ADVENTURE_REQ        = 21028; // 请求通缉令奇遇数据
+    SC_WANTED_ADVENTURE_RES        = 21029; // 返回通缉令奇遇数据
+    CS_WANTED_ADVENTURE_CHANGE_REQ = 21030; // 请求更改奇遇数据
+    SC_WANTED_ADVENTURE_CHANGE_RES = 21031; // 返回更改奇遇数据
+    // 通缉令商店协议
+    CS_WANTED_SHOP_REQ     = 21032; // 请求通缉令商店数据
+    SC_WANTED_SHOP_RES     = 21033; // 返回通缉令商店数据
+    CS_WANTED_SHOP_BUY_REQ = 21034; // 请求购买商品
+    SC_WANTED_SHOP_BUY_RES = 21035; // 返回购买商品
+    // 通缉令复活回血
+    CS_WANTED_REVIVE_REQ  = 21036; // 请求复活
+    SC_WANTED_REVIVE_RES  = 21037; // 返回复活
+    CS_WANTED_RECOVER_REQ = 21038; // 请求复活
+    SC_WANTED_RECOVER_RES = 21039; // 返回复活
+
+    CS_WANTED_BIONIC_GIVEUP_REQ = 21040; // 请求仿生品放弃
+    SC_WANTED_BIONIC_GIVEUP_RSP = 21041; // 返回仿生品放弃结果
+    // 效果数据
+    CS_WANTED_EFFECT_REQ = 21042; // 请求效果数据
+    SC_WANTED_EFFECT_RSP = 21043; // 返回效果数据
+    SC_WANTED_EFFECT_NTF = 21044; // 效果数据Ntf
+    // npc
+    //CS_WANTED_NPC_REQ = 21045; // 请求npc数据
+    //SC_WANTED_NPC_RSP = 21046; // 返回npc数据
+    SC_WANTED_NPC_NTF = 21047; // npc数据变化通知
+    CS_WANTED_NPC_INTERACT_REQ = 21048; // 请求与npc交互
+    SC_WANTED_NPC_INTERACT_RSP = 21049; // 返回与npc
+    SC_WANTED_AWARD_NTF = 21050; // 通缉令奖励
+
+    CS_WANTED_CREDIT_DATA       = 21051; // 请求通缉令周积分数据
+    SC_WANTED_CREDIT_DATA       = 21052; // 返回通缉令周积分数据
+    CS_WANTED_CREDIT_CLAIM      = 21053; // 请求领取通缉令周积分里程碑奖励
+    SC_WANTED_CREDIT_CLAIM      = 21054; // 返回通缉令周积分里程碑奖励领取结果
+    SC_WANTED_CREDIT_UPDATE_NTF = 21055; // 通缉令周积分变更通知
+    CS_WANTED_CREDIT_CLAIM_ALL  = 21056; // 请求一键领取所有周积分里程碑奖励
+    SC_WANTED_CREDIT_CLAIM_ALL  = 21057; // 返回一键领取周积分里程碑奖励结果
+    SC_WANTED_SHOP_NTF          = 21058; // 通缉令商店价格变更通知
+    CS_WANTED_AWARD_REFRESH_REQ = 21059; // 请求三选一奖励刷新
+    SC_WANTED_AWARD_REFRESH_RSP = 21060; // 返回三选一奖励刷新
+    CS_WANTED_AWARD_DATA_REQ    = 21061; // 请求奖励数据
+    SC_WANTED_AWARD_DATA_RSP    = 21062; // 返回奖励数据
+
+    // [21100,21150) 左闭右开，战令
+    CS_BATTLE_PASS_DATA  = 21100; //请求战令数据
+    SC_BATTLE_PASS_DATA  = 21101; //返回战令数据
+    CS_BATTLE_PASS_AWARD = 21102; //请求领取战令奖励
+    SC_BATTLE_PASS_AWARD = 21103; //领取战令结果
+    SC_BATTLE_PASS_NTF   = 21104; // 战令数据发生变化
+
+    // [21150,21200) 左闭右开，每日活跃任务
+    CS_DAILY_MISSION_QUERY             = 21150; // 请求每日活跃数据
+    SC_DAILY_MISSION_QUERY             = 21151; // 返回每日活跃数据
+    CS_DAILY_MISSION_ACTIVEPOINT_CLAIM = 21152; // 请求领取每日活跃任务目标活跃度
+    SC_DAILY_MISSION_ACTIVEPOINT_CLAIM = 21153; // 返回领取每日活跃任务目标活跃度
+    CS_DAILY_MISSION_REWARD_CLAIM      = 21154; // 请求领取每日活跃度奖励
+    SC_DAILY_MISSION_REWARD_CLAIM      = 21155; // 返回领取每日活跃度奖励
+    SC_DAILY_MISSION_NTF               = 21156; // 每日活跃数据更新通知
+
+    // [21200,21300) 左闭右开，区域进度管理
+    CS_REQ_REGION_PROGRESS     = 21200; // 请求区域进度
+    SC_RES_REGION_PROGRESS     = 21201; // 返回区域进度
+    CS_REQ_CLAIM_REWARD        = 21202; // 请求领取奖励
+    SC_RES_CLAIM_REWARD        = 21203; // 返回领取奖励
+    SC_UNLOCK_SUB_REGION_NTF   = 21204; // 子区域解锁通知
+    SC_SUB_REGION_UPDATE_NTF   = 21205; // 子区域进度更新通知
+    CS_REQ_UNLOCKED_WIND_ROADS = 21206; // 请求已解锁风路
+    SC_RES_UNLOCKED_WIND_ROADS = 21207; // 返回已解锁风路
+    SC_UNLOCK_WIND_ROAD_NTF    = 21208; // 风路解锁通知
+
+    // [21300,21400) 左闭右开，引导相关
+    CS_REQ_GUIDE_INFO   = 21300; // 请求引导信息
+    SC_RES_GUIDE_INFO   = 21301; // 返回引导信息
+    SC_UNLOCK_GUIDE_NTF = 21302; // 新增解锁引导通知
+    CS_REQ_READ_GUIDE   = 21303; // 请求阅读引导
+    SC_RES_READ_GUIDE   = 21304; // 返回阅读引导
+
+    // [21400,21500) 左闭右开，通用限次组
+    CS_LIMIT_GROUP_REQ = 21400; //请求限次组数据
+    SC_LIMIT_GROUP_RES = 21401; //返回限次组数据
+    SC_LIMIT_GROUP_NTF = 21402; //限次组数据变化通知
+    // [21500,21600) 左闭右开，巡逻怪
+    CS_PATROL_MONSTER_REQ = 21500; //请求巡逻怪数据
+    SC_PATROL_MONSTER_RES = 21501; //返回巡逻怪数据
+    SC_PATROL_MONSTER_NTF = 21502; //巡逻怪数据变化
+
+    // [21600,21700) 左闭右开，赛马玩法
+    CS_REQ_HORSE_TRACK_INFO         = 21600; //请求赛道信息
+    SC_RES_HORSE_TRACK_INFO         = 21601; //返回赛道信息
+    CS_REQ_UNLOCK_HORSE_TRACK       = 21602; //请求解锁赛道
+    SC_RES_UNLOCK_HORSE_TRACK       = 21603; //返回解锁赛道结果
+    CS_REQ_JOIN_HORSE_TRACK         = 21604; //请求加入赛道
+    SC_RES_JOIN_HORSE_TRACK         = 21605; //返回加入赛道结果
+    CS_REQ_HORSE_TRACK_LOADING_INFO = 21607; //请求当前赛道信息
+    SC_RES_HORSE_TRACK_LOADING_INFO = 21608; //返回当前赛道信息
+    CS_REQ_START_HORSE_RACE         = 21609; //请求开始
+    SC_RES_START_HORSE_RACE         = 21610; //返回开始
+    CS_REQ_SUBMIT_HORSE_RACE_RESULT = 21611; //请求提交赛道结果
+    SC_RES_SUBMIT_HORSE_RACE_RESULT = 21612; //返回提交赛道结果
+    CS_REQ_PAUSE_HORSE_RACE         = 21613; //请求暂停赛道
+    SC_RES_PAUSE_HORSE_RACE         = 21614; //返回暂停赛道结果
+    CS_REQ_UNPAUSE_HORSE_RACE       = 21615; //请求恢复赛道
+    SC_RES_UNPAUSE_HORSE_RACE       = 21616; //返回恢复赛道结果
+    SC_HORSE_TRACK_INFO_NTF         = 21617; //赛道信息变更通知
+    CS_REQ_REPORT_NPC_FINISH        = 21618; //上报NPC完赛
+    SC_RES_REPORT_NPC_FINISH        = 21619; //返回上报NPC完赛结果
+    CS_REQ_CLAIM_HORSE_RACE_REPLAY  = 21620; //请求重复领取奖励
+    SC_RES_CLAIM_HORSE_RACE_REPLAY  = 21621; //返回重复领取结果
+
+    // [21700,21800) 左闭右开，活动框架相关
+    CS_ACTIVITY_LIST_REQ   = 21700;
+    SC_ACTIVITY_LIST_RES   = 21701;
+    SC_ACTIVITY_LIST_NTF   = 21702;
+    CS_ACTIVITY_UNLOCK_REQ = 21703;
+    SC_ACTIVITY_UNLOCK_RES = 21704;
+
+    // [21800,21900) 左闭右开，设置系统相关
+    CS_REQ_SETTING     = 21800; // 请求设置系统相关
+    SC_RES_SETTING     = 21801; // 返回设置系统相关
+    CS_REQ_SET_SETTING = 21802; // 设置请求
+    SC_RES_SET_SETTING = 21803; // 设置响应
+
+    // [21900,22000) 左闭右开，配方合成
+    CS_COMPOSE_GET_RECIPES       = 21900; // 请求配方列表
+    SC_COMPOSE_GET_RECIPES       = 21901; // 返回配方列表
+    CS_COMPOSE_EXECUTE           = 21902; // 请求执行合成
+    SC_COMPOSE_EXECUTE           = 21903; // 返回合成结果
+    SC_COMPOSE_RECIPE_UNLOCK_NTF = 21904; // 配方解锁通知
+
+    // [22000,22100) 左闭右开，装备系统]
+    CS_EQUIPMENT_DATA           = 22000; // 请求装备信息
+    SC_EQUIPMENT_DATA           = 22001; // 返回装备信息
+    CS_EQUIPMENT_WEAR           = 22002; // 请求装备穿戴
+    SC_EQUIPMENT_WEAR           = 22003; // 返回装备穿戴结果
+    CS_EQUIPMENT_UNWEAR         = 22004; // 请求装备脱下
+    SC_EQUIPMENT_UNWEAR         = 22005; // 返回装备脱下结果
+    CS_EQUIPMENT_LOCK           = 22006; // 装备上锁
+    SC_EQUIPMENT_LOCK           = 22007; // 返回装备上锁结果
+    SC_EQUIPMENT_ADD_NTF        = 22008; // 添加装备
+    SC_EQUIPMENT_REMOVE_NTF     = 22009; // 移除装备
+    CS_EQUIPMENT_DECOMPOSE_REQ  = 22010; // 分解装备
+    SC_EQUIPMENT_DECOMPOSE_RSP  = 22011; // 返回分解装备
+    CS_EQUIPMENT_REFINE_REQ     = 22012; // 精炼装备
+    SC_EQUIPMENT_REFINE_RSP     = 22013; // 返回精炼装备结果
+    CS_EQUIPMENT_ENCHANT_REQ    = 22014; // 附魔装备
+    SC_EQUIPMENT_ENCHANT_RSP    = 22015; // 返回附魔装备结果
+    CS_EQUIPMENT_ENCHANT_CONFIRM_REQ = 22016; // 附魔确认
+    SC_EQUIPMENT_ENCHANT_CONFIRM_RSP = 22017; // 返回附魔确认结果
+
+    // [22100,22200) 左闭右开，深渊系统
+    CS_REQ_ABYSS_INFO   = 22100; // 请求深渊信息
+    SC_RES_ABYSS_INFO   = 22101; // 返回深渊信息
+    CS_REQ_ABYSS_ENTER  = 22102; // 请求进入深渊
+    SC_RES_ABYSS_ENTER  = 22103; // 返回进入深渊结果
+    CS_REQ_ABYSS_FINISH = 22104; // 请求完成深渊结算
+    SC_RES_ABYSS_FINISH = 22105; // 返回完成深渊结算结果
+    // SC_ABYSS_UPDATE_NTF = 22106; // 深渊信息更新通知
+    CS_REQ_ABYSS_PROGRESS_UPDATE = 22107; // 请求深渊进度更新
+    SC_RES_ABYSS_PROGRESS_UPDATE = 22108; // 返回深渊进度更新结果
+    CS_REQ_ABYSS_STAR_AWARD      = 22109; // 请求深渊星级奖励
+    SC_RES_ABYSS_STAR_AWARD      = 22110; // 返回深渊星级奖励结果
+    CS_REQ_ABYSS_ENTER_ALREADY   = 22111; // 客户端确认进入深渊
+    SC_RES_ABYSS_ENTER_ALREADY   = 22112; // 服务器确认进入深
+
+    // [22200,22300) 左闭右开，分解系统
+    CS_DECOMPOSE_MOTIVE = 22200; // 分解系统-专武分解请求
+    SC_DECOMPOSE_MOTIVE = 22201; // 分解系统-专武分解响应
+    CS_DECOMPOSE_ITEM   = 22202; // 分解系统-道具分解请求
+    SC_DECOMPOSE_ITEM   = 22203; // 分解系统-道具分解响应
+
+    // [22300,22400) 左闭右开，好感度相关
+    CS_REQ_AFFINITY_INFO        = 22300; // 请求好感度信息
+    SC_RES_AFFINITY_INFO        = 22301; // 返回好感度信息
+    SC_AFFINITY_INFO_UPDATE_NTF = 22302; // 好感度信息更新通知
+    SC_AFFINITY_UPDATE_NTF      = 22303; // 好感度升级, 经验增加通知
+    CS_REQ_AFFINITY_ASSISTANT   = 22304; // 请求设置助手
+    SC_RES_AFFINITY_ASSISTANT   = 22305; // 返回设置助手
+    CS_REQ_AFFINITY_GIFT        = 22306; // 请求送礼物
+    SC_RES_AFFINITY_GIFT        = 22307; // 返回送礼物结果
+    CS_REQ_AFFINITY_REWARD      = 22308; // 请求领取奖励
+    SC_RES_AFFINITY_REWARD      = 22309; // 返回领取奖励结果
+    CS_REQ_AFFINITY_EVENT       = 22310; // 请求触发好感度事件
+    SC_RES_AFFINITY_EVENT       = 22311; // 返回触发好感度事件结果
+    CS_REQ_AFFINITY_COUPLE_ACTION = 22312; // 请求双人动作触发每日首次表现
+    SC_RES_AFFINITY_COUPLE_ACTION = 22313; // 返回双人动作触发每日首次表现结果
+    CS_REQ_AFFINITY_ACCEPT_DATE_TASK = 22314; // 请求接取约会任务
+    SC_RES_AFFINITY_ACCEPT_DATE_TASK = 22315; // 返回接取约会任务结果
+    CS_REQ_AFFINITY_READ_STAGE = 22316; // 请求标记好感度阶段已读
+    SC_RES_AFFINITY_READ_STAGE = 22317; // 返回标记好感度阶段已读结果
+    CS_REQ_AFFINITY_READ_INTEL = 22318; // 请求标记情报已读
+    SC_RES_AFFINITY_READ_INTEL = 22319; // 返回标记情报已读结果
+    CS_REQ_AFFINITY_READ_VOICE = 22320; // 请求标记语音已读
+    SC_RES_AFFINITY_READ_VOICE = 22321; // 返回标记语音已读结果
+    CS_REQ_AFFINITY_READ_MEMOIR_PHOTO = 22322; // 请求标记回忆录照片已读
+    SC_RES_AFFINITY_READ_MEMOIR_PHOTO = 22323; // 返回标记回忆录照片已读结果
+
+    // [22400, 22500) 左闭右开， 新手引导
+    CS_ROOKIE_GUIDE_STEP_START_REQ = 22400;    // 新手引导步骤开始请求
+    SC_ROOKIE_GUIDE_STEP_START_RES = 22401;    // 新手引导步骤开始响应
+    CS_ROOKIE_GUIDE_STEP_COMPLETE_REQ = 22402; // 新手引导步骤完成请求
+    SC_ROOKIE_GUIDE_STEP_COMPLETE_RES = 22403; // 新手引导步骤完成响应
+    CS_ROOKIE_GUIDE_INFOS_REQ = 22404;         // 新手引导信息请求
+    SC_ROOKIE_GUIDE_INFOS_RES = 22405;         // 新手引导信息响应
+    SC_ROOKIE_GUIDE_INFO_CHANGE_NTF = 22406;   // 新手引导信息变化通知
+    SC_ROOKIE_GUIDE_INFOS_CLEAR_NTF = 22407;   // 新手引导信息清空通知
+
+    // [22500, 22600] 左闭右开，杂项小功能
+    CS_MINI_ITEM_EXCHANGE_REQ = 22500; //兑换道具请求
+    SC_MINI_ITEM_EXCHANGE_RSP = 22501; //兑换道具响应
+    CS_INTERACTSTATE_ALL_DATA_REQ = 22502; //请求所有交互状态数据
+    SC_INTERACTSTATE_ALL_DATA_RSP = 22503; //返回所有交互状态数据
+    CS_INTERACTSTATE_UPDATE_REQ = 22504; //更新交互状态请求
+    SC_INTERACTSTATE_UPDATE_RSP = 22505; //更新交互状态
+    CS_INTERACTSTATE_DEL_REQ = 22506; //删除交互状态请求
+    SC_INTERACTSTATE_DEL_RSP = 22507; //删除交互状态响应
+    CS_MINI_DIAMOND_POWER_EXCHANGE_REQ = 22508; //兑换钻石能量请求
+    SC_MINI_DIAMOND_POWER_EXCHANGE_RSP = 22509; //兑换钻石能量响应
+
+    // [22600, 22610) 左闭右开，通用奖励系统
+    CS_GET_REWARD = 22600; // 请求获取奖励
+    SC_GET_REWARD = 22601; // 响应获取奖励
+
+    // [22700, 22800] 左闭右开，老通缉令天赋树
+    CS_WANTED_TALENT_REQ = 22700; //请求通缉令天赋树数据
+    SC_WANTED_TALENT_RSP = 22701; //返回通缉令天赋树数据
+    CS_WANTED_TALENT_ACTIVE_REQ = 22702; //请求激活天赋树节点
+    SC_WANTED_TALENT_ACTIVE_RSP = 22703; //返回激活天赋树节点
+    SC_WANTED_TALENT_POINT_NTF = 22704; //通知天赋点改动
+    CS_WANTED_TALENT_RESET_REQ = 22705;//请求重置天赋树
+    SC_WANTED_TALENT_RESET_RSP = 22706;//返回重置天赋树
+
+    // [22800, 22900] 命座
+    CS_CONSTELLATION_QUERY_REQ = 22800; // 请求命座数据
+    SC_CONSTELLATION_QUERY_RSP = 22801; // 返回命座数据
+    CS_CONSTELLATION_ACTIVE_REQ = 22802; // 请求激活命座
+    SC_CONSTELLATION_ACTIVE_RSP = 22803; // 返回激活命座
+    
+    // [22900, 23000) 左闭右开，通缉令宝石
+    CS_WANTED_GEMS_REQ = 22900; //请求通缉令宝石数据
+    SC_WANTED_GEMS_RSP = 22901; //返回通缉令宝石数据
+    SC_WANTED_GEMS_NTF = 22902; //通缉令宝石通用获得通知
+    SC_WANTED_OBTAIN_GEMS_NTF = 22903; //通缉令获得宝石通知
+    SC_WANTED_GEM_EVOLVE_NTF = 22904; //通缉令宝石进阶通知
+    CS_WANTED_GEM_EVOLVE_REQ = 22905; //请求通缉令宝石进阶
+    SC_WANTED_GEM_EVOLVE_RSP = 22906; //返回通缉令宝石进阶结果
+    SC_WANTED_GEM_MERGE_NTF = 22907; //通缉令宝石合成通知
+    CS_WANTED_GEM_MERGE_REQ = 22908; //请求通缉令宝石合成
+    SC_WANTED_GEM_MERGE_RSP = 22909; //返回通缉令宝石合成结果
+    CS_WANTED_GEM_AUTO_EQUIP_REQ = 22910; //请求切换宝石自动装配开关
+    SC_WANTED_GEM_AUTO_EQUIP_RSP = 22911; //返回宝石自动装配开关切换结果
+
+    // [23000, 23100) 左闭右开，信鸽系统
+    CS_LETTER_ALL_REQ = 23000; // 请求信件数据
+    SC_LETTER_ALL_RSP = 23001; // 返回信件数据
+    SC_LETTER_RECV_NTF = 23002; // 收到新信件通知
+    CS_LETTER_READ_REQ = 23003; // 请求阅读信件
+    SC_LETTER_READ_RSP = 23004; // 返回阅读信件结果
+    CS_LETTER_REPLY_REQ = 23005; // 请求回复信件
+    SC_LETTER_REPLY_RSP = 23006; // 返回回复信件结果
+    CS_LETTER_GET_REWARD_REQ = 23007; // 请求信件奖励
+    SC_LETTER_GET_REWARD_RSP = 23008; // 返回信件奖励结果
+    CS_LETTER_MARK_PAGE_OPENED_REQ = 23009; // 请求标记信件页面已打开
+    SC_LETTER_MARK_PAGE_OPENED_RSP = 23010; // 返回标记信件页面已打开结果
+
+    // [23100, 23200) 左闭右开，新版通缉令(Hunt)
+    CS_HUNT_BOARD_QUERY_REQ     = 23100; // 请求打开告示板
+    SC_HUNT_BOARD_QUERY_RSP     = 23101; // 返回告示板数据
+    CS_HUNT_BOOK_QUERY_REQ      = 23102; // 请求侦探手册数据
+    SC_HUNT_BOOK_QUERY_RSP      = 23103; // 返回侦探手册数据
+    CS_HUNT_ACCEPT_REQ          = 23104; // 接取通缉令
+    SC_HUNT_ACCEPT_RSP          = 23105; // 接取通缉令响应
+    SC_HUNT_ACCEPT_NTF          = 23106; // 接取通缉令通知
+    CS_HUNT_ACTIVATE_REQ        = 23107; // 激活通缉令
+    SC_HUNT_ACTIVATE_RSP        = 23108; // 激活通缉令响应
+    CS_HUNT_GIVEUP_REQ          = 23109; // 放弃通缉令
+    SC_HUNT_GIVEUP_RSP          = 23110; // 放弃通缉令响应
+    CS_HUNT_BOARD_COLUMN_SPEEDUP_REQ    = 23111; // 加速刷新栏位
+    SC_HUNT_BOARD_COLUMN_SPEEDUP_RSP    = 23112; // 加速刷新栏位响应
+    CS_HUNT_UNLOCK_STAGE_REQ     = 23113; // 请求解锁阶段
+    SC_HUNT_UNLOCK_STAGE_RSP     = 23114; // 解锁阶段响应
+    SC_HUNT_BOARD_COLUMN_UPDATE_NTF = 23115; // 告示板栏位变更通知
+    SC_HUNT_ENTRY_UPDATE_NTF    = 23116; // 通缉令条目变更通知
+    SC_HUNT_NODE_UPDATE_NTF     = 23117; // 节点变更通知
+
+    // [23200,23300) 左闭右开，任务活动模块
+    CS_TASK_ACTIVITY_DATA_REQ   = 23200; // 任务活动数据请求
+    SC_TASK_ACTIVITY_DATA_RSP   = 23201; // 任务活动数据返回
+    CS_TASK_ACTIVITY_REWARD_REQ    = 23202; // 领取任务活动奖励请求
+    SC_TASK_ACTIVITY_REWARD_RSP    = 23203; // 领取任务活动奖励返回
+    CS_TASK_ACTIVITY_CLAIM_ALL_REQ = 23204; // 一键领取任务活动全部奖励请求
+    SC_TASK_ACTIVITY_CLAIM_ALL_RSP = 23205; // 一键领取任务活动全部奖励返回
+
+    // [23300, 23400) 左闭右开，临时角色(TmpCharacter)
+    CS_TMP_CHARACTER_LIST_REQ         = 23300; // 临时角色列表请求
+    SC_TMP_CHARACTER_LIST_RSP         = 23301; // 临时角色列表响应
+    SC_TMP_CHARACTER_ADD_NTF          = 23302; // 临时角色新增通知
+    SC_TMP_CHARACTER_DEL_NTF          = 23303; // 临时角色删除通知
+    SC_TMP_CHARACTER_ATTR_CHANGED_NTF = 23304; // 临时角色属性变更通知
+
+    // [23400, 23500) 左闭右开，情报中心
+    CS_INTEL_RISK_VALUE_REQ             = 23400; // 风险值数据请求
+    SC_INTEL_RISK_VALUE_RSP             = 23401; // 风险值数据响应
+    SC_INTEL_RISK_VALUE_NTF             = 23402; // 风险值变化通知
+    CS_FAVORITE_GAMEPLAY_FULL_REQ       = 23403; // 玩法收藏全量数据请求
+    SC_FAVORITE_GAMEPLAY_FULL_RSP       = 23404; // 玩法收藏全量数据响应
+    CS_FAVORITE_GAMEPLAY_CHANGE_REQ     = 23405; // 玩法收藏变更请求
+    SC_FAVORITE_GAMEPLAY_CHANGE_RSP     = 23406; // 玩法收藏变更响应
+    CS_INTEL_CENTER_INFO_REQ            = 23407; // 情报中心信息请求
+    SC_INTEL_CENTER_INFO_RSP            = 23408; // 情报中心信息响应
+    SC_INTEL_COIN_EARNED_NTF            = 23409; // 情报碎片累计量变化通知
+    CS_CLAIM_INTEL_INCOME_REQ           = 23410; // 领取情报建筑收益请求
+    SC_CLAIM_INTEL_INCOME_RSP           = 23411; // 领取情报建筑收益响应
+    CS_INTEL_UPGRADE_REQ                = 23412; // 情报中心主动升级请求
+    SC_INTEL_UPGRADE_RSP                = 23413; // 情报中心主动升级响应
+    SC_INTEL_TIMED_ITEM_OUTPUT_NTF      = 23414; // TimedItemOutput 触发通知
+
+    // [23500, 23600) 左闭右开，咖啡制作(Coffee)
+    CS_REQ_COFFEE_STAGE_INFO        = 23500; // 请求关卡信息
+    SC_RES_COFFEE_STAGE_INFO        = 23501; // 返回关卡信息
+    CS_REQ_COFFEE_START_STAGE       = 23502; // 开始关卡
+    SC_RES_COFFEE_START_STAGE       = 23503; // 开始关卡响应
+    CS_REQ_COFFEE_FINISH_STAGE      = 23504; // 完成关卡结算
+    SC_RES_COFFEE_FINISH_STAGE      = 23505; // 完成关卡结算响应
+    CS_REQ_COFFEE_CLAIM_REWARD      = 23506; // 领取重复奖励
+    SC_RES_COFFEE_CLAIM_REWARD      = 23507; // 领取重复奖励响应
+    CS_REQ_COFFEE_GET_ACTIVE_STAGE  = 23508; // 查询当前进行中的关卡
+    SC_RES_COFFEE_GET_ACTIVE_STAGE  = 23509; // 查询当前进行中的关卡响应
+    // [23600, 23700) 左闭右开，小丑牌(Balatro)
+    CS_BALATRO_START_REQ        = 23600; // 开始Run请求
+    SC_BALATRO_START_RSP        = 23601; // 开始Run响应
+    CS_BALATRO_BLIND_START_REQ  = 23602; // 开始盲注请求
+    SC_BALATRO_BLIND_START_RSP  = 23603; // 开始盲注响应
+    CS_BALATRO_BLIND_END_REQ    = 23604; // 结束盲注请求
+    SC_BALATRO_BLIND_END_RSP    = 23605; // 结束盲注响应
+    CS_BALATRO_SHOP_BUY_REQ     = 23606; // 购买商品请求
+    SC_BALATRO_SHOP_BUY_RSP     = 23607; // 购买商品响应
+    CS_BALATRO_SHOP_REFRESH_REQ = 23608; // 刷新商店请求
+    SC_BALATRO_SHOP_REFRESH_RSP = 23609; // 刷新商店响应
+    CS_BALATRO_USE_ITEM_REQ     = 23610; // 使用道具请求
+    SC_BALATRO_USE_ITEM_RSP     = 23611; // 使用道具响应
+    CS_BALATRO_QUIT_REQ         = 23612; // 手动退出请求
+    SC_BALATRO_QUIT_RSP         = 23613; // 手动退出响应
+    CS_BALATRO_END_REQ          = 23614; // 结算请求
+    SC_BALATRO_END_RSP          = 23615; // 结算响应
+    CS_BALATRO_SELL_ITEM_REQ    = 23616; // 卖出道具请求
+    SC_BALATRO_SELL_ITEM_RSP    = 23617; // 卖出道具响应
+    CS_BALATRO_SYNC_SNAPSHOT_REQ = 23618; // 同步客户端快照请求
+    SC_BALATRO_SYNC_SNAPSHOT_RSP = 23619; // 同步客户端快照响应
+    CS_BALATRO_QUERY_REQ             = 23620; // 查询对局状态请求
+    SC_BALATRO_QUERY_RSP             = 23621; // 查询对局状态响应
+    CS_BALATRO_HELL_CONTINUE_REQ     = 23622; // 噩梦模式继续请求
+    SC_BALATRO_HELL_CONTINUE_RSP     = 23623; // 噩梦模式继续响应
+
+    // [23700, 23710) 左闭右开，问卷(Wj)
+    CS_REQ_WJ_COMPLETION_QUERY = 23700; // 批量查询问卷完成情况
+    SC_RES_WJ_COMPLETION_QUERY = 23701; // 批量查询问卷完成情况响应
+
+    // [23800, 23900) 左闭右开，战斗校验(BattleVerify)
+    CS_BATTLE_LOG_REPORT = 23800; // 战斗日志上报
+    SC_BATTLE_LOG_REPORT = 23801; // 战斗日志上报回包
+    CS_BATTLE_VERIFY_SWITCH_QUERY_REQ = 23802; // 查询战斗校验上报总开关状态
+    SC_BATTLE_VERIFY_SWITCH_QUERY_RSP = 23803; // 查询战斗校验上报总开关状态回包
+    SC_BATTLE_VERIFY_SWITCH_NTF       = 23804; // 战斗校验上报总开关状态变更通知（服务端主动下发）
+
+    CS_CMD_MAX  = 49999; // cs命令字的最大值
+}

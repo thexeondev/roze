@@ -1,0 +1,159 @@
+syntax = "proto3";
+package msg;
+
+// ============================================================
+// 战斗校验 - 事件子消息
+// ============================================================
+
+message PBSkillCastEvent
+{
+    uint64 inst_id = 1;         // 角色实例唯一id
+    int32  skill_id = 2;        // 技能配置id
+    int32  skill_level = 3;     // 技能等级
+}
+
+message PBAddBuffEvent
+{
+    uint64 inst_id = 1;                     // 角色实例唯一id
+    uint32 buff_id = 2;                     // buff配置id
+    uint32 buff_level = 3;                  // buff等级
+    repeated uint32 expected_attr_types = 4; // 声称会改的属性Type
+}
+
+message PBAddAffixEvent
+{
+    uint64 inst_id = 1;         // 角色实例唯一id
+    int32  affix_id = 2;        // 词缀id
+    repeated int32  affix_atom_ids = 3;   // 词缀原子id列表（AffixSource权威主键）
+}
+
+message PBActivateAffixEvent
+{
+    uint64 inst_id = 1;         // 角色实例唯一id
+    int32  affix_id = 2;        // 词缀id
+    int32  affix_atom_id = 3;   // 词缀原子id
+    bool   trigger = 4;         // RNG交叉校验: 触发判定
+    bool   condition = 5;       // RNG交叉校验: 条件判定
+    bool   behavior = 6;        // RNG交叉校验: 行为判定
+}
+
+message PBPawnDeathEvent
+{
+    uint64 inst_id = 1;                 // 死亡实例id
+    uint64 killer_inst_id = 2;          // 击杀者实例id（advisory归因）
+    int32  cause_attack_info_id = 3;    // 致死攻击信息id
+}
+
+message PBAttackHitEvent
+{
+    uint64 inst_id = 1;                 // 攻击者实例id
+    int64  attack_uid = 2;              // 攻击唯一id（AttackCurrentUID）
+    int32  attack_info_id = 3;          // 攻击信息配置id
+    repeated uint64 target_inst_ids = 4; // 命中目标实例id列表
+}
+
+// 一个事件对单个角色造成的属性增量（一个 event 可能同时影响多个角色）
+// 复用 PBBattleVerifyAttrib（{attrib_type, value}）承载差值：value 语义为 after-before（可为负）
+message PBBattleVerifyCharacterAttribDelta
+{
+    uint64 inst_id = 1;                          // 受影响角色实例id
+    repeated PBBattleVerifyAttrib attrib_deltas = 2; // 该角色的属性差值列表（value = after-before）
+}
+
+// ============================================================
+// 战斗校验 - 事件容器
+// ============================================================
+
+message PBBattleEvent
+{
+    uint32 frame_id = 1;        // 帧序号
+    int64  ts_ms = 2;           // 绝对毫秒时间戳
+    int32  seq_in_frame = 3;    // 帧内序号
+    repeated PBBattleVerifyCharacterAttribDelta character_attrib_deltas = 4; // 事件前后各受影响角色的属性增量
+    oneof event_data {
+        PBSkillCastEvent      skill_cast = 10;
+        PBAddBuffEvent        add_buff = 11;
+        PBAddAffixEvent       add_affix = 12;
+        PBActivateAffixEvent  activate_affix = 13;
+        PBPawnDeathEvent      pawn_death = 14;
+        PBAttackHitEvent      attack_hit = 15;
+    }
+}
+
+// ============================================================
+// 战斗校验 - 状态快照
+// ============================================================
+
+message PBBattleVerifyAttrib
+{
+    int32 attrib_type = 1;
+    int64 value = 2;
+}
+
+message PBBattleVerifyCharacterState
+{
+    uint64 inst_id = 1;
+    repeated PBBattleVerifyAttrib attrib_data = 2;
+}
+
+message PBBattleState
+{
+    uint32 frame_id = 1;        // 帧序号
+    int64  ts_ms = 2;           // 绝对毫秒时间戳
+    int32  seq_in_frame = 3;    // 帧内序号
+    repeated PBBattleVerifyCharacterState characters = 4; // 玩家队伍角色属性状态
+    repeated PBBattleVerifyCharacterState monsters = 5;   // 怪物属性状态（仅落库存档，不进在线校验）
+}
+
+// ============================================================
+// 战斗校验 - 统一上报/回包协议
+// ============================================================
+
+// @desc 战斗日志上报
+// @cmd CS_BATTLE_LOG_REPORT
+message CS_Battle_Log_Report
+{
+    uint64 battle_uid = 1;          // 战斗唯一ID
+    uint32 segment_id = 2;         // 递增段号（1-based，0无效）
+    uint32 start_frame = 3;        // 本段最小帧
+    uint32 end_frame = 4;          // 本段最大帧
+    repeated PBBattleEvent events = 5;  // 战斗事件
+    PBBattleState state = 6;       // 状态快照
+}
+
+// @desc 战斗日志上报回包
+// @cmd SC_BATTLE_LOG_REPORT
+message SC_Battle_Log_Report
+{
+    int32  ret = 1;                 // 结果
+    uint64 battle_uid = 2;          // 战斗唯一ID
+    uint32 segment_id = 3;         // 确认收到的段号
+}
+
+// ============================================================
+// 战斗校验 - 上报总开关（下发/查询）
+//   服务端可通过 GM 关闭整条战斗日志上报管线。关闭后：
+//     · 客户端仍发 CS_Battle_Log_Report 时，回包 ret=ENM_TEXT_BATTLE_VERIFY_REPORT_DISABLED（不再重发）
+//     · 服务端通过 SC_Battle_Verify_Switch_Ntf 主动下发开关状态，客户端据此停止上报
+//     · 客户端也可用 CS_Battle_Verify_Switch_Query_Req 主动拉取当前状态（如登录/重连后）
+// ============================================================
+
+// @desc 查询战斗校验上报总开关状态
+// @cmd CS_BATTLE_VERIFY_SWITCH_QUERY_REQ
+message CS_Battle_Verify_Switch_Query_Req
+{
+}
+
+// @desc 查询战斗校验上报总开关状态回包
+// @cmd SC_BATTLE_VERIFY_SWITCH_QUERY_RSP
+message SC_Battle_Verify_Switch_Query_Rsp
+{
+    bool report_enabled = 1;        // true=服务端正常接收战斗日志上报；false=已关闭，客户端应停止上报
+}
+
+// @desc 战斗校验上报总开关状态变更通知（服务端主动下发：GM 切换时向在线玩家广播、总开关关闭时入战再补发一次）
+// @cmd SC_BATTLE_VERIFY_SWITCH_NTF
+message SC_Battle_Verify_Switch_Ntf
+{
+    bool report_enabled = 1;        // true=服务端正常接收战斗日志上报；false=已关闭，客户端应停止上报
+}

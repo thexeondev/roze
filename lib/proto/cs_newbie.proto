@@ -1,0 +1,72 @@
+syntax = "proto3";
+package msg;
+
+// @desc 前期历程阶段信息
+message NewbieStageInfo
+{
+    uint32 stage_id = 1;                      // 前期历程阶段ID
+    bool is_unlocked = 2;                       // 是否已解锁
+    bool is_reward = 3;                       // 是否已领取奖励
+}
+
+// @desc 前期历程信息
+message NewbieInfo
+{
+    uint32 newbie_id = 1;                      // 前期历程ID
+    uint64 progress = 2;                       // 事件进度
+    bool is_finish = 3;                       // 是否已完成
+    bool is_reward = 4;                        // 是否已领取奖励
+}
+
+// @desc 客户端请求：查询玩家前期历程状态
+// @cmd CS_NEWBIE_GET_DATA_REQUEST
+message CS_Newbie_Get_Data_Request
+{
+}
+
+// @desc 服务器响应：返回玩家前期历程状态
+// @cmd SC_NEWBIE_GET_DATA_RESPONSE
+message SC_Newbie_Get_Data_Response
+{
+    int32 result = 1;                           // 0=成功，其他值表示错误
+    repeated NewbieStageInfo stages = 2;       // 前期历程阶段数据列表
+    repeated NewbieInfo newbies = 3;           // 前期历程数据列表
+}
+
+// @desc 服务器通知：前期历程进度更新通知，只更新有变化的事件
+// @cmd SC_NEWBIE_PROGRESS_UPDATE_NTF
+message SC_Newbie_Progress_Update_Ntf
+{
+    repeated NewbieInfo newbies = 1;       // 更新的前期历程数据列表
+    repeated NewbieStageInfo stages = 2;       // 更新的前期历程阶段数据列表
+}
+
+// @desc 客户端请求：领取阶段奖励
+// @cmd CS_NEWBIE_CLAIM_STAGE_REWARD_REQUEST
+message CS_Newbie_Claim_Stage_Reward_Request
+{
+    uint32 stage_id = 1;                      // 前期历程阶段ID
+}
+
+// @desc 服务器响应：领取阶段奖励
+// @cmd SC_NEWBIE_CLAIM_STAGE_REWARD_RESPONSE
+message SC_Newbie_Claim_Stage_Reward_Response
+{
+    int32 result = 1;                           // 0=成功，其他值表示错误
+    uint32 stage_id = 2;                      // 前期历程阶段ID
+}
+
+// @desc 客户端请求：领取事件奖励
+// @cmd CS_NEWBIE_CLAIM_NEWBIE_REWARD_REQUEST
+message CS_Newbie_Claim_Newbie_Reward_Request
+{
+    uint32 newbie_id = 1;                      // 前期历程ID
+}
+
+// @desc 服务器响应：领取事件奖励
+// @cmd SC_NEWBIE_CLAIM_NEWBIE_REWARD_RESPONSE
+message SC_Newbie_Claim_Newbie_Reward_Response
+{
+    int32 result = 1;                           // 0=成功，其他值表示错误
+    uint32 newbie_id = 2;                      // 前期历程ID
+}

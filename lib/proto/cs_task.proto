@@ -1,0 +1,143 @@
+syntax = "proto3";
+package msg;
+import "comm_data.proto";
+import "comm_macro.proto";
+
+// @desc 拉取任务数据
+// @cmd CS_REQ_TASK_LIST
+message CS_Task_List
+{
+}
+
+// @desc 拉取任务数据 响应
+// @cmd SC_RES_TASK_LIST
+message SC_Task_List
+{
+    int32  result = 1;
+    // TaskData processing_tasks = 2; // 进行中的任务
+    // repeated uint32 finished_tasks = 3;     // 已完成的任务（ID）
+    PlayerTaskData task_data = 4; // 玩家任务信息
+}
+
+// @desc 任务进度更新推送
+// @cmd SC_NTF_TASK_PROGRESS_UPDATE
+message SC_Task_ProgressUpdate_Ntf
+{
+    TaskData updated_data = 1;
+    EnmTaskActionUpdateType updateType = 2;       // 任务更新类型
+}
+
+// @desc 任务action进度推进
+// @cmd CS_TASK_ACTION_UPDATE
+message CS_Task_ActionUpdate
+{
+    uint64 action_id = 1;
+    uint32 task_type = 2;   // 对应任务类型
+    uint32 progress = 3;    // action当前进度（是否型action完成填1）
+}
+
+// @desc 任务action进度推进 响应
+// @cmd SC_TASK_ACTION_UPDATE
+message SC_Task_ActionUpdate
+{
+    int32 result = 1;
+    uint64 action_id = 2;
+    uint32 task_type = 3;   // 对应任务类型
+    uint32 progress = 4;    // action当前进度（是否型action完成填1）
+    uint32 max_progress = 5;    // 最大进度值（非进度型填充1）
+}
+
+// @desc 激活任务
+// @cmd CS_TASK_ACTIVATE_REQ
+message CS_Task_Activate_Req
+{
+    uint32 task_id = 1;
+    uint32 task_type = 2;
+}
+
+// @desc 激活任务 响应
+// @cmd SC_TASK_ACTIVATE_RSP
+message SC_Task_Activate_Rsp
+{
+    int32  result = 1;
+    uint32 task_id = 2;
+    uint32 task_type = 3;
+}
+
+// @desc 重置任务
+// @cmd CS_TASK_RESET_REQ
+message CS_Task_Reset_Req
+{
+    repeated TaskIdType tasks = 1;
+}
+
+message TaskResetResult
+{
+    int32      result = 1;
+    TaskIdType task   = 2;
+}
+
+// @desc 重置任务 响应
+// @cmd SC_TASK_RESET_RSP
+message SC_Task_Reset_Rsp
+{
+    int32                    result  = 1;
+    repeated TaskResetResult results = 2;
+}
+
+//********************************** CBT2 新增任务接取 *************************************
+
+// @desc 接取任务 请求
+// @cmd CS_TASK_ACCEPT_REQ
+message CS_Task_Accept_Req
+{
+    uint32 task_id = 1;
+    uint32 task_type = 2;
+}
+
+// @desc 接取任务 响应
+// @cmd SC_TASK_ACCEPT_RSP
+message SC_Task_Accept_Rsp
+{
+    int32  result = 1;
+    uint32 task_id = 2;
+    uint32 task_type = 3;
+}
+
+// @desc 待接取任务数据 请求
+// @cmd CS_TASK_ACCEPT_INFO_REQ
+message CS_Task_Accept_Info_Req
+{
+}
+
+// @desc 待接取任务数据 响应
+// @cmd SC_TASK_ACCEPT_INFO_RSP
+message SC_Task_Accept_Info_Rsp
+{
+    int32 result = 1;
+    repeated TaskAcceptInfo task_accept_infos = 2;
+}
+
+// @desc 待接取任务数据变更推送（增量NTF）
+// @cmd SC_TASK_ACCEPT_INFO_NTF
+message SC_Task_Accept_Info_Ntf
+{
+    ETaskAcceptInfoNtfType type            = 1;
+    repeated TaskAcceptInfo task_accept_infos = 2; // type=Unlock/CondUpdate 时填，按 task_id 合并
+    repeated TaskIdType     removed_task_infos = 3; // type=Remove/AcceptSuccess 时填
+}
+
+// @desc 更新待接取任务的条件完成 请求
+// @cmd CS_TASK_ACCEPT_COND_UPDATE_REQ
+message CS_Task_Accept_Cond_Update_Req
+{
+    uint32 cond_id = 1; // 已完成的接取条件ID
+}
+
+// @desc 更新待接取任务的条件完成 响应
+// @cmd SC_TASK_ACCEPT_COND_UPDATE_RSP
+message SC_Task_Accept_Cond_Update_Rsp
+{
+    int32  result  = 1;
+    uint32 cond_id = 2; // 回显请求中的 cond_id，便于客户端对应
+}

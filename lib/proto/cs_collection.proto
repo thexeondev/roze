@@ -1,0 +1,87 @@
+syntax = "proto3";
+package msg;
+
+import "comm_data.proto";
+
+// @desc 采集物状态
+enum EnmCollectionStatus
+{
+    ECS_LOCK = 0; //未解锁
+    ECS_CAN_COLLECT = 1; //可采集
+    ECS_COLLECTED = 2; //已采集
+    ECS_DESTROYED = 3; //已销毁
+};
+
+// @desc 采集物来源类型
+enum EnmCollectionFromType
+{
+    ECOLLECT_FROM_GM         = 0; // gm命令
+    ECOLLECT_FROM_TABLE      = 1; //策划配置分布表
+    ECOLLECT_FROM_COLLECTION = 2; //从其他采集物产生
+    ECOLLECT_FROM_BATTLE     = 3; //战斗产生
+    ECOLLECT_FROM_TASK       = 4; //任务产生
+};
+
+// @desc 采集物数据
+message OneCollectionData // @gencstruct
+{
+    uint64 uniq_id = 1;//唯一id
+    uint32 cfg_id = 2; //配置id
+    EnmCollectionStatus status = 3;//采集物状态
+    uint32 status_time = 4; //状态改变的时间
+    uint64 block_id = 5; //所在区块id
+    Vector3Int location = 6; // 具体坐标
+    Rotator rotation = 7; //旋转表示朝向
+    EnmCollectionFromType from_type = 8; //产生途径类型
+    uint64 from_id = 9;//产生途径ID
+	Vector3Int from_location = 10; // 产生途径坐标(如果有的话)
+}
+
+// @desc 采集列表
+// @cmd  CS_COLLECTION_GET_LIST
+message CS_Collection_Get_List 
+{
+    uint64 block_id = 1; //地图区块id
+}
+
+// @desc 采集列表
+// @cmd  SC_COLLECTION_GET_LIST 
+message SC_Collection_Get_List 
+{    
+    int32 result = 1;
+    repeated OneCollectionData item_list = 2; //列表
+}
+
+enum ENU_COLLECTION_OP
+{
+    EN_COLLECTION_OP_MIN = 0;
+    EN_COLLECTION_OP_COLLECT = 1; //领取奖励
+    EN_COLLECTION_OP_DESTROY = 2; //销毁
+    EN_COLLECTION_OP_MAX = 3;
+}
+
+// @desc 操作采集点
+// @cmd  CS_COLLECTION_OPERATE 
+message CS_Collection_Operate
+{
+   uint64 uniq_id = 1; 
+   //ECOLLECTION_TYPE type = 2; 
+   ENU_COLLECTION_OP op = 3;
+   uint32  param_place_hold = 4;
+}
+
+// @desc 操作列表
+// @cmd  SC_COLLECTION_OPERATE 
+message SC_Collection_Operate
+{
+   int32 result = 1;
+   OneCollectionData collection_item  = 2;
+}
+
+// @desc 通知采集点变化
+// @cmd  SC_COLLECTION_DATA_NTF 
+message SC_Collection_Data_Ntf
+{
+    repeated uint64 delete_uid = 1;//需要删除的采集物
+    repeated OneCollectionData ntf_list = 2;
+}

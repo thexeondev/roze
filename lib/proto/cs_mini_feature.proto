@@ -1,0 +1,97 @@
+// 一些小功能 杂项的 不值当搞module的 可以集中在这里
+syntax = "proto3";
+package msg;
+
+// --------------------------------------------------------道具兑换--------------------------------------------------
+// @desc 请求进行道具兑换
+// @cmd  CS_MINI_ITEM_EXCHANGE_REQ
+message CS_Mini_Item_Exchange_Req
+{
+    uint32 src_item_id = 1; //源道具A(想消耗的道具)
+    uint32 des_item_id = 2; //目标道具B(想通过兑换获得的道具)
+    uint32 des_item_count = 3; //目标道具B的数量
+}
+
+// @desc 回应道具兑换
+// @cmd  SC_MINI_ITEM_EXCHANGE_RSP
+message SC_Mini_Item_Exchange_Rsp
+{
+    int32 result = 1;          // 结果
+    uint32 src_item_id = 2; //源道具A(消耗的道具)
+    uint32 src_item_count = 3; //源道具A(消耗的道具数量)
+    uint32 des_item_id = 4; //目标道具B(通过兑换获得的道具)
+    uint32 des_item_count = 5; //目标道具B的数量
+}
+// --------------------------------------------------------道具兑换--------------------------------------------------
+
+// --------------------------------------------------------机关互动状态--------------------------------------------------
+message InteractStateData{
+    uint32 type = 1;
+    uint64 inst_id = 2;
+    uint32 state = 3;
+}
+
+// @desc 请求所有交互状态数据
+// @cmd  CS_INTERACTSTATE_ALL_DATA_REQ
+message CS_InteractState_All_Data_REQ
+{
+}
+
+// @desc 返回所有交互状态数据
+// @cmd  SC_INTERACTSTATE_ALL_DATA_RSP
+message SC_InteractState_All_Data_RSP
+{
+    repeated InteractStateData interact_states = 1;
+}
+
+// @desc 更新交互状态请求
+// @cmd  CS_INTERACTSTATE_UPDATE_REQ
+message CS_InteractState_Update_REQ
+{
+    InteractStateData interact_state = 1;
+}
+
+// @desc 更新交互状态响应
+// @cmd  SC_INTERACTSTATE_UPDATE_RSP
+message SC_InteractState_Update_RSP
+{
+    int32 result = 1;          // 结果
+    InteractStateData interact_state = 2;
+}
+
+// @desc 删除交互状态请求
+// @cmd  CS_INTERACTSTATE_DEL_REQ
+message CS_InteractState_Del_REQ
+{
+    uint32 type = 1;
+    uint64 inst_id = 2;
+}
+
+// @desc 删除交互状态响应
+// @cmd  SC_INTERACTSTATE_DEL_RSP
+message SC_InteractState_Del_RSP
+{
+    int32 result = 1;          // 结果
+    uint32 type = 2;
+    uint64 inst_id = 3;
+}
+
+// --------------------------------------------------------机关互动状态--------------------------------------------------
+
+
+// --------------------------------------------------------钻石体力兑换--------------------------------------------------
+// @desc 请求进行钻石体力兑换
+// @cmd  CS_MINI_DIAMOND_POWER_EXCHANGE_REQ
+message CS_Mini_Diamond_Power_Exchange_Req
+{
+    uint32 exchange_id = 1; //兑换配置ID
+}
+
+// @desc 回应钻石体力兑换
+// @cmd  SC_MINI_DIAMOND_POWER_EXCHANGE_RSP
+message SC_Mini_Diamond_Power_Exchange_Rsp
+{
+    int32 result = 1;          // 结果
+    uint32 exchange_id = 2; //兑换配置ID
+}
+// --------------------------------------------------------钻石体力兑换--------------------------------------------------

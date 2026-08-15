@@ -1,0 +1,99 @@
+syntax = "proto3";
+package msg;
+
+import "comm_macro.proto";
+import "comm_data.proto";
+
+
+message LetterData
+{
+    uint32 id = 1; // 信件ID
+    EnmLetterState state = 2; // 信件状态
+    uint32 recv_time = 3; // 收到时间
+    uint32 read_time = 4; // 阅读时间
+    uint32 reply_time = 5; // 回复时间
+    uint32 option_id = 6; // 选项ID
+    repeated ItemIdCount commit_items = 7; //好感度信件提交道具记录
+    bool is_rewarded = 8; // 是否已领取奖励
+}
+
+// @desc 请求信件数据
+// @cmd CS_LETTER_ALL_REQ
+message CS_Letter_All_Req
+{
+}
+
+// @desc 获取信件数据响应
+// @cmd SC_LETTER_ALL_RSP
+message SC_Letter_All_Rsp
+{
+    int32 result = 1; // 结果
+    repeated LetterData letter_datas = 2; // 信件数据列表
+    bool has_opened_page = 3; // 客户端是否首次打开过信件页面
+}
+
+// @desc 收到新信件通知
+// @cmd SC_LETTER_RECV_NTF
+message SC_Letter_Recv_Ntf
+{
+    LetterData letter_data = 1; // 新信件数据
+}
+
+// @desc 请求阅读信件
+// @cmd CS_LETTER_READ_REQ
+message CS_Letter_Read_Req
+{    uint32 letter_id = 1; // 信件ID
+}
+
+// @desc 阅读信件响应
+// @cmd SC_LETTER_READ_RSP
+message SC_Letter_Read_Rsp
+{    
+    int32 result = 1; // 结果
+    uint32 letter_id = 2; // 信件ID
+}
+
+// @desc 请求回复信件
+// @cmd CS_LETTER_REPLY_REQ
+message CS_Letter_Reply_Req
+{
+    uint32 letter_id = 1; // 信件ID
+    uint32 option_id = 2; // 选项ID
+    repeated ItemIdCount commit_items = 3; //好感度信件提交道具列表
+}
+
+// @desc 回复信件响应
+// @cmd SC_LETTER_REPLY_RSP
+message SC_Letter_Reply_Rsp
+{
+    int32 result = 1; // 结果
+    uint32 letter_id = 2; // 信件ID
+    LetterData letter_data = 3; // 信件数据
+}
+
+// @desc 请求信件奖励
+// @cmd CS_LETTER_GET_REWARD_REQ
+message CS_Letter_Get_Reward_Req
+{    uint32 letter_id = 1; // 信件ID
+}
+
+// @desc 领取信件奖励响应
+// @cmd SC_LETTER_GET_REWARD_RSP
+message SC_Letter_Get_Reward_Rsp
+{
+    int32 result = 1; // 结果
+    uint32 letter_id = 2; // 信件ID
+}
+
+// @desc 标记信件页面已打开
+// @cmd CS_LETTER_MARK_PAGE_OPENED_REQ
+message CS_Letter_Mark_Page_Opened_Req
+{
+}
+
+// @desc 标记信件页面已打开响应
+// @cmd SC_LETTER_MARK_PAGE_OPENED_RSP
+message SC_Letter_Mark_Page_Opened_Rsp
+{
+    int32 result = 1; // 结果
+}

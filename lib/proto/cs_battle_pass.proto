@@ -1,0 +1,52 @@
+syntax = "proto3";
+package msg;
+
+import "comm_data.proto";
+
+// @desc 单个战令数据
+message CmdOneBattelPassData
+{
+    uint32 id = 1;//战令ID
+    uint32 level = 2;//等级
+    uint32 exp = 3;//经验
+    uint32 award_lv = 4;//已经领取的等级奖励
+}
+
+// @desc 请求战令数据
+// @cmd CS_BATTLE_PASS_DATA
+message CS_Battle_Pass_Data
+{
+    repeated uint32 battle_pass_id = 1;
+}
+
+// @desc 返回战令数据
+// @cmd SC_BATTLE_PASS_DATA
+message SC_Battle_Pass_Data
+{
+    int32 result = 1;// 有错误的就发错误码 但正确的 还是要填充到下面的数据
+    repeated CmdOneBattelPassData datas = 2;// 战令数据
+}
+
+// @desc 请求战令领奖
+// @cmd CS_BATTLE_PASS_AWARD
+message CS_Battle_Pass_Award
+{
+    uint32 id = 1;//战令ID
+}
+
+// @desc 返回战令领奖
+// @cmd SC_BATTLE_PASS_AWARD
+message SC_Battle_Pass_Award
+{
+    int32 result = 1;
+    uint32 id = 2;//战令ID
+    uint32 level = 3;//等级
+    repeated CmdItem items = 4;//奖励列表
+}
+
+// @desc 战令数据变化
+// @cmd SC_BATTLE_PASS_NTF
+message SC_Battle_Pass_Ntf
+{
+    CmdOneBattelPassData data = 1;//战令数据
+}

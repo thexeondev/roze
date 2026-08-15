@@ -1,0 +1,40 @@
+syntax = "proto3";
+package msg;
+
+import "comm_macro.proto";
+
+// @desc 引导信息
+message GuideInfo
+{
+    uint32 guide_id = 1; // 引导id
+    EnmGuideState state = 2; // 状态
+}
+
+// @desc 请求引导信息
+// @cmd CS_REQ_GUIDE_INFO
+message CS_Req_Guide_Info
+{
+}
+
+// @desc 响应引导信息
+// @cmd SC_RES_GUIDE_INFO
+message SC_Res_Guide_Info
+{
+    int32 result = 1; // 结果
+    repeated GuideInfo guide_list = 2;  // 引导列表
+}
+
+// @desc 请求阅读引导
+// @cmd CS_REQ_READ_GUIDE
+message CS_Req_Read_Guide
+{
+    repeated uint32 guide_id = 1; // 引导id
+}
+
+// @desc 响应阅读引导
+// @cmd SC_RES_READ_GUIDE
+message SC_Res_Read_Guide
+{
+    int32 result = 1; // 结果
+    repeated GuideInfo guide_info = 2; // 引导信息
+}

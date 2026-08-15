@@ -1,0 +1,48 @@
+syntax = "proto3";
+import "comm_data.proto";
+package msg;
+
+message GachaPoolInfo {
+    uint32 ret                     = 1;  // 卡池的结果 0是正常
+    uint32 pool_id                 = 2;  // 卡池ID
+    uint32 activity_id             = 3;  // 对应活动id
+    uint32 currency_id             = 4;  // 货币id
+    uint32 single_cost             = 5;  // 单抽消耗
+    uint32 mult_cost               = 6;  // 十抽消耗
+    uint64 start_time              = 7;  // 开启时间
+    uint64 end_time                = 8;  // 结束时间
+    uint32 daily_draw_limit        = 9;  // 单日抽取上限
+    uint32 ssr_trigger_left_draw   = 10; // 五星小保底还需抽数
+    uint32 ssrup_trigger_left_draw = 11; // 五星大保底还需抽数
+}
+
+// @desc 请求抽卡
+// @cmd CS_Do_Gacha_Req
+message CS_Do_Gacha {
+    uint32 pool_id = 1; // 卡池ID
+    bool   is_mult = 2; // 是否是十连抽
+    uint64 action_id = 3; // 行为ID,埋点使用
+}
+
+// @desc 抽卡结果
+// @cmd SC_Gacha_Result
+message SC_Do_Gacha_Result {
+    int32                  result    = 1; // 结果
+    ItemIdCount            cost      = 2; // 抽卡实际消耗
+    repeated GachaPoolInfo pool_info = 3; // 卡池信息
+}
+
+// @desc 获取玩家卡池信息
+// @cmd CS_Get_Pool_Info_Req
+message CS_Get_Pool_Info {
+    repeated uint32 pool_id = 1; // 卡池ID
+}
+
+// @desc 获取玩家卡池信息
+// @cmd SC_Get_Pool_Info_Ack
+message SC_Get_Pool_Info {
+    int32                  result         = 1; // 结果
+    repeated GachaPoolInfo pool_info      = 2; // 卡池信息
+    bool                   is_first_gacha = 3; // 是否第一次单抽
+    bool                   is_first_mult  = 4; // 是否第一次十连抽
+}

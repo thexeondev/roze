@@ -1,0 +1,32 @@
+syntax = "proto3";
+package msg;
+
+// @desc 怪物产生途径
+enum EnmMonsterFromType
+{
+    EMONSTER_FROM_INVALID = 0; // 无效
+    EMONSTER_FROM_TABLE = 1; //策划配置分布表
+    EMONSTER_FROM_TASK = 2; //任务产生
+};
+
+// @desc 请求巡逻怪数据
+// @cmd CS_PATROL_MONSTER_REQ
+message CS_Patrol_Monster_Req
+{
+}
+
+// @desc 返回巡逻怪数据
+// @cmd SC_PATROL_MONSTER_RES
+message SC_Patrol_Monster_Res
+{
+    int32 result = 1;
+    repeated uint32 cd_monsters = 2; // 冷却中的怪物ID列表
+}
+
+// @desc 巡逻怪数据变化通知
+// @cmd SC_PATROL_MONSTER_NTF
+message SC_Patrol_Monster_Ntf
+{
+    uint32 monster_id = 1;
+    bool cd_is_ok = 2; // 是否冷却完毕
+}

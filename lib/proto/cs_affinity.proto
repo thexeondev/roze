@@ -1,0 +1,232 @@
+syntax = "proto3";
+package msg;
+
+import "comm_data.proto";
+import "comm_macro.proto";
+
+// @desc 好感度红点数据（记录已读状态，供客户端计算红点）
+message AffinityRedPointInfo
+{
+    uint32 read_stage = 1; // 已阅读的阶段
+    repeated uint32 read_intel_ids = 2; // 已读情报id
+    repeated uint32 read_voice_ids = 3; // 已读语音id
+    repeated uint32 completed_couple_action_ids = 4; // 已完成双人动作id
+    repeated uint32 read_memoir_photos = 5; // 已读回忆录照片id
+}
+
+message AffinityInfo
+{
+    uint64 char_uid = 1; // 角色唯一id
+    uint32 level = 2; // 好感度等级
+    uint32 exp = 3; // 好感度经验值
+    uint32 assistant_pos = 4; // 助手点位
+    uint32 remaining_day_gift_cnt = 5; // 剩余礼物次数
+    uint32 remaining_extra_day_gift_cnt = 6; // 额外剩余礼物次数
+    uint32 claimed_reward_level = 7; // 已领取奖励最高等级
+    uint32 total_companion_days = 8; // 累计陪伴天数
+    uint32 total_gift_count = 9; // 累计送出礼物个数
+    repeated uint32 unlocked_memoir_photos = 10; // 已解锁回忆录照片id
+    repeated uint32 completed_date_task_ids = 11; // 已完成约会任务id
+    AffinityRedPointInfo red_point_info = 12; // 红点数据
+}
+
+// @desc 好感度信息
+// @cmd CS_REQ_AFFINITY_INFO
+message CS_Req_Affinity_Info
+{
+}
+
+// @desc 好感度信息
+// @cmd SC_RES_AFFINITY_INFO
+message SC_Res_Affinity_Info
+{
+    int32 result = 1; // 结果
+    repeated AffinityInfo affinity_list = 2;  // 好感度列表
+    uint32 total_remaining_day_gift_cnt = 3; // 今日剩余礼物次数(不包含额外次数)
+}
+
+// @desc 主动推送好感度信息，比如跨天之后
+// @cmd SC_AFFINITY_INFO_UPDATE_NTF
+message SC_Affinity_Info_Update_Ntf
+{
+    repeated AffinityInfo affinity_list = 1;  // 好感度列表
+    uint32 total_remaining_day_gift_cnt = 2; // 今日剩余礼物次数(不包含额外次数)
+}
+
+// @desc 完成各种事件的时候触发 好感度升级, 经验增加
+// @cmd SC_AFFINITY_UPDATE_NTF
+message SC_Affinity_Update_Ntf
+{
+    repeated AffinityInfo affinity_list = 1; // 好感度列表
+    EnmAffinityUpdateType update_type = 2; // 更新类型
+    uint32 team_delta_exp = 3; // 好感度经验值增量
+}
+
+// @desc 设置助手
+// @cmd CS_REQ_AFFINITY_ASSISTANT
+message CS_Req_Affinity_Assistant
+{
+    uint64 char_uid = 1; // 角色唯一id
+    uint32 assistant_pos = 2; // 助手点位, 0表示取消助手
+}
+
+// @desc 设置助手 响应
+// @cmd SC_RES_AFFINITY_ASSISTANT
+message SC_Res_Affinity_Assistant
+{
+    int32 result = 1; // 结果
+    repeated AffinityInfo affinity_list = 2; // 好感度列表,只填充uid和pos
+}
+
+// @desc 送礼物
+// @cmd CS_REQ_AFFINITY_GIFT
+message CS_Req_Affinity_Gift
+{
+    uint64 char_uid = 1; // 角色唯一id
+    repeated ItemIdCount items = 2; // 礼物道具id
+}
+
+// @desc 送礼物 响应
+// @cmd SC_RES_AFFINITY_GIFT
+message SC_Res_Affinity_Gift
+{
+    int32 result = 1; // 结果
+    AffinityInfo affinity_info = 2; // 好感度信息
+    uint32 total_remaining_day_gift_cnt = 3; // 今日剩余礼物次数(不包含额外次数)
+    repeated ItemIdCount items = 4; // 回礼道具
+}
+
+// @desc 领取奖励
+// @cmd CS_REQ_AFFINITY_REWARD
+message CS_Req_Affinity_Reward
+{
+    uint64 char_uid = 1; // 角色唯一id
+}
+
+// @desc 领取奖励 响应
+// @cmd SC_RES_AFFINITY_REWARD
+message SC_Res_Affinity_Reward
+{
+    int32 result = 1; // 结果
+    AffinityInfo affinity_info = 2; // 好感度信息
+    repeated ItemIdCount items = 3; // 奖励道具
+}
+
+// @desc 触发好感度事件
+// @cmd CS_REQ_AFFINITY_EVENT
+message CS_Req_Affinity_Event
+{
+    uint32 event_type = 1; // 好感度事件类型 AffinityEventType_Enum
+    uint64 char_uid = 2; // 角色唯一id, 0表示不指定
+    uint32 count = 3; // 次数
+    uint64 param = 4; // 额外参数
+}
+
+// @desc 触发好感度事件 响应
+// @cmd SC_RES_AFFINITY_EVENT
+message SC_Res_Affinity_Event
+{
+    int32 result = 1; // 结果
+}
+
+// @desc 双人动作触发每日首次表现
+// @cmd CS_REQ_AFFINITY_COUPLE_ACTION
+message CS_Req_Affinity_Couple_Action
+{
+    uint64 char_uid = 1; // 角色唯一id
+    uint32 couple_action_id = 2; // 双人动作id
+}
+
+// @desc 双人动作触发每日首次表现 响应
+// @cmd SC_RES_AFFINITY_COUPLE_ACTION
+message SC_Res_Affinity_Couple_Action
+{
+    int32 result = 1; // 结果
+    uint64 char_uid = 2; // 角色唯一id
+    uint32 couple_action_id = 3; // 双人动作id
+    uint32 memoir_photo_id = 4; // 回忆录照片id
+}
+
+// @desc 接取约会任务 (id = P_AffinityInteractionReward.ID)
+// @cmd CS_REQ_AFFINITY_ACCEPT_DATE_TASK
+message CS_Req_Affinity_Accept_Date_Task
+{
+    uint32 id = 1; // P_AffinityInteractionReward.ID
+}
+
+// @desc 接取约会任务 响应
+// @cmd SC_RES_AFFINITY_ACCEPT_DATE_TASK
+message SC_Res_Affinity_Accept_Date_Task
+{
+    int32 result = 1; // 结果
+    uint32 id = 2; // 请求中的 id
+    uint32 date_task_id = 3; // 实际接取的约会任务 id
+}
+
+// @desc 标记好感度阶段为已读（红点 read_stage）
+// @cmd CS_REQ_AFFINITY_READ_STAGE
+message CS_Req_Affinity_Read_Stage
+{
+    uint64 char_uid = 1; // 角色唯一id
+    uint32 read_stage = 2; // 本次已阅读到的阶段
+}
+
+// @desc 标记好感度阶段为已读 响应
+// @cmd SC_RES_AFFINITY_READ_STAGE
+message SC_Res_Affinity_Read_Stage
+{
+    int32 result = 1; // 结果
+    uint64 char_uid = 2; // 角色唯一id
+    uint32 read_stage = 3; // 更新后的已阅读阶段
+}
+
+// @desc 标记情报为已读（红点 read_intel_ids）
+// @cmd CS_REQ_AFFINITY_READ_INTEL
+message CS_Req_Affinity_Read_Intel
+{
+    uint64 char_uid = 1; // 角色唯一id
+    repeated uint32 intel_ids = 2; // 本次标记已读的情报id
+}
+
+// @desc 标记情报为已读 响应
+// @cmd SC_RES_AFFINITY_READ_INTEL
+message SC_Res_Affinity_Read_Intel
+{
+    int32 result = 1; // 结果
+    uint64 char_uid = 2; // 角色唯一id
+    repeated uint32 read_intel_ids = 3; // 更新后的已读情报id
+}
+
+// @desc 标记语音为已读（红点 read_voice_ids）
+// @cmd CS_REQ_AFFINITY_READ_VOICE
+message CS_Req_Affinity_Read_Voice
+{
+    uint64 char_uid = 1; // 角色唯一id
+    repeated uint32 voice_ids = 2; // 本次标记已读的语音id
+}
+
+// @desc 标记语音为已读 响应
+// @cmd SC_RES_AFFINITY_READ_VOICE
+message SC_Res_Affinity_Read_Voice
+{
+    int32 result = 1; // 结果
+    uint64 char_uid = 2; // 角色唯一id
+    repeated uint32 read_voice_ids = 3; // 更新后的已读语音id
+}
+
+// @desc 标记回忆录照片为已读（红点 read_memoir_photos）
+// @cmd CS_REQ_AFFINITY_READ_MEMOIR_PHOTO
+message CS_Req_Affinity_Read_Memoir_Photo
+{
+    uint64 char_uid = 1; // 角色唯一id
+    repeated uint32 memoir_photo_ids = 2; // 本次标记已读的回忆录照片id
+}
+
+// @desc 标记回忆录照片为已读 响应
+// @cmd SC_RES_AFFINITY_READ_MEMOIR_PHOTO
+message SC_Res_Affinity_Read_Memoir_Photo
+{
+    int32 result = 1; // 结果
+    uint64 char_uid = 2; // 角色唯一id
+    repeated uint32 read_memoir_photos = 3; // 更新后的已读回忆录照片id
+}

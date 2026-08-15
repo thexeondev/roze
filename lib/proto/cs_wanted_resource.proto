@@ -1,0 +1,206 @@
+syntax = "proto3";
+package msg;
+
+import "cs_wanted_define.proto";
+
+// *************************************** 通缉令局内资源协议 ***************************************
+
+// *************************************** 祝福和羁绊 ***************************************
+// @desc 请求通缉令祝福和羁绊数据
+// @cmd CS_WANTED_BLESS_BOND_REQ
+message CS_Wanted_Bless_Bond_Req
+{
+    uint32 wanted_id = 1; //当前通缉令ID 用作校验
+}
+
+// @desc 返回通缉令祝福和羁绊数据
+// @cmd SC_WANTED_BLESS_BOND_RES
+message SC_Wanted_Bless_Bond_Res
+{
+    int32 result = 1; //结果
+    repeated uint32 bless_ids = 2; //祝福ID列表
+    repeated CmdBond bonds = 3; //羁绊数据
+}
+// @desc 通缉令祝福数据Ntf
+// @cmd SC_WANTED_BLESS_NTF
+message SC_Wanted_Bless_Ntf
+{
+    uint32 type = 1; // 对应表格里 EWantedAwardType
+    repeated uint32 bless_ids = 2; //祝福ID列表
+}
+
+// @desc 通缉令羁绊数据Ntf
+// @cmd SC_WANTED_BOND_NTF
+message SC_Wanted_Bond_Ntf
+{
+    repeated CmdBond bonds = 1; //羁绊数据
+}
+
+// *************************************** 仿生品 ***************************************
+// @desc 请求通缉令仿生品数据
+// @cmd CS_WANTED_BIONICS_REQ
+message CS_Wanted_Bionics_Req
+{
+    uint32 wanted_id = 1; //当前通缉令ID 用作校验
+}
+
+// @desc 返回通缉令仿生品数据
+// @cmd SC_WANTED_BIONICS_RES
+message SC_Wanted_Bionics_Res
+{
+    int32 result = 1; //结果
+    repeated CmdBionics bionics = 2; //仿生品ID
+}
+
+// @desc 通缉令仿生品数据Ntf
+// @cmd SC_WANTED_BIONICS_NTF
+message SC_Wanted_Bionics_Ntf
+{
+    uint32 type = 1; // 对应表格里 EWantedAwardType
+    repeated CmdBionics bionics = 2; //仿生品ID列表
+}
+
+// *************************************** 遗物 ***************************************
+// @desc 请求通缉令遗物数据
+// @cmd CS_WANTED_RELICS_REQ
+message CS_Wanted_Relics_Req
+{
+    uint32 wanted_id = 1; //当前通缉令ID 用作校验
+}
+
+// @desc 返回通缉令遗物数据
+// @cmd SC_WANTED_RELICS_RES
+message SC_Wanted_Relics_Res
+{
+    int32 result = 1; //结果
+    repeated uint32 relics_ids = 2; //遗物id
+}
+
+// @desc 通缉令遗物数据Ntf
+// @cmd SC_WANTED_RELICS_NTF
+message SC_Wanted_Relics_Ntf
+{
+    uint32 type = 1; // 对应表格里 EWantedAwardType
+    repeated uint32 relics_ids = 2; //遗物id列表
+}
+
+// *************************************** 效果 ***************************************
+// @desc 请求通缉令效果数据
+// @cmd CS_WANTED_EFFECT_REQ
+message CS_Wanted_Effect_Req
+{
+    uint32 wanted_id = 1; //当前通缉令ID 用作校验
+}
+
+// @desc 返回通缉令效果数据
+// @cmd SC_WANTED_EFFECT_RSP
+message SC_Wanted_Effect_Rsp
+{
+    int32 result = 1; //结果
+    repeated uint32 effect_ids = 2; //效果id组
+}
+
+// @desc 通缉令效果数据Ntf
+// @cmd SC_WANTED_EFFECT_NTF
+message SC_Wanted_Effect_Ntf
+{
+    repeated uint32 delete_ids = 1; //要删除的id列表
+    repeated uint32 add_ids = 2; //要添加的id列表
+}
+
+/***************************************** 通缉令宝石 *******************************************/
+
+// @desc 通缉令宝石仓库数据请求
+// @cmd CS_WANTED_GEMS_REQ
+message CS_Wanted_Gems_Req
+{
+}
+
+// @desc 通缉令宝石仓库数据返回
+// @cmd SC_WANTED_GEMS_RSP
+message SC_Wanted_Gems_Rsp
+{
+    int32 result = 1;               //结果
+    repeated WantedGem gems = 2;    //宝石仓库数据
+}
+
+// @desc 通缉令宝石仓库数据更新通知（全量）
+// @cmd SC_WANTED_GEMS_NTF
+message SC_Wanted_Gems_Ntf
+{
+    repeated WantedGem gems = 1; //宝石仓库更新信息
+}
+
+// @desc 通缉令宝石常规获得Ntf
+// @cmd SC_WANTED_OBTAIN_GEMS_NTF
+message SC_Wanted_Obtain_Gems_Ntf
+{
+    uint32 type = 1;                     // 对应表格里 EWantedAwardType
+    repeated WantedResultGem gems = 2;   //宝石获得信息
+}
+
+// @desc 通缉令宝石进化通知
+// @cmd SC_WANTED_GEM_EVOLVE_NTF
+message SC_Wanted_Gem_Evolve_Ntf
+{
+    repeated WantedGemEvolve evolve_list = 1; //宝石进化信息列表
+}
+
+// @desc 通缉令宝石进化请求
+// @cmd CS_WANTED_GEM_EVOLVE_REQ
+message CS_Wanted_Gem_Evolve_Req
+{
+    WantedGemEvolve evolve_info = 1; //宝石进化信息
+}
+
+// @desc 通缉令宝石进化响应
+// @cmd SC_WANTED_GEM_EVOLVE_RSP
+message SC_Wanted_Gem_Evolve_Rsp
+{
+    int32 result = 1; //结果
+    uint32 src_gem_id = 2; // 当前宝石ID
+    WantedResultGem target_gem_info = 3; //进化后的宝石信息
+    bool is_finish = 4; //是否后续没有新的进化或合成
+}
+
+// @desc 通缉令宝石合成通知
+// @cmd SC_WANTED_GEM_MERGE_NTF
+message SC_Wanted_Gem_Merge_Ntf
+{
+    repeated WantedGemMerge merge_list = 1; //宝石合成信息列表
+}
+
+// @desc 通缉令宝石合成请求
+// @cmd CS_WANTED_GEM_MERGE_REQ
+message CS_Wanted_Gem_Merge_Req
+{
+    WantedGemMerge merge_info = 1;
+}
+
+// @desc 通缉令宝石合成响应
+// @cmd SC_WANTED_GEM_MERGE_RSP
+message SC_Wanted_Gem_Merge_Rsp
+{
+    int32 result = 1; //结果
+    WantedGemMerge merge_info = 2; //请求合成的宝石信息
+    WantedResultGem target_gem_info = 3; //合成后的宝石信息
+    bool is_finish = 4; //是否后续没有新的进化或合成
+}
+
+// @desc 通缉令宝石自动装配开关切换请求
+// @cmd CS_WANTED_GEM_AUTO_EQUIP_REQ
+message CS_Wanted_Gem_Auto_Equip_Req
+{
+    uint32 wanted_id = 1; //当前通缉令ID 用作校验
+    bool off = 2; //true=关闭自动装配 false=开启自动装配
+}
+
+// @desc 通缉令宝石自动装配开关切换响应
+// @cmd SC_WANTED_GEM_AUTO_EQUIP_RSP
+message SC_Wanted_Gem_Auto_Equip_Rsp
+{
+    int32 result = 1; //结果
+    bool off = 2; //当前开关状态
+}
+
+/***************************************** 通缉令宝石 *******************************************/

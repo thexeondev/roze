@@ -1,0 +1,7 @@
+.{
+    .name = .roze,
+    .version = "0.1.0",
+    .minimum_zig_version = "0.17.0-dev.1609+11e2bb391",
+    .paths = .{""},
+    .fingerprint = 0x4bf13fbdab7b1337,
+}

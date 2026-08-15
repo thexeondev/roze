@@ -1,0 +1,166 @@
+syntax = "proto3";
+package msg;
+
+import "comm_data.proto";
+
+message CmdEquipmentData
+{
+    uint32 tid = 1;                                     // 表格ID
+    uint64 uid = 2;                                     // 唯一ID
+    uint64 owner_uid = 3;                               // 拥有者唯一ID（未被装备为0）
+    bool is_lock = 4;                                   // 锁定状态
+    repeated uint32 refine_level_array = 5;             // 副属性精炼等级数组
+    uint32 enchant_id = 6;                              // 目前附魔ID（未附魔时为0）
+    uint32 enchant_id_candidate = 7;                    // 待选择附魔ID（通常为0，附魔流程未结束时才有值）
+}
+
+// @desc 装备-全量数据请求
+// @cmd  CS_EQUIPMENT_DATA
+message CS_Equipment_Data
+{
+    uint32 page = 1;                                    // 第一次请求赋值为 1，后续根据回包决定后续是否继续请求
+}
+
+// @desc 装备-全量数据响应
+// @cmd  SC_EQUIPMENT_DATA
+message SC_Equipment_Data
+{
+    int32 result = 1;                                   // 结果
+    uint32 page_cur = 2;                                // 当前页
+    uint32 page_max = 3;                                // 最大页
+    repeated CmdEquipmentData data = 4;                 // 装备数据
+}
+
+// @desc 装备-穿戴请求
+// @cmd  CS_EQUIPMENT_WEAR
+message CS_Equipment_Wear
+{
+    uint64 uid = 1;                                     // 装备唯一ID
+    uint64 owner_uid = 2;                               // 角色唯一ID
+}
+
+// @desc 装备-穿戴响应
+// @cmd  SC_EQUIPMENT_WEAR
+message SC_Equipment_Wear
+{
+    int32 result = 1;                                   // 结果
+    uint64 uid = 2;                                     // 装备唯一ID
+    uint64 owner_uid = 3;                               // 角色唯一ID
+    uint64 other_uid = 4;                               // 被替换的装备唯一ID
+    uint64 other_owner_uid = 5;                         // 被替换的角色唯一ID
+}
+
+// @desc 装备-脱下请求
+// @cmd  CS_EQUIPMENT_UNWEAR
+message CS_Equipment_UnWear
+{
+    uint64 uid = 1;                                     // 装备唯一ID
+    uint64 owner_uid = 2;                               // 角色唯一ID
+}
+
+// @desc 装备-脱下响应
+// @cmd  SC_EQUIPMENT_UNWEAR
+message SC_Equipment_UnWear
+{
+    int32 result = 1;                                   // 结果
+    uint64 uid = 2;                                     // 装备唯一ID
+    uint64 owner_uid = 3;                               // 角色唯一ID
+}
+
+// @desc 装备-上锁/解锁请求
+// @cmd  CS_EQUIPMENT_LOCK
+message CS_Equipment_Lock
+{
+    uint64 uid = 1;                                     // 装备唯一ID
+    bool lock_state = 2;                                // 锁定状态
+}
+
+// @desc 装备-上锁/解锁响应
+// @cmd  SC_EQUIPMENT_LOCK
+message SC_Equipment_Lock
+{
+    int32 result = 1;                                   // 结果
+    uint64 uid = 2;                                     // 装备唯一ID
+    bool lock_state = 3;                                // 锁定状态
+}
+
+// @desc 装备-新增通知
+// @cmd SC_EQUIPMENT_ADD_NTF
+message SC_Equipment_Add_Ntf
+{
+    repeated CmdEquipmentData data = 1;                 // 装备数据
+}
+
+// @desc 装备-移除通知
+// @cmd SC_EQUIPMENT_REMOVE_NTF
+message SC_Equipment_Remove_Ntf
+{
+    repeated uint64 uids = 1;                           // 装备唯一ID
+}
+
+// @desc 装备-分解请求
+// @cmd  CS_EQUIPMENT_DECOMPOSE_REQ
+message CS_Equipment_Decompose_Req
+{
+    repeated uint64 uids = 1;                           // 放入的装备uid
+}
+
+// @desc 装备-分解响应
+// @cmd  SC_EQUIPMENT_DECOMPOSE_RSP
+message SC_Equipment_Decompose_Rsp
+{
+    int32 result = 1;                                   // 结果
+    repeated ItemIdCount recycle_items = 2;             // 返还的道具
+}
+
+// @desc 装备-精炼请求
+// @cmd  CS_EQUIPMENT_REFINE_REQ
+message CS_Equipment_Refine_Req
+{
+    uint64 uid = 1; // 装备唯一ID
+    repeated uint64 cost_equip_uid_list = 2; // 放入的同名装备
+    uint32 common_refine_item_cost_count = 3; // 通用精炼道具消耗数量
+}
+
+// @desc 装备-精炼响应
+// @cmd  SC_EQUIPMENT_REFINE_RSP
+message SC_Equipment_Refine_Rsp
+{
+    int32 result = 1; // 结果
+    uint64 uid = 2; // 装备唯一ID
+    repeated uint32 refine_level_array = 6; // 副属性精炼等级数组
+}
+
+// @desc 装备-附魔请求
+// @cmd  CS_EQUIPMENT_ENCHANT_REQ
+message CS_Equipment_Enchant_Req
+{
+    uint64 uid = 1; // 装备唯一ID
+    uint32 character_id = 2; // 定向角色ID（非定向时为0）
+}
+
+// @desc 装备-附魔响应
+// @cmd  SC_EQUIPMENT_ENCHANT_RSP
+message SC_Equipment_Enchant_Rsp
+{
+    int32 result = 1; // 结果
+    uint64 uid = 2; // 装备唯一ID
+    uint32 enchant_id_candidate = 3; // 待选择附魔ID
+}
+
+// @desc 装备-附魔确认请求
+// @cmd  CS_EQUIPMENT_ENCHANT_CONFIRM_REQ
+message CS_Equipment_Enchant_Confirm_Req
+{
+    uint64 uid = 1; // 装备唯一ID
+    uint32 enchant_id = 2; // 最终确认的附魔ID
+}
+
+// @desc 装备-附魔确认响应
+// @cmd  SC_EQUIPMENT_ENCHANT_CONFIRM_RSP
+message SC_Equipment_Enchant_Confirm_Rsp
+{
+    int32 result = 1; // 结果
+    uint64 uid = 2; // 装备唯一ID
+    uint32 enchant_id = 3; // 最终确认的附魔ID
+}

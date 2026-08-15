@@ -1,0 +1,144 @@
+// 大世界相关协议
+syntax = "proto3";
+package msg;
+
+import "comm_data.proto";
+
+// @desc 存档点解锁
+// @cmd CS_SAVEPOINT_UNLOCK
+message CS_SavePoint_Unlock
+{
+    uint64 savepoint_id = 1;    // 解锁的存档点id
+}
+
+// @desc 存档点解锁响应
+// @cmd SC_SAVEPOINT_UNLOCK
+message SC_SavePoint_Unlock
+{
+    int32 result = 1;
+    uint64 savepoint_id = 2;
+}
+
+// @desc 玩家坐标变化同步（UDP协议）
+// @cmd CS_LOCATION_SYNC
+message CS_LocationSync
+{
+    Vector3Int location = 1;
+    uint64 map_id = 2;    // 地图id
+    uint32 using_member_slot = 3; // 当前使用角色slot
+    uint32 move_type = 4;         // 移动方式
+    uint32 move_vehicle_type = 5; // 移动主体
+}
+
+// @desc 与NPC对话
+// @cmd CS_NPC_DIALOGUE
+message CS_NpcDialogue
+{
+    uint64 NPC_id = 1;
+}
+
+// @desc 与交互物操作
+// @cmd CS_ENTITY_OPERATION
+message CS_EntityOperation
+{
+    uint64 entity_id = 1;
+    uint32 target_status = 2;
+}
+
+// @desc 当前存档点上报
+// @cmd CS_SAVEPOINT_SYNC
+message CS_SavePoint_Sync
+{
+    uint64 savepoint_id = 1;    // 当前存档点id
+}
+
+// @desc 存档点上报响应
+// @cmd SC_SAVEPOINT_SYNC
+message SC_SavePoint_Sync
+{
+    int32 result = 1;
+    uint64 savepoint_id = 2;
+}
+
+// @desc 游戏时间变化主动推送
+// @cmd SC_GAMETIME_SLIP_NTF
+message SC_GameTime_Slip_Ntf
+{
+    uint32 slip_to_time = 1;    // 推进到时间（分钟）
+    uint32 cur_weather = 2;     // 当前天气ID
+}
+
+// @desc 游戏时间设置请求
+// @cmd CS_GAMETIME_SETUP_REQ
+message CS_GameTime_Setup_Req
+{
+    uint32 slip_to_time = 1; // 推进到时间（分钟）
+    uint32 weather = 2;      // 对应WeatherType,0表示服务器随机
+}
+
+// @desc 游戏时间设置返回
+// @cmd SC_GAMETIME_SETUP_RES
+message SC_GameTime_Setup_Res
+{
+    int32 result = 1;
+    uint32 slip_to_time = 2; // 推进到时间（分钟）
+    uint32 weather = 3;
+}
+
+// @desc 游戏时间对齐请求
+// @cmd CS_GAMETIME_ALIGN_REQ
+message CS_GameTime_Align_Req
+{
+}
+
+// @desc 游戏时间对齐响应
+// @cmd SC_GAMETIME_ALIGN_RSP
+message SC_GameTime_Align_Rsp
+{
+    uint32 cur_time = 1; // 当前的时间（分钟）
+    uint32 cur_weather = 2; // 当前天气ID
+}
+
+
+message ExposeBattle
+{
+    uint64 battle_id = 1;   // 入战id
+    uint32 weight = 2;      // 权重
+}
+
+message ExposeNpcGroupData
+{
+    uint64 npc_group_id = 1;
+    repeated ExposeBattle battle_list = 2;  // 对应入战表
+}
+
+// @desc 拉取此地区揭发怪表
+// @cmd CS_EXPOSE_GET_MONSTER_LIST
+message CS_Expose_Get_Monster_List 
+{
+    uint64 subregion = 1;
+}
+
+// @desc 拉取此地区揭发怪表 响应
+// @cmd SC_EXPOSE_GET_MONSTER_LIST
+message SC_Expose_Get_Monster_List 
+{
+    uint32 result = 1;
+    uint64 subregion = 2;
+    repeated ExposeNpcGroupData npcgroup_data = 3;
+}
+
+// @desc 解锁传送点
+// @cmd CS_REQ_UNLOCK_TELEPORT
+message CS_Req_Unlock_Teleport
+{
+    uint64 teleport_id = 1; // 传送点id
+}
+
+// @desc 解锁传送点
+// @cmd SC_RES_UNLOCK_TELEPORT
+message SC_Res_Unlock_Teleport
+{
+    uint64 teleport_id = 1; // 传送点id
+    uint32 result = 2; // 结果  
+}

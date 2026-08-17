@@ -17,7 +17,7 @@ At present, we support `Linux` and `Windows`.
 
 ## Requirements
 **Roze** is a zero-dependency project from day one, all you need to build it from sources is:
-- Zig Compiler, version `0.17.0-dev.1609+11e2bb391`: [Linux](https://ziglang.org/builds/zig-x86_64-linux-0.17.0-dev.1609+11e2bb391.tar.xz)/[Windows](https://ziglang.org/builds/zig-x86_64-windows-0.17.0-dev.1609+11e2bb391.zip)
+- Zig Compiler, version `0.17.0-dev.1778+767d25269`: [Linux](https://ziglang.org/builds/zig-x86_64-linux-0.17.0-dev.1778+767d25269.tar.xz)/[Windows](https://ziglang.org/builds/zig-x86_64-windows-0.17.0-dev.1778+767d25269.zip)
 
 ##### HINT: if you're using Linux, you can run the `envrc` script included in this repository to setup the zig environment. It's a simple `/bin/sh` script that downloads zig compiler, untars it and adds to the `$PATH`.
 
@@ -26,7 +26,7 @@ Once you've got `zig` compiler set up, you can compile the server.
 First, double-check that the compiler version matches by typing `zig version` in your terminal.
 ```sh
 $ zig version
-0.17.0-dev.1609+11e2bb391
+0.17.0-dev.1778+767d25269
 ```
 If the output matches, you can proceed to the compilation.
 

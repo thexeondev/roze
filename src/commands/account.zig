@@ -3,6 +3,7 @@ const std = @import("std");
 const roze = @import("../roze.zig");
 const protobuf = roze.protobuf;
 const Scope = roze.Scope;
+const assets = roze.assets;
 
 const log = std.log.scoped(.@"roze::commands::account");
 
@@ -96,6 +97,14 @@ pub fn CS_FIN_ENTER_MAP(scope: *Scope) Scope.Error!void {
         },
     };
 
+    var unlocked_savepoints_buf: [assets.npc_lists.save_point_npc_ids.len]u64 = undefined;
+    var unlocked_savepoints: std.ArrayList(u64) = .initBuffer(&unlocked_savepoints_buf);
+
+    for (assets.npc_lists.save_point_npc_ids, assets.npc_lists.save_point_map_ids) |npc_id, map_id| {
+        if (map_id == scope.gameplay.map.id)
+            unlocked_savepoints.appendAssumeCapacity(npc_id);
+    }
+
     const response: protobuf.gen.SC_Fin_Enter_Map = .{
         .role_id = request.role_id,
         .map_id = request.map_id,
@@ -122,6 +131,7 @@ pub fn CS_FIN_ENTER_MAP(scope: *Scope) Scope.Error!void {
         .task_data = .init,
         .world_map_id = scope.gameplay.map.id,
         .unlocked_teleport_id_list = &.{11242401},
+        .unlocked_savepoints = unlocked_savepoints.items,
     };
 
     try scope.sink.send(.SC_FIN_ENTER_MAP, response);

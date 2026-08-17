@@ -8,6 +8,41 @@ const Gameplay = roze.Gameplay;
 
 pub const tables = @import("assets/tables.zig");
 
+pub const NpcLists = struct {
+    save_point_npc_ids: []const u64,
+    /// Guaranteed to have same length as `save_point_ids`
+    save_point_map_ids: []const u64,
+};
+
+pub const npc_lists: NpcLists = npc_lists: {
+    var save_point_npc_ids: [tables.functional_npc.len]u64 = undefined;
+    var save_point_map_ids: [tables.functional_npc.len]u64 = undefined;
+    var save_point_count: usize = 0;
+
+    @setEvalBranchQuota(tables.functional_npc.len);
+    for (tables.functional_npc) |functional_npc| {
+        const npc_type: tables.FunctionalNpcType = @fromBackingInt(functional_npc.type);
+
+        switch (npc_type) {
+            .save_point => {
+                defer save_point_count += 1;
+
+                save_point_npc_ids[save_point_count] = functional_npc.id;
+                save_point_map_ids[save_point_count] = functional_npc.map_id;
+            },
+            else => {},
+        }
+    }
+
+    const final_save_point_npc_ids = save_point_npc_ids[0..save_point_count].*;
+    const final_save_point_map_ids = save_point_map_ids[0..save_point_count].*;
+
+    break :npc_lists .{
+        .save_point_npc_ids = &final_save_point_npc_ids,
+        .save_point_map_ids = &final_save_point_map_ids,
+    };
+};
+
 /// Runtime asset indexer.
 pub const Index = struct {
     character_develop_attributes: [tables.character.len]*const tables.P_DevelopAttribute,

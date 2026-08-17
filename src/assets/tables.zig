@@ -7,6 +7,7 @@ pub const guide_platform: []const P_GuidePlatform = @import("p_guideplatformtabl
 pub const region: []const P_Region = @import("p_regiontable");
 pub const sub_region_config_read_target: []const C_SubRegionConfigReadTarget =
     @import("c_subregionconfigreadtarget");
+pub const functional_npc: []const P_FunctionalNpc = @import("p_functionalnpctable");
 
 pub const region_progress_sheets = struct {
     pub const P_RegionProgressTable_Dayfair: []const P_RegionProgress =
@@ -252,4 +253,44 @@ pub const P_RegionSequence = struct {
     param_num: u32,
     /// 图标
     icon: []const u8,
+};
+
+pub const P_FunctionalNpc = struct {
+    /// 功能NPC实例唯一ID
+    id: u64,
+    /// 所处的地图ID
+    map_id: u64,
+    /// 位置坐标
+    position: [3]i64,
+    /// 旋转
+    rotation: [3]f32,
+    /// 功能NPC的类型
+    type: i32,
+    /// 类型下的模板ID
+    template_id: u64,
+    /// NPC信息ID(P_FunctionalNPCInfo)
+    npc_info_id: u32,
+    /// 根据业务需求的额外信息(模块自行处理读写)
+    extra_info: ?[]const u8 = null,
+    /// 关注的POI区域解锁任务
+    poi_task_id: u64,
+};
+
+pub const FunctionalNpcType = enum(u32) {
+    none = 0,
+    save_point = 101,
+    normal_conversation_npc = 102,
+    case_inspect_npc = 103,
+    world_dungeon_npc = 104,
+    billboard = 105,
+    teleport_point = 106,
+    horse_race_npc = 107,
+    observeboard = 108,
+    assistant_area = 109,
+    mail_box = 110,
+    hunt_poster = 111,
+    guide_npc = 112,
+    companion_npc = 113,
+    sequence_player = 114,
+    task_npc = 115,
 };

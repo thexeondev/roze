@@ -133,7 +133,7 @@ pub fn main(init: process.Init.Minimal) !void {
     };
 
     var asset_index: roze.assets.Index = undefined;
-    asset_index.init();
+    try asset_index.init(arena);
 
     var sdk_bind = roze.he_sdk.Bind.init(io, arena, store_dir, bind_capacity) catch |err| switch (err) {
         error.OutOfMemory => fatal(

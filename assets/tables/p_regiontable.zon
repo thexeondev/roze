@@ -1,0 +1,20 @@
+.{
+    .{
+        .id = 100001001,
+        .region_name = 1010500111,
+        .region_icon = "Img_RegionalExploration_MogStreet",
+        .sub_region_id = .{100001001001, 100001001002, 100001001003, 100001001004},
+    },
+    .{
+        .id = 100001002,
+        .region_name = 1010500112,
+        .region_icon = "Img_RegionalExploration_SiGuanStreet",
+        .sub_region_id = .{100001002001, 100001002002, 100001002003, 100001002004, 100001002005, 100001002006},
+    },
+    .{
+        .id = 100001004,
+        .region_name = 1010500113,
+        .region_icon = "Img_RegionalExploration_WhiteDayAvenue",
+        .sub_region_id = .{100001004002, 100001004001},
+    },
+}

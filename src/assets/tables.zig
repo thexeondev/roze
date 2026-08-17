@@ -4,6 +4,20 @@ pub const develop_attribute: []const P_DevelopAttribute = @import("p_developattr
 pub const battle_attribute: []const C_BattleAttribute = @import("c_battleattributetable");
 pub const guide: []const C_Guide = @import("c_guidetable");
 pub const guide_platform: []const P_GuidePlatform = @import("p_guideplatformtable");
+pub const region: []const P_Region = @import("p_regiontable");
+pub const sub_region_config_read_target: []const C_SubRegionConfigReadTarget =
+    @import("c_subregionconfigreadtarget");
+
+pub const region_progress_sheets = struct {
+    pub const P_RegionProgressTable_Dayfair: []const P_RegionProgress =
+        @import("p_regionprogresstable_dayfair");
+
+    pub const P_RegionProgressTable_Four: []const P_RegionProgress =
+        @import("p_regionprogresstable_four");
+
+    pub const P_RegionProgressTable_Morgue: []const P_RegionProgress =
+        @import("p_regionprogresstable_morgue");
+};
 
 pub const P_Character = struct {
     /// 角色ID
@@ -183,4 +197,33 @@ pub const P_GuidePlatform = struct {
     event_type3: ?i32 = null,
     /// 触发条件参数3
     event_args3: ?[]const u8 = null,
+};
+
+pub const P_Region = struct {
+    /// 区域ID
+    id: u32,
+    /// 区域名
+    region_name: u64,
+    /// 区域 icon
+    region_icon: []const u8,
+    /// 子区域ID（P_SubRegionTable）
+    sub_region_id: []const u64,
+};
+
+pub const C_SubRegionConfigReadTarget = struct {
+    /// SubRegionID
+    id: u64,
+    /// P_RegionProgressTable名
+    region_progress_sheet: []const u8,
+    /// P_RegionSequenceTable名
+    region_sequence_sheet: []const u8,
+    /// C_RegionSequenceUITable名
+    sequence_ui_sheet: []const u8,
+};
+
+pub const P_RegionProgress = struct {
+    /// SubRegionID
+    id: u64,
+    /// 序列ID（P_RegionSequenceTable）
+    sequence_id: []const u32,
 };

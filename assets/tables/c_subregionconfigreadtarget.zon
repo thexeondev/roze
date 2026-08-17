@@ -1,0 +1,74 @@
+.{
+    .{
+        .id = 100001001001,
+        .region_progress_sheet = "P_RegionProgressTable_Morgue",
+        .region_sequence_sheet = "P_RegionSequenceTable_Morgue",
+        .sequence_ui_sheet = "C_RegionSequenceUITable_Morgue",
+    },
+    .{
+        .id = 100001001002,
+        .region_progress_sheet = "P_RegionProgressTable_Morgue",
+        .region_sequence_sheet = "P_RegionSequenceTable_Morgue",
+        .sequence_ui_sheet = "C_RegionSequenceUITable_Morgue",
+    },
+    .{
+        .id = 100001001003,
+        .region_progress_sheet = "P_RegionProgressTable_Morgue",
+        .region_sequence_sheet = "P_RegionSequenceTable_Morgue",
+        .sequence_ui_sheet = "C_RegionSequenceUITable_Morgue",
+    },
+    .{
+        .id = 100001001004,
+        .region_progress_sheet = "P_RegionProgressTable_Morgue",
+        .region_sequence_sheet = "P_RegionSequenceTable_Morgue",
+        .sequence_ui_sheet = "C_RegionSequenceUITable_Morgue",
+    },
+    .{
+        .id = 100001002001,
+        .region_progress_sheet = "P_RegionProgressTable_Four",
+        .region_sequence_sheet = "P_RegionSequenceTable_Four",
+        .sequence_ui_sheet = "C_RegionSequenceUITable_Four",
+    },
+    .{
+        .id = 100001002002,
+        .region_progress_sheet = "P_RegionProgressTable_Four",
+        .region_sequence_sheet = "P_RegionSequenceTable_Four",
+        .sequence_ui_sheet = "C_RegionSequenceUITable_Four",
+    },
+    .{
+        .id = 100001002003,
+        .region_progress_sheet = "P_RegionProgressTable_Four",
+        .region_sequence_sheet = "P_RegionSequenceTable_Four",
+        .sequence_ui_sheet = "C_RegionSequenceUITable_Four",
+    },
+    .{
+        .id = 100001002004,
+        .region_progress_sheet = "P_RegionProgressTable_Four",
+        .region_sequence_sheet = "P_RegionSequenceTable_Four",
+        .sequence_ui_sheet = "C_RegionSequenceUITable_Four",
+    },
+    .{
+        .id = 100001002005,
+        .region_progress_sheet = "P_RegionProgressTable_Four",
+        .region_sequence_sheet = "P_RegionSequenceTable_Four",
+        .sequence_ui_sheet = "C_RegionSequenceUITable_Four",
+    },
+    .{
+        .id = 100001002006,
+        .region_progress_sheet = "P_RegionProgressTable_Four",
+        .region_sequence_sheet = "P_RegionSequenceTable_Four",
+        .sequence_ui_sheet = "C_RegionSequenceUITable_Four",
+    },
+    .{
+        .id = 100001004001,
+        .region_progress_sheet = "P_RegionProgressTable_Dayfair",
+        .region_sequence_sheet = "P_RegionSequenceTable_Dayfair",
+        .sequence_ui_sheet = "C_RegionSequenceUITable_Dayfair",
+    },
+    .{
+        .id = 100001004002,
+        .region_progress_sheet = "P_RegionProgressTable_Dayfair",
+        .region_sequence_sheet = "P_RegionSequenceTable_Dayfair",
+        .sequence_ui_sheet = "C_RegionSequenceUITable_Dayfair",
+    },
+}

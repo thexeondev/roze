@@ -1,5 +1,6 @@
 const Gameplay = @This();
 const std = @import("std");
+const mem = std.mem;
 const assert = std.debug.assert;
 const IntegerBitSet = std.bit_set.IntegerBitSet;
 
@@ -21,15 +22,23 @@ pub const init: Gameplay = .{
 
 pub const Map = extern struct {
     id: u64,
-    last_location: [3]i32,
+    save_point_index: u32,
     bits: Bits,
 
+    pub const starting_save_point_id = 12020019;
+
+    pub const starting_save_point_index: u32 = @intCast(mem.findScalar(
+        u64,
+        assets.npc_lists.save_point_npc_ids,
+        starting_save_point_id,
+    ).?);
+
     pub const init: Map = .{
-        .id = 100001002004,
-        .last_location = .{ 40462, 104829, 32967 },
+        .id = 100001001002,
+        .save_point_index = Map.starting_save_point_index,
         .bits = .{
-            .weather = .sunny,
-            .time = @fromBackingInt(360),
+            .weather = .rainy,
+            .time = @fromBackingInt(0),
         },
     };
 
@@ -159,7 +168,7 @@ pub const Character = struct {
         }
 
         pub fn toIndex(id: Character.Id) Character.Index {
-            return @fromBackingInt(@intCast(std.mem.findScalar(Id, list, id).?));
+            return @fromBackingInt(@intCast(mem.findScalar(Id, list, id).?));
         }
     };
 

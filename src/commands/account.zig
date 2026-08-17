@@ -23,7 +23,7 @@ pub fn CS_ROLE_LOGIN(scope: *Scope) Scope.Error!void {
         .port = 0,
         .map_id = scope.gameplay.map.id,
         .today_first_login = true,
-        .current_savepoint = 0,
+        .current_savepoint = assets.npc_lists.save_point_npc_ids[scope.gameplay.map.save_point_index],
         .is_inited_name = true,
         .time_zone_offset_seconds = 0,
     };
@@ -37,10 +37,10 @@ pub fn CS_ENTER_MAP(scope: *Scope) Scope.Error!void {
 
     const readiness: protobuf.gen.SC_Map_Ready_Ntf = .{
         .map_id = scope.gameplay.map.id,
-        .last_logout_location = protobuf.packers.packVector3Int(&scope.gameplay.map.last_location),
-        .born_pos_type = .ENM_BORN_POSITION,
+        .last_logout_location = .init,
+        .born_pos_type = .ENM_BORN_SAVE_POINT,
         .rotation = .{ .x = 0, .y = 0, .z = 0 },
-        .current_savepoint = 0,
+        .current_savepoint = assets.npc_lists.save_point_npc_ids[scope.gameplay.map.save_point_index],
     };
 
     try scope.sink.send(.SC_MAP_READY_NTF, readiness);
@@ -50,10 +50,10 @@ pub fn CS_ENTER_MAP(scope: *Scope) Scope.Error!void {
         .map_id = request.map_id,
         .teleport_id = 0,
         .map_info = .{
-            .current_gametime = 360,
-            .current_weather = 1,
+            .current_gametime = @backingInt(scope.gameplay.map.bits.time),
+            .current_weather = scope.gameplay.map.bits.weather.toWeatherTypeInt(),
         },
-        .savepoint_id = 0,
+        .savepoint_id = assets.npc_lists.save_point_npc_ids[scope.gameplay.map.save_point_index],
     };
 
     try scope.sink.send(.SC_ENTER_MAP, response);
@@ -103,8 +103,8 @@ pub fn CS_FIN_ENTER_MAP(scope: *Scope) Scope.Error!void {
         .role_info = .{
             .base_info = base_info,
             .map_info = .{
-                .current_gametime = 360,
-                .current_weather = 1,
+                .current_gametime = @backingInt(scope.gameplay.map.bits.time),
+                .current_weather = scope.gameplay.map.bits.weather.toWeatherTypeInt(),
             },
             .global_conf = .{
                 .satiety_limit = 100,
@@ -117,8 +117,8 @@ pub fn CS_FIN_ENTER_MAP(scope: *Scope) Scope.Error!void {
                 .launch_date_type = 0,
             },
         },
-        .last_logout_location = protobuf.packers.packVector3Int(&scope.gameplay.map.last_location),
-        .current_savepoint = 0,
+        .last_logout_location = .init,
+        .current_savepoint = assets.npc_lists.save_point_npc_ids[scope.gameplay.map.save_point_index],
         .born_pos_type = .ENM_BORN_POSITION,
         .task_data = .init,
         .world_map_id = scope.gameplay.map.id,

@@ -1,4 +1,5 @@
 const std = @import("std");
+const mem = std.mem;
 const fatal = std.process.fatal;
 const assert = std.debug.assert;
 const Allocator = std.mem.Allocator;
@@ -22,6 +23,13 @@ pub const NpcLists = struct {
     /// Contains indexes into `tables.functional_npc`
     /// Guaranteed to have same length as `teleport_point_npc_ids`
     teleport_point_indexes: []const usize,
+
+    pub fn getSavePointIndexByNpcId(lists: *const NpcLists, save_point_npc_id: u64) ?u32 {
+        const index = mem.findScalar(u64, lists.save_point_npc_ids, save_point_npc_id) orelse
+            return null;
+
+        return @intCast(index);
+    }
 };
 
 pub const npc_lists: NpcLists = npc_lists: {

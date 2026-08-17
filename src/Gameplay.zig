@@ -39,11 +39,9 @@ pub const Map = extern struct {
 
     pub const starting_save_point_id = 12020019;
 
-    pub const starting_save_point_index: u32 = @intCast(mem.findScalar(
-        u64,
-        assets.npc_lists.save_point_npc_ids,
+    pub const starting_save_point_index: u32 = assets.npc_lists.getSavePointIndexByNpcId(
         starting_save_point_id,
-    ).?);
+    ).?;
 
     pub const init: Map = .{
         .id = 100001001002,

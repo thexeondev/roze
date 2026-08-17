@@ -97,7 +97,10 @@ pub const Sink = struct {
     end: *usize,
     send_seq: *u32,
 
-    pub const Error = error{SinkOverflow};
+    pub const Error = error{
+        /// `buffer` didn't have enough space to encode a command.
+        SinkBufferOverflow,
+    };
 
     pub fn send(sink: *const Sink, tag: protobuf.gen.EClientServerCmds, cmd: anytype) Sink.Error!void {
         const CSMsgPkg = protobuf.gen.CSMsgPkg;
@@ -138,7 +141,7 @@ pub const Sink = struct {
         };
 
         if (sink.buffer.len - sink.end.* < Header.size + package_len)
-            return error.SinkOverflow;
+            return error.SinkBufferOverflow;
 
         errdefer comptime unreachable;
 

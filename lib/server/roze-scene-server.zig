@@ -512,7 +512,7 @@ fn tick(
             };
 
             const get_or_create = handleAccountLogin(globals, body, &sink, current_time) catch |err| switch (err) {
-                error.SinkOverflow => |e| return e,
+                error.SinkBufferOverflow => |e| return e,
                 error.StoreLocked => {
                     client.state = .waiting_login; // retain current state
                     return error.StoreLocked;
@@ -799,7 +799,16 @@ fn tick(
                             },
                         };
 
-                        try roze.commands.execute(&scope);
+                        roze.commands.execute(&scope) catch |err| switch (err) {
+                            error.SinkBufferOverflow => |e| {
+                                log.err(
+                                    \\sink buffer overflow while executing command with id {d}
+                                    \\consider re-evaluating `write_buffer_size`
+                                , .{scope.command.id});
+                                return e;
+                            },
+                            else => |e| return e,
+                        };
 
                         if (scope.store.gameplay_state_save_requested) save_requested = true;
                     },

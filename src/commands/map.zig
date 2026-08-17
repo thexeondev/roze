@@ -96,3 +96,28 @@ pub fn CS_SAVEPOINT_SYNC(scope: *Scope) Scope.Error!void {
     scope.gameplay.map.save_point_index = save_point_index;
     scope.store.requestGameplayStateSave();
 }
+
+pub fn CS_REQ_UNLOCK_TELEPORT(scope: *Scope) Scope.Error!void {
+    const log = std.log.scoped(.@"roze::commands::unlock_teleport");
+
+    const request = try scope.command.take(protobuf.gen.CS_Req_Unlock_Teleport.Decoded);
+
+    const teleport_point_index = assets.npc_lists.getTeleportPointIndexByNpcId(request.teleport_id) orelse {
+        log.debug("teleport point with id {d} doesn't exist", .{request.teleport_id});
+        return try scope.sink.send(.SC_RES_UNLOCK_TELEPORT, @as(protobuf.gen.SC_Res_Unlock_Teleport, .{
+            .result = 1,
+        }));
+    };
+
+    try scope.sink.send(.SC_RES_UNLOCK_TELEPORT, @as(protobuf.gen.SC_Res_Unlock_Teleport, .{
+        .result = 0,
+        .teleport_id = request.teleport_id,
+    }));
+
+    if (scope.gameplay.teleport_point_unlock.isSet(teleport_point_index)) return;
+
+    errdefer comptime unreachable; // Ensure that it's safe to request save.
+
+    scope.gameplay.teleport_point_unlock.set(teleport_point_index);
+    scope.store.requestGameplayStateSave();
+}

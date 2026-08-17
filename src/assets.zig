@@ -30,6 +30,13 @@ pub const NpcLists = struct {
 
         return @intCast(index);
     }
+
+    pub fn getTeleportPointIndexByNpcId(lists: *const NpcLists, teleport_point_npc_id: u64) ?u32 {
+        const index = mem.findScalar(u64, lists.teleport_point_npc_ids, teleport_point_npc_id) orelse
+            return null;
+
+        return @intCast(index);
+    }
 };
 
 pub const npc_lists: NpcLists = npc_lists: {

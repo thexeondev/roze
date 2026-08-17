@@ -10,11 +10,11 @@ const Io = roze.Io;
 
 pub const Userdata = struct {
     ring: linux.IoUring,
-    n_submitted: u32,
+    submitted_n: u32,
 };
 
 pub fn init(io: *Io) Io.InitError!void {
-    io.userdata.n_submitted = 0;
+    io.userdata.submitted_n = 0;
     io.userdata.ring = linux.IoUring.init(
         256,
         linux.IORING_SETUP_SINGLE_ISSUER |
@@ -57,7 +57,7 @@ fn submitAll(io: *Io) Io.WaitError!void {
         const storage: *Io.Operation.Storage = @fieldParentPtr("submission", submission);
         makeSqe(storage, sqe);
 
-        io.userdata.n_submitted += 1;
+        io.userdata.submitted_n += 1;
     }
 }
 
@@ -217,7 +217,7 @@ fn fillCompletions(io: *Io) void {
             } };
 
             io.completions.append(&storage.completion.node);
-            io.userdata.n_submitted -= 1;
+            io.userdata.submitted_n -= 1;
         }
     }
 }
@@ -227,7 +227,7 @@ fn flushSq(io: *Io) Io.WaitError!void {
 }
 
 fn enterTimeout(io: *Io, timeout_ns: u63) Io.WaitError!void {
-    if (io.userdata.n_submitted == 0) return;
+    if (io.userdata.submitted_n == 0) return;
 
     var ts: linux.kernel_timespec = .{
         .sec = timeout_ns / std.time.ns_per_s,

@@ -61,7 +61,7 @@ pub fn List(comptime Struct: type) type {
             var handle: Handle = undefined;
 
             inline for (struct_info.field_names, 0..) |field_name, field_index| {
-                @field(handle, field_name) = &list.items(@fromBackingInt(@intCast(field_index)))[i];
+                @field(handle, field_name) = &list.items(@fromBackingInt(field_index))[i];
             }
 
             return handle;

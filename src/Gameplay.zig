@@ -107,7 +107,7 @@ pub const Character = struct {
             @setEvalBranchQuota(assets.tables.character.len);
             var result: [assets.tables.character.len]Id = undefined;
             for (&result, assets.tables.character) |*id, config|
-                id.* = @fromBackingInt(@intCast(config.id));
+                id.* = @fromBackingInt(config.id);
 
             const final = result;
             break :list &final;
@@ -185,13 +185,13 @@ pub const Character = struct {
 
             pub fn wrap(uid: MotiveUniqueId) MotiveUniqueId.Optional {
                 assert(@backingInt(uid) != 0);
-                return @fromBackingInt(@intCast(@backingInt(uid)));
+                return @fromBackingInt(@backingInt(uid));
             }
 
             pub fn unwrap(o: Optional) ?MotiveUniqueId {
                 return switch (o) {
                     .none => null,
-                    else => @fromBackingInt(@intCast(@backingInt(o))),
+                    else => @fromBackingInt(@backingInt(o)),
                 };
             }
         };
@@ -206,13 +206,13 @@ pub const Character = struct {
             _,
 
             pub fn wrap(snapshot: Character.Snapshot) Character.Snapshot.Optional {
-                return @fromBackingInt(@intCast(@as(u64, @bitCast(snapshot))));
+                return @fromBackingInt(@backingInt(snapshot));
             }
 
             pub fn unwrap(o: Character.Snapshot.Optional) ?Character.Snapshot {
                 return switch (o) {
                     .none => null,
-                    _ => @as(Character.Snapshot, @bitCast(@backingInt(o))),
+                    _ => @as(Character.Snapshot, @fromBackingInt(@backingInt(o))),
                 };
             }
         };

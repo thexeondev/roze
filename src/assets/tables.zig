@@ -19,6 +19,17 @@ pub const region_progress_sheets = struct {
         @import("p_regionprogresstable_morgue");
 };
 
+pub const region_sequence_sheets = struct {
+    pub const P_RegionSequenceTable_Dayfair: []const P_RegionSequence =
+        @import("p_regionsequencetable_dayfair");
+
+    pub const P_RegionSequenceTable_Four: []const P_RegionSequence =
+        @import("p_regionsequencetable_four");
+
+    pub const P_RegionSequenceTable_Morgue: []const P_RegionSequence =
+        @import("p_regionsequencetable_morgue");
+};
+
 pub const P_Character = struct {
     /// 角色ID
     id: u32,
@@ -226,4 +237,19 @@ pub const P_RegionProgress = struct {
     id: u64,
     /// 序列ID（P_RegionSequenceTable）
     sequence_id: []const u32,
+};
+
+pub const P_RegionSequence = struct {
+    /// 序列ID
+    id: u32,
+    /// 子区域名
+    sub_region_name: []const u8,
+    /// 类型（P_RegionProgressTypeRegistTable）
+    type: u32,
+    /// param1
+    param_id: []const u64,
+    /// param1
+    param_num: u32,
+    /// 图标
+    icon: []const u8,
 };

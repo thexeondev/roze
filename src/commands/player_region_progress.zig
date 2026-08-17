@@ -45,7 +45,12 @@ pub fn CS_REQ_REGION_PROGRESS(scope: *Scope) Scope.Error!void {
             const progress = progress_list.addManyAsSliceAssumeCapacity(progress_config.sequence_id.len);
 
             for (progress, progress_config.sequence_id) |*progress_data, sequence_id| {
-                progress_data.* = .{ .sequence_id = sequence_id, .count = 1 };
+                const sequence_config = scope.asset_index.sub_region_sequence.get(sequence_id).?;
+
+                progress_data.* = .{
+                    .sequence_id = sequence_id,
+                    .count = sequence_config.param_num,
+                };
             }
 
             sub_regions[sub_region_i] = .{

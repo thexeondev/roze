@@ -12,6 +12,7 @@ pub const tables = @import("assets/tables.zig");
 pub const Index = struct {
     character_develop_attributes: [tables.character.len]*const tables.P_DevelopAttribute,
     sub_region_progress: std.array_hash_map.Auto(u64, *const tables.P_RegionProgress),
+    sub_region_sequence: std.array_hash_map.Auto(u64, *const tables.P_RegionSequence),
 
     pub fn init(index: *Index, arena: Allocator) Allocator.Error!void {
         for (tables.character, &index.character_develop_attributes) |*character, *develop_attribute| {
@@ -24,10 +25,23 @@ pub const Index = struct {
         index.sub_region_progress = .empty;
         try index.sub_region_progress.ensureTotalCapacity(arena, tables.sub_region_config_read_target.len);
 
+        var sequence_count: usize = 0;
+
         inline for (@typeInfo(tables.region_progress_sheets).@"struct".decl_names) |sheet_name| {
             const progress_sheet = @field(tables.region_progress_sheets, sheet_name);
-            for (progress_sheet) |*config|
+            for (progress_sheet) |*config| {
                 index.sub_region_progress.putAssumeCapacity(config.id, config);
+                sequence_count += config.sequence_id.len;
+            }
+        }
+
+        index.sub_region_sequence = .empty;
+        try index.sub_region_sequence.ensureTotalCapacity(arena, sequence_count);
+
+        inline for (@typeInfo(tables.region_sequence_sheets).@"struct".decl_names) |sheet_name| {
+            const sequence_sheet = @field(tables.region_sequence_sheets, sheet_name);
+            for (sequence_sheet) |*config|
+                index.sub_region_sequence.putAssumeCapacity(config.id, config);
         }
     }
 

@@ -257,9 +257,9 @@ pub const Storage = struct {
 pub const Uid = enum(u64) {
     _,
 
-    pub const string_length = 20;
+    pub const print_buffer_size = 20;
 
-    pub fn print(uid: Uid, buffer: *[string_length]u8) []u8 {
+    pub fn print(uid: Uid, buffer: *[print_buffer_size]u8) []u8 {
         return mem.print(buffer, "{d}", .{@backingInt(uid)}) catch unreachable;
     }
 
@@ -273,11 +273,11 @@ pub const Uid = enum(u64) {
 };
 
 pub const Email = extern struct {
-    const max_length = 63;
-    buffer: [max_length]u8,
+    const length_max = 63;
+    buffer: [length_max]u8,
 
     pub fn fromSlice(slice: []const u8) ?Email {
-        if (slice.len > max_length)
+        if (slice.len > length_max)
             return null;
 
         for (slice) |c| if (!std.ascii.isAlphanumeric(c) and c != '@' and c != '.')

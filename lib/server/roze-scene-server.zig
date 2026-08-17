@@ -245,6 +245,18 @@ pub fn main(init: process.Init.Minimal) !void {
 }
 
 const Client = struct {
+    const read_buffer_size: usize = 128 * 1024;
+    const write_buffer_size: usize = 128 * 1024;
+    const state_path_buffer_size: usize = 1024;
+
+    comptime {
+        // Must fit at least `message_size_max` and `Header`.
+        // The buffers are used as is, without rebasing until messages are processed.
+
+        assert(read_buffer_size >= roze.net.message_size_max + roze.net.Header.size);
+        assert(write_buffer_size >= roze.net.message_size_max + roze.net.Header.size);
+    }
+
     state: State,
     send_seq: u32,
     role_id: u64,
@@ -270,7 +282,7 @@ const Client = struct {
     },
     gameplay_state_file: Io.File.Optional,
     // initialized by `start_loading_gameplay_state`
-    gameplay_state_path_buffer: [1024]u8,
+    gameplay_state_path_buffer: [state_path_buffer_size]u8,
     gameplay_state_path: [:0]const u8, // points to `gameplay_state_path_buffer`
     gameplay: roze.Gameplay,
     gameplay_header: roze.Gameplay.Header,
@@ -293,17 +305,6 @@ const Client = struct {
         reading_messages,
         sending_messages,
     };
-
-    const read_buffer_size: usize = 128 * 1024;
-    const write_buffer_size: usize = 128 * 1024;
-
-    comptime {
-        // Must fit at least message_len_max and `Header`.
-        // The buffers are used as is, without rebasing until messages are processed.
-
-        assert(read_buffer_size >= roze.net.message_len_max + roze.net.Header.size);
-        assert(write_buffer_size >= roze.net.message_len_max + roze.net.Header.size);
-    }
 
     fn submitAccept(client: *Client, io: *Io, listening: *const Io.Socket.Listening) void {
         client.operation = .init(.{ .tcp_accept = .{
@@ -375,7 +376,7 @@ const Client = struct {
     const AdvanceFileRwStatus = enum {
         rw_submitted,
         fsync_submitted,
-        read_complete,
+        read_completed,
     };
 
     fn advanceFileRw(client: *Client, io: *Io, advance_n: usize) AdvanceFileRwStatus {
@@ -392,7 +393,7 @@ const Client = struct {
             buffers = buffers[1..];
 
             if (buffers.len == 0) switch (rw.kind) {
-                .read => return .read_complete,
+                .read => return .read_completed,
                 .write => {
                     client.operation = .init(.{ .file_synchronize = .{
                         .file_handle = rw.handle,
@@ -557,7 +558,7 @@ fn tick(
             } else 0;
 
             switch (client.advanceFileRw(io, written_this_tick)) {
-                .read_complete => unreachable, // writing
+                .read_completed => unreachable, // writing
                 .rw_submitted => return .writing_sdk_bind,
                 .fsync_submitted => continue :state .syncing_sdk_bind,
             }
@@ -653,7 +654,7 @@ fn tick(
             } else 0;
 
             switch (client.advanceFileRw(io, read_n)) {
-                .read_complete => continue :state .sending_messages,
+                .read_completed => continue :state .sending_messages,
                 .rw_submitted => return .reading_gameplay_state_file,
                 .fsync_submitted => unreachable, // reading
             }
@@ -680,7 +681,7 @@ fn tick(
             } else 0;
 
             switch (client.advanceFileRw(io, write_n)) {
-                .read_complete => unreachable, // writing
+                .read_completed => unreachable, // writing
                 .rw_submitted => return .writing_gameplay_state_file,
                 .fsync_submitted => continue :state .syncing_gameplay_state_file,
             }
@@ -836,7 +837,7 @@ const HandleAccountLoginError = roze.net.Sink.Error || error{
     BadRequest,
 };
 
-const max_channel_name_len = 5;
+const channel_name_length_max = 5;
 
 fn handleAccountLogin(
     globals: *const Globals,
@@ -855,7 +856,7 @@ fn handleAccountLogin(
     const request = roze.protobuf.decode(roze.protobuf.gen.CS_Account_Login.Decoded, message.body) catch
         return error.BadRequest;
 
-    if (request.channel_name.len > max_channel_name_len)
+    if (request.channel_name.len > channel_name_length_max)
         return error.BadRequest;
 
     const channel_uid = std.fmt.parseInt(u64, request.channel_uid, 10) catch
@@ -863,7 +864,7 @@ fn handleAccountLogin(
 
     const get_or_create = try globals.sdk_bind.getOrCreate(channel_uid);
 
-    var userid_buf: [max_channel_name_len + 21]u8 = undefined;
+    var userid_buf: [channel_name_length_max + 21]u8 = undefined;
     const userid = mem.print(&userid_buf, "{s}_{d}", .{ request.channel_name, channel_uid }) catch
         unreachable;
 

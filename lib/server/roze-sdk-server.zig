@@ -653,7 +653,7 @@ fn serveRequest(
 
             const identified = &got_or_created.identified;
 
-            var uid_fmt: [roze.he_sdk.Account.Uid.string_length]u8 = undefined;
+            var uid_fmt: [roze.he_sdk.Account.Uid.print_buffer_size]u8 = undefined;
             const uid = identified.uid.print(&uid_fmt);
 
             try connection.respondRetEncrypted(roze.he_sdk.SafeLoginRet, &.{
@@ -706,7 +706,7 @@ fn serveRequest(
                 return .respond;
             };
 
-            var uid_fmt: [roze.he_sdk.Account.Uid.string_length]u8 = undefined;
+            var uid_fmt: [roze.he_sdk.Account.Uid.print_buffer_size]u8 = undefined;
             const uid = identified.uid.print(&uid_fmt);
 
             try connection.respondRetEncrypted(roze.he_sdk.FetchCurrentTokenRet, &.{

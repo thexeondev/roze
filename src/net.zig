@@ -5,7 +5,7 @@ const assert = std.debug.assert;
 const roze = @import("roze.zig");
 const protobuf = roze.protobuf;
 
-pub const message_len_max = std.math.maxInt(u16);
+pub const message_size_max = std.math.maxInt(u16);
 
 pub const Header = struct {
     pub const size = 11;

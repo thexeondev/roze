@@ -10,17 +10,33 @@ pub const tables = @import("assets/tables.zig");
 
 pub const NpcLists = struct {
     save_point_npc_ids: []const u64,
-    /// Guaranteed to have same length as `save_point_ids`
+    /// Guaranteed to have same length as `save_point_npc_ids`
     save_point_map_ids: []const u64,
+    /// Contains indexes into `tables.functional_npc`
+    /// Guaranteed to have same length as `save_point_npc_ids`
+    save_point_indexes: []const usize,
+
+    teleport_point_npc_ids: []const u64,
+    /// Guaranteed to have same length as `teleport_point_npc_ids`
+    teleport_point_map_ids: []const u64,
+    /// Contains indexes into `tables.functional_npc`
+    /// Guaranteed to have same length as `teleport_point_npc_ids`
+    teleport_point_indexes: []const usize,
 };
 
 pub const npc_lists: NpcLists = npc_lists: {
     var save_point_npc_ids: [tables.functional_npc.len]u64 = undefined;
     var save_point_map_ids: [tables.functional_npc.len]u64 = undefined;
+    var save_point_indexes: [tables.functional_npc.len]usize = undefined;
     var save_point_count: usize = 0;
 
+    var teleport_point_npc_ids: [tables.functional_npc.len]u64 = undefined;
+    var teleport_point_map_ids: [tables.functional_npc.len]u64 = undefined;
+    var teleport_point_indexes: [tables.functional_npc.len]usize = undefined;
+    var teleport_point_count: usize = 0;
+
     @setEvalBranchQuota(tables.functional_npc.len);
-    for (tables.functional_npc) |functional_npc| {
+    for (tables.functional_npc, 0..) |functional_npc, index| {
         const npc_type: tables.FunctionalNpcType = @fromBackingInt(functional_npc.type);
 
         switch (npc_type) {
@@ -29,6 +45,14 @@ pub const npc_lists: NpcLists = npc_lists: {
 
                 save_point_npc_ids[save_point_count] = functional_npc.id;
                 save_point_map_ids[save_point_count] = functional_npc.map_id;
+                save_point_indexes[save_point_count] = index;
+            },
+            .teleport_point => {
+                defer teleport_point_count += 1;
+
+                teleport_point_npc_ids[teleport_point_count] = functional_npc.id;
+                teleport_point_map_ids[teleport_point_count] = functional_npc.map_id;
+                teleport_point_indexes[teleport_point_count] = index;
             },
             else => {},
         }
@@ -36,10 +60,20 @@ pub const npc_lists: NpcLists = npc_lists: {
 
     const final_save_point_npc_ids = save_point_npc_ids[0..save_point_count].*;
     const final_save_point_map_ids = save_point_map_ids[0..save_point_count].*;
+    const final_save_point_indexes = save_point_indexes[0..save_point_count].*;
+
+    const final_teleport_point_npc_ids = teleport_point_npc_ids[0..teleport_point_count].*;
+    const final_teleport_point_map_ids = teleport_point_map_ids[0..teleport_point_count].*;
+    const final_teleport_point_indexes = teleport_point_indexes[0..teleport_point_count].*;
 
     break :npc_lists .{
         .save_point_npc_ids = &final_save_point_npc_ids,
         .save_point_map_ids = &final_save_point_map_ids,
+        .save_point_indexes = &final_save_point_indexes,
+
+        .teleport_point_npc_ids = &final_teleport_point_npc_ids,
+        .teleport_point_map_ids = &final_teleport_point_map_ids,
+        .teleport_point_indexes = &final_teleport_point_indexes,
     };
 };
 

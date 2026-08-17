@@ -188,3 +188,20 @@ pub fn packUnlockedSavepoints(
 
     return buffer[0..count];
 }
+
+pub const UnlockedTeleportsBuffer = [assets.npc_lists.teleport_point_npc_ids.len]u64;
+
+pub fn packUnlockedTeleportIdList(
+    buffer: *UnlockedTeleportsBuffer,
+    set: *const Gameplay.TeleportPointSet,
+) []const u64 {
+    var count: usize = 0;
+    var iterator = set.iterator(.{});
+
+    while (iterator.next()) |index| {
+        defer count += 1;
+        buffer[count] = assets.npc_lists.teleport_point_npc_ids[index];
+    }
+
+    return buffer[0..count];
+}

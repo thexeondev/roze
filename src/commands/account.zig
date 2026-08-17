@@ -42,6 +42,12 @@ pub fn CS_ENTER_MAP(scope: *Scope) Scope.Error!void {
         &scope.gameplay.save_point_unlock,
     );
 
+    var unlocked_teleport_id_list_buffer: packers.UnlockedTeleportsBuffer = undefined;
+    const unlocked_teleport_id_list = packers.packUnlockedTeleportIdList(
+        &unlocked_teleport_id_list_buffer,
+        &scope.gameplay.teleport_point_unlock,
+    );
+
     const readiness: protobuf.gen.SC_Map_Ready_Ntf = .{
         .map_id = scope.gameplay.map.id,
         .last_logout_location = .init,
@@ -49,6 +55,7 @@ pub fn CS_ENTER_MAP(scope: *Scope) Scope.Error!void {
         .rotation = .{ .x = 0, .y = 0, .z = 0 },
         .current_savepoint = assets.npc_lists.save_point_npc_ids[scope.gameplay.map.save_point_index],
         .unlocked_savepoints = unlocked_savepoints,
+        .unlocked_teleport_id_list = unlocked_teleport_id_list,
     };
 
     try scope.sink.send(.SC_MAP_READY_NTF, readiness);
@@ -111,6 +118,12 @@ pub fn CS_FIN_ENTER_MAP(scope: *Scope) Scope.Error!void {
         &scope.gameplay.save_point_unlock,
     );
 
+    var unlocked_teleport_id_list_buffer: packers.UnlockedTeleportsBuffer = undefined;
+    const unlocked_teleport_id_list = packers.packUnlockedTeleportIdList(
+        &unlocked_teleport_id_list_buffer,
+        &scope.gameplay.teleport_point_unlock,
+    );
+
     const response: protobuf.gen.SC_Fin_Enter_Map = .{
         .role_id = request.role_id,
         .map_id = request.map_id,
@@ -136,8 +149,8 @@ pub fn CS_FIN_ENTER_MAP(scope: *Scope) Scope.Error!void {
         .born_pos_type = .ENM_BORN_POSITION,
         .task_data = .init,
         .world_map_id = scope.gameplay.map.id,
-        .unlocked_teleport_id_list = assets.npc_lists.teleport_point_npc_ids,
         .unlocked_savepoints = unlocked_savepoints,
+        .unlocked_teleport_id_list = unlocked_teleport_id_list,
     };
 
     try scope.sink.send(.SC_FIN_ENTER_MAP, response);

@@ -64,6 +64,7 @@ pub fn CS_CHARACTER_UPDATE_TEAM(scope: *Scope) Scope.Error!void {
         );
     };
 
+    var selected_characters: Gameplay.Character.Set = .empty;
     var new_members: Gameplay.Character.Team.Members = @splat(.none);
     var first_used_slot_maybe: ?Gameplay.Character.Team.Slot = null;
     var count_in_member_data: u32 = 0;
@@ -111,6 +112,15 @@ pub fn CS_CHARACTER_UPDATE_TEAM(scope: *Scope) Scope.Error!void {
             );
         }
 
+        if (selected_characters.isSet(@backingInt(character_index))) {
+            log.debug("duplicated character with inst id {d}", .{member_in.inst_id});
+            return try scope.sink.send(
+                .SC_CHARACTER_UPDATE_TEAM,
+                @as(protobuf.gen.SC_Character_Update_Team, .{ .result = -1 }),
+            );
+        }
+
+        selected_characters.set(@backingInt(character_index));
         new_members[@backingInt(slot)] = .wrap(character_index);
 
         if (first_used_slot_maybe == null)

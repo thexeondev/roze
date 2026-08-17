@@ -32,8 +32,9 @@ pub const Map = extern struct {
 
 pub const Character = struct {
     pub const count = assets.tables.character.len;
+    pub const Set = IntegerBitSet(Character.count);
 
-    unlocked: IntegerBitSet(Character.count),
+    unlocked: Character.Set,
     bits: [Character.count]Bits,
     motives: [Character.count]MotiveUniqueId.Optional,
     snapshots: [Character.count]Snapshot.Optional,

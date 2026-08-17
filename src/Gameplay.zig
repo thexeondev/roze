@@ -11,14 +11,22 @@ const assets = roze.assets;
 const log = std.log.scoped(.@"roze::Gameplay");
 
 map: Map,
+save_point_unlock: SavePointSet,
 character: Character,
 character_team: Character.Team,
 
 pub const init: Gameplay = .{
     .map = .init,
+    .save_point_unlock = save_point_unlock: {
+        var save_point_unlock: SavePointSet = .empty;
+        save_point_unlock.set(Map.starting_save_point_index);
+        break :save_point_unlock save_point_unlock;
+    },
     .character = .init,
     .character_team = .init,
 };
+
+pub const SavePointSet = IntegerBitSet(assets.npc_lists.save_point_npc_ids.len);
 
 pub const Map = extern struct {
     id: u64,
@@ -384,14 +392,14 @@ pub const Header = extern struct {
 
 pub fn StateVector(comptime mut: Io.Mutability) type {
     // Increase this number when adding a new field.
-    return [8]Io.Buffer(mut);
+    return [9]Io.Buffer(mut);
 }
 
 pub fn writableVector(gameplay: *Gameplay, header_buffer: *Header, bufs: *StateVector(.@"var")) void {
     // Increase this number when adding a new field.
     // Don't be tempted to make it a constant elsewhere,
     // as this has to be in-sync with the code below.
-    comptime assert(bufs.len == 8);
+    comptime assert(bufs.len == 9);
 
     bufs[0].init(@ptrCast(header_buffer));
     bufs[1].init(@ptrCast(&gameplay.map));
@@ -401,13 +409,14 @@ pub fn writableVector(gameplay: *Gameplay, header_buffer: *Header, bufs: *StateV
     bufs[5].init(@ptrCast(&gameplay.character.snapshots));
     bufs[6].init(@ptrCast(&gameplay.character_team.members));
     bufs[7].init(@ptrCast(&gameplay.character_team.bits));
+    bufs[8].init(@ptrCast(&gameplay.save_point_unlock));
 }
 
 pub fn readableVector(gameplay: *Gameplay, header_buffer: *Header, bufs: *StateVector(.@"const")) void {
     // Increase this number when adding a new field.
     // Don't be tempted to make it a constant elsewhere,
     // as this has to be in-sync with the code below.
-    comptime assert(bufs.len == 8);
+    comptime assert(bufs.len == 9);
 
     header_buffer.* = .{ .state_version = Header.version };
     bufs[0].init(@ptrCast(header_buffer));
@@ -418,4 +427,5 @@ pub fn readableVector(gameplay: *Gameplay, header_buffer: *Header, bufs: *StateV
     bufs[5].init(@ptrCast(&gameplay.character.snapshots));
     bufs[6].init(@ptrCast(&gameplay.character_team.members));
     bufs[7].init(@ptrCast(&gameplay.character_team.bits));
+    bufs[8].init(@ptrCast(&gameplay.save_point_unlock));
 }

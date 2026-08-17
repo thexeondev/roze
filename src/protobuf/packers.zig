@@ -171,3 +171,20 @@ pub fn packTeamData(
         .name = "reversedrooms",
     };
 }
+
+pub const UnlockedSavepointsBuffer = [assets.npc_lists.save_point_npc_ids.len]u64;
+
+pub fn packUnlockedSavepoints(
+    buffer: *UnlockedSavepointsBuffer,
+    set: *const Gameplay.SavePointSet,
+) []const u64 {
+    var count: usize = 0;
+    var iterator = set.iterator(.{});
+
+    while (iterator.next()) |index| {
+        defer count += 1;
+        buffer[count] = assets.npc_lists.save_point_npc_ids[index];
+    }
+
+    return buffer[0..count];
+}

@@ -46,7 +46,7 @@ pub fn execute(scope: *roze.Scope) roze.Scope.Error!void {
     const id = scope.command.id;
 
     if (id < 0 or id > handlers.len)
-        log.warn("command id out of range: {d}", .{id});
+        return log.warn("command id out of range: {d}", .{id});
 
     return if (handlers[id]) |handler| {
         try handler(scope);

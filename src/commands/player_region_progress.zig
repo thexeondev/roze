@@ -1,5 +1,4 @@
 const std = @import("std");
-const assert = std.debug.assert;
 const ArrayList = std.ArrayList;
 
 const roze = @import("../roze.zig");

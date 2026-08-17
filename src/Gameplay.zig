@@ -22,11 +22,48 @@ pub const init: Gameplay = .{
 pub const Map = extern struct {
     id: u64,
     last_location: [3]i32,
-    padding: i32 = 0,
+    bits: Bits,
 
     pub const init: Map = .{
         .id = 100001002004,
         .last_location = .{ 40462, 104829, 32967 },
+        .bits = .{
+            .weather = .sunny,
+            .time = @fromBackingInt(360),
+        },
+    };
+
+    pub const Bits = packed struct(u32) {
+        weather: Weather,
+        time: Time,
+        _: u19 = 0,
+    };
+
+    pub const Weather = enum(u2) {
+        pub const count = @typeInfo(Map.Weather).@"enum".field_names.len;
+
+        sunny = 0,
+        rainy = 1,
+        after_rain = 2,
+        foggy = 3,
+
+        pub fn toWeatherTypeInt(weather: Map.Weather) u32 {
+            return @as(u32, @backingInt(weather)) + 1;
+        }
+
+        pub fn fromWeatherTypeInt(int: u32) ?Map.Weather {
+            if (int == 0) return null;
+            if (int > Map.Weather.count) return null;
+
+            const casted = std.math.cast(u2, int - 1) orelse return null;
+            return @fromBackingInt(casted);
+        }
+    };
+
+    pub const Time = enum(u11) {
+        pub const base = 1440;
+
+        _,
     };
 };
 

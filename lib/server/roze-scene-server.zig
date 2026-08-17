@@ -430,7 +430,6 @@ fn tick(
     client: *Client,
     io_result_maybe: *Maybe(Io.Operation.Result),
 ) !Client.State {
-    log.debug("tick({t})", .{client.state});
     const current_time: Io.Timespec = .collect(io);
 
     state: switch (client.state) {

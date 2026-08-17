@@ -152,7 +152,9 @@ fn configureAssets(
     b: *Build,
     options: struct { roze: *Build.Module },
 ) void {
-    b.dependOnDirectory(b.path("assets/tables/"));
+    // https://codeberg.org/ziglang/zig/src/commit/6716bf52e70791104caf057af3fece674f0ac3dd/lib/compiler/Maker.zig#L1514
+    // b.dependOnDirectory(b.path("assets/tables/"));
+    b.graph.poisonCache();
 
     const tables_dir = b.root.openDir(b.graph.io, "assets/tables/", .{ .iterate = true }) catch |err|
         std.debug.panic("failed to open tables directory: {t}", .{err});

@@ -25,6 +25,10 @@ pub const Map = extern struct {
     save_point_index: u32,
     bits: Bits,
 
+    comptime {
+        assert(std.meta.hasUniqueRepresentation(Map));
+    }
+
     pub const starting_save_point_id = 12020019;
 
     pub const starting_save_point_index: u32 = @intCast(mem.findScalar(
@@ -370,6 +374,10 @@ pub const Attr = enum(i32) {
 
 pub const Header = extern struct {
     const version: u32 = 1;
+
+    comptime {
+        assert(std.meta.hasUniqueRepresentation(Header));
+    }
 
     state_version: u32,
 };

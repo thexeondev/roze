@@ -64,3 +64,35 @@ pub fn CS_SAVEPOINT_UNLOCK(scope: *Scope) Scope.Error!void {
     scope.gameplay.save_point_unlock.set(save_point_index);
     scope.store.requestGameplayStateSave();
 }
+
+pub fn CS_SAVEPOINT_SYNC(scope: *Scope) Scope.Error!void {
+    const log = std.log.scoped(.@"roze::commands::savepoint_sync");
+
+    const request = try scope.command.take(protobuf.gen.CS_SavePoint_Sync.Decoded);
+
+    const save_point_index = assets.npc_lists.getSavePointIndexByNpcId(request.savepoint_id) orelse {
+        log.debug("savepoint with id {d} doesn't exist", .{request.savepoint_id});
+        return try scope.sink.send(.SC_SAVEPOINT_SYNC, @as(protobuf.gen.SC_SavePoint_Sync, .{
+            .result = -1,
+        }));
+    };
+
+    if (!scope.gameplay.save_point_unlock.isSet(save_point_index)) {
+        log.debug("savepoint with id {d} is not unlocked", .{request.savepoint_id});
+        return try scope.sink.send(.SC_SAVEPOINT_SYNC, @as(protobuf.gen.SC_SavePoint_Sync, .{
+            .result = -1,
+        }));
+    }
+
+    try scope.sink.send(.SC_SAVEPOINT_SYNC, @as(protobuf.gen.SC_SavePoint_Sync, .{
+        .result = 0,
+        .savepoint_id = request.savepoint_id,
+    }));
+
+    if (scope.gameplay.map.save_point_index == save_point_index) return;
+
+    errdefer comptime unreachable; // Ensure that it's safe to request save.
+
+    scope.gameplay.map.save_point_index = save_point_index;
+    scope.store.requestGameplayStateSave();
+}
